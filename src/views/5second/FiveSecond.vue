@@ -89,7 +89,7 @@ const loadGameState = () => {
   if (savedState) {
     const gameState = JSON.parse(savedState)
     currentPlayer.value = gameState.currentPlayer
-    five_second_users.value = gameState.five_second_users
+    five_second_users.value = gameState.five_second_users.map(user => ({ ...user, score: user.score || 0 }));
   }
 }
 
@@ -100,8 +100,8 @@ const clearGameState = () => {
 onMounted(() => {
   const roomId = route.params.roomId
   // Load players from localStorage
-  const players = JSON.parse(localStorage.getItem('five_second_users')) || []
-  five_second_users.value = players.map(player => ({ ...player, score: 0 }))
+  const savedUsers = JSON.parse(localStorage.getItem('five_second_users')) || []
+  five_second_users.value = savedUsers.map(user => ({ ...user, score: user.score || 0 }))
   loadGameState()
   if (!currentQuestion.value) {
     currentQuestion.value = questions[Math.floor(Math.random() * questions.length)]
