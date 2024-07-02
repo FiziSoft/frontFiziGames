@@ -1,137 +1,138 @@
-<style>
-
-.delete-button {
-            background-color: transparent; /* Красный цвет кнопки */
-            border: none;
-            color: white;
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s;
-        }
-
-        .delete-button:hover {
-            background-color: #ff3333; /* Более темный красный при наведении */
-        }
-.containerFormCreate_tod {
-  width: 450px;
-  display: flex;
-  color:aliceblue;
-}
-        
-</style>
-
-
-
-
-
 <template>
-    <GameLayout nameGame="Правда або Дія">
+  <GameLayout nameGame="5 секунд">
     <br>
     <div class="containerFormCreate">    
-    <form @submit.prevent="addNewPlayer" class="formCreate">
+      <form @submit.prevent="addNewPlayer" class="formCreate">
 
-      <div class="containerFormCreate_tod" v-for="(user, i) in five_second_users" :key="i">
-        
+        <div v-if="hasSavedData" class="div_continue">
+      <button @click="continueGame" class="btn-grad">Продовжити стару гру</button>
+    </div>
 
-        <div class="formElement_tod">
-          <label>{{ five_second_users.name }}</label>
-          <input type="text" @click="onFocus" v-model="user.name">
-        </div>  
-
-        <div></div>
-        
-        <div class="gender-selection formElement_tod">        
-      
-        
-
-          <button @click="five_second_users.splice(i,1)" class="delete-button">
-            <i class="fas fa-trash-alt"></i> 
-          </button>
-       
+        <div class="containerFormCreate_5sec" v-for="(user, i) in five_second_users" :key="i">
+          <div class="formElement_tod">
+            <input type="text" @click="onFocus" v-model="user.name">
+          </div>
+          <div class="gender-selection formElement_tod">        
+            <button @click="removeUser(i)" class="delete-button">
+              <i class="fas fa-trash-alt"></i> 
+            </button>
+          </div>
         </div>
+        
+        <button @click="addUser" class="btn-grad">Додати гравця</button>
+        <button type="submit" class="btn-grad" v-on:click="startGame">Почати гру</button>
+      </form>
+    </div>
 
+   
 
+    <ShareButton @share="handleShare" />
 
-      </div>
-      
-      
-      <button @click="addUser" class="btn-grad"> Додати гравця </button>
-      <button type="submit" class="btn-grad" v-on:click="startGame"> Почати гру  </button>
-
-
-     
-
-    </form>
-  </div>
-
-  <ShareButton @share="handleShare" />
-
-      <DIV>
-        <ul>
-          <li v-for="(i, key) in users" :key="key">{{ i.name }} {{ i.isBoy }} {{ key }}</li>
-        </ul>
-      </DIV>
-
-
-
-
-    </GameLayout>
-</template>          
-
+    <div>
+      <ul>
+        <li v-for="(i, key) in users" :key="key">{{ i.name }} {{ i.isBoy }} {{ key }}</li>
+      </ul>
+    </div>
+  </GameLayout>
+</template>
 
 <script setup>
 import GameLayout from '../GameLayout.vue';
-import {onBeforeMount, ref, reactive} from 'vue'
-import {router} from "../../router.js"
-  
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router';
- 
-const newPhone = ref('')
-const five_second_users = ref([
-  {
-  name: "Ваше ім'я",
-  
-  },
- 
-])
 
-try{
-const cur_players = JSON.parse(localStorage.five_second_users)
-five_second_users.value = cur_players
-}
-catch{
-  alert('ddd')
-}
+const router = useRouter();
+const route = useRoute();
 
-let player = 
-  {
-    name: '',
-    
+const five_second_users = ref([]);
+const hasSavedData = ref(false);
+
+onMounted(() => {
+  // Проверяем наличие сохраненных данных
+  const savedData = JSON.parse(localStorage.getItem('five_second_game_state'));
+  if (savedData) {
+    hasSavedData.value = true;
+    five_second_users.value = savedData.five_second_users;
+  } else {
+    five_second_users.value = [{ name: "Ваше ім'я" }];
   }
+});
 
-  let countPlayers = 0  
-const addUser = () =>{
-  if (countPlayers % 2 == 0){
-    five_second_users.value.push({name: "І'мя", isBoy: true})
-    countPlayers = ++countPlayers 
-  }
- else{five_second_users.value.push({name: "І'мя", isBoy: false})
-  countPlayers = ++countPlayers} 
- 
-}
+const addUser = () => {
+  five_second_users.value.push({ name: "І'мя" });
+};
+
+const removeUser = (index) => {
+  five_second_users.value.splice(index, 1);
+};
 
 const onFocus = (e) => e.target.select();
 
 const startGame = () => {
-  const roomId = Math.random().toString(36).substr(2, 9); // Генерация уникального ID комнаты
+  // Генерация уникального ID комнаты
+  const roomId = Math.random().toString(36).substr(2, 9);
   localStorage.setItem('five_second_users', JSON.stringify(five_second_users.value));
+  // Очищаем старые данные игры
+  localStorage.removeItem('five_second_game_state');
   router.push({ name: 'five-second-room', params: { roomId } });
-  console.log(five_second_users.value);
 };
-  
+
+const continueGame = () => {
+  const savedData = JSON.parse(localStorage.getItem('five_second_game_state'));
+  if (savedData) {
+    router.push({ name: 'five-second-room', params: { roomId: savedData.roomId } });
+  }
+};
 </script>
+
+<style scoped>
+
+.div_continue {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  font-size: 18px;
+  height: 50px;
+}
+
+
+.delete-button {
+  background-color: transparent;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.delete-button:hover {
+  background-color: #ff3333;
+}
+
+.containerFormCreate_5sec {
+  width: 450px;
+  display: flex;
+  color: aliceblue;
+ justify-content: center;
+ align-self:flex-start;
+}
+
+
+
+.formCreate {
+  display: flex;
+  flex-direction: column;
+}
+
+.gender-selection {
+  display: flex;
+  align-items: center;
+}
+</style>

@@ -11,7 +11,7 @@
     </div>
     <div class="controls" v-if="!gameOver">
       <button class="btn-grad" @click="startGame" :disabled="isRunning">Start</button>
-      <p v-if="isRunning">Time left: {{ timeLeft }}s</p>
+      <p v-if="isRunning" class="timer">{{ timeLeft }}</p>
     </div>
     <div v-if="gameOver" class="modal">
       <button class="btn-grad" @click="playerAnswered(true)">Смог ответить</button>
@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import questions from './questions.json'
 
@@ -65,6 +65,7 @@ const nextQuestion = () => {
   currentQuestion.value = questions[Math.floor(Math.random() * questions.length)]
   gameOver.value = false
   currentPlayer.value = (currentPlayer.value + 1) % five_second_users.value.length
+  saveGameState()
 }
 
 const playerAnswered = (answeredCorrectly) => {
@@ -74,14 +75,47 @@ const playerAnswered = (answeredCorrectly) => {
   nextQuestion()
 }
 
+const saveGameState = () => {
+  const gameState = {
+    currentPlayer: currentPlayer.value,
+    five_second_users: five_second_users.value,
+    roomId: route.params.roomId
+  }
+  localStorage.setItem('five_second_game_state', JSON.stringify(gameState))
+}
+
+const loadGameState = () => {
+  const savedState = localStorage.getItem('five_second_game_state')
+  if (savedState) {
+    const gameState = JSON.parse(savedState)
+    currentPlayer.value = gameState.currentPlayer
+    five_second_users.value = gameState.five_second_users
+  }
+}
+
+const clearGameState = () => {
+  localStorage.removeItem('five_second_game_state')
+}
+
 onMounted(() => {
   const roomId = route.params.roomId
   // Load players from localStorage
   const players = JSON.parse(localStorage.getItem('five_second_users')) || []
   five_second_users.value = players.map(player => ({ ...player, score: 0 }))
+  loadGameState()
   if (!currentQuestion.value) {
     currentQuestion.value = questions[Math.floor(Math.random() * questions.length)]
   }
+})
+
+watch(five_second_users, saveGameState, { deep: true })
+watch(currentPlayer, saveGameState)
+
+router.beforeEach((to, from, next) => {
+  if (to.name === 'five-second-room' && from.name !== 'five-second-room') {
+    clearGameState()
+  }
+  next()
 })
 </script>
 
@@ -138,12 +172,19 @@ onMounted(() => {
   z-index: 1000;
 }
 
+.timer {
+  font-weight: 100;
+  font-size: 40px;
+  color: bisque;
+}
+
 .player-list {
   margin-bottom: 20px;
 }
 
 .player-list div {
   margin: 5px 0;
+  color: white; /* Устанавливаем белый цвет текста для всех игроков */
 }
 
 .current-player {
@@ -151,5 +192,6 @@ onMounted(() => {
   background-color: #d3d3d3;
   padding: 5px;
   border-radius: 5px;
+  color: black !important; /* Устанавливаем черный цвет текста для текущего игрока */
 }
 </style>
