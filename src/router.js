@@ -13,6 +13,8 @@ import DataView from './components/DataView.vue'
 import BattleSee from './views/BattleSee/BattleSee'
 import BattleSeeCreateRoom from './views/BattleSee/BattleSeeCreateRoom'
 import TruthDareCrud from './views/TOD/TruthDareCrud'
+import FiveSecond from './views/5second/FiveSecond.vue'
+import FiveSecondCreateRoom from './views/5second/FiveSecondCreateRoom.vue'
 
 const routes = [
     {
@@ -92,6 +94,17 @@ const routes = [
         path: '/crud',
         name: 'TruthDareCrud',
         component: TruthDareCrud,
+    }
+    ,
+    {
+        path: '/five-second',
+        name: 'five-second',
+        component: FiveSecondCreateRoom,
+    },
+    {
+        path: '/five-second/:roomId',
+        name: 'five-second-room',
+        component: FiveSecond,
     }
 ]
 

@@ -13,7 +13,7 @@ const app = createApp(App)
 
 app.use(router)
 app.use(store)
-// app.use(VueNativeSock, 'ws://localhost:8001/ws', {
+// app.use(VueNativeSock, 'ws://localhost:5000/ws', {
 //   format: 'json',
 //   reconnection: true,
 //   reconnectionAttempts: 5,

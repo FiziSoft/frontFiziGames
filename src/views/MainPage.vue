@@ -28,8 +28,13 @@
             <i class="fa-solid fa-hat-wizard"></i>
             <div>BattleSee</div></h1></a>
        </div>
+
+       <div  class="name_game">
+          <a :href="network_url+'/five-second' "><h1 class="">
+            <i class="fa-solid fa-hat-wizard"></i>
+            <div>5 seond</div></h1></a>
+       </div>
    
-       BattleSee
    
    
    <br>

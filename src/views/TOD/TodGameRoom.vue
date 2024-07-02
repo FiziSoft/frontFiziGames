@@ -50,7 +50,7 @@
           <button v-if="isVisible('button1')" ref="button1" v-show="truth_div===true" @click="go_truths(), setOnView()" class="btn-grad">Правда</button>
       </transition>
       <transition name="fade">
-        <button v-if="isVisible('button2')" ref="button2"  v-show="dares_div===true" @click="go_dares()" class="btn-grad">Дія</button>
+        <button v-if="isVisible('button2')" ref="button2"  v-show="dares_div===true" @click="go_dares(), setOnView()" class="btn-grad">Дія</button>
       </transition>
       
         <!-- <button @click="callRandomFunction" class="btn-grad">Випадково</button> -->
