@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+# Build the Vue.js application
+npm run build
+
+# Start the Express server in the background
+node server.js &
+
+# Start Nginx
+nginx -c $PWD/nginx/nginx.conf -g 'daemon off;'
