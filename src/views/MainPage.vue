@@ -51,7 +51,7 @@
    let ti_me = Date();
    
    // const network_url = ref('http://192.168.50.58:8080')
-   const network_url = 'http://localhost:8080'
+   const network_url = 'https://salty-crag-94803-5b1ef9ad0209.herokuapp.com'
    
    
    
