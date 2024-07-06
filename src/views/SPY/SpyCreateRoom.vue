@@ -32,12 +32,10 @@
 import axios from "axios";
 import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { v4 as uuidv4 } from 'uuid';
 import GameLayout from "../GameLayout.vue";
 import Dropdown_my from "/src/components/Dropdown_my.vue";
-import TimerFizi from '@/components/TimerFizi.vue';
-import TelegramShareButton from '@/components/TelegramShareButton.vue';
-import network_url from "@/views/MainPage.vue"
-
+import network_url from "@/views/MainPage.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -53,11 +51,11 @@ const cur_world = ref('');
 const room = reactive({ name: '', players: [], theme: [] });
 const loading = ref(true);
 const qrCodeValue = ref('');
-const url_serv = "127.0.0.1:7000"
+const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com";
 
 const getThemes = async () => {
   try {
-    const res = await axios.get(`http://${url_serv}/getThemes`);
+    const res = await axios.get(`https://${url_serv}/getThemes`);
     themes.value = res.data;
   } catch (error) {
     console.log('Error fetching themes:', error);
@@ -72,63 +70,10 @@ const isButtonActive = computed(() => {
   return playerName.value.trim().length > 0 && numPlayers.value && time_game.value && theme_str.value;
 });
 
-const checkRoomExists = async (roomId) => {
-  try {
-    const response = await axios.get(`http://${url_serv}/rooms/${roomId}`);
-    return response.status === 200 && response.data;
-  } catch (error) {
-    if (error.response && error.response.status === 404) {
-      errorMessage.value = "Комната не существует. Пожалуйста, проверьте ID комнаты и попробуйте снова.";
-    } else {
-      console.error('Error checking room:', error);
-      errorMessage.value = "Произошла ошибка. Пожалуйста, попробуйте снова позже.";
-    }
-    return false;
-  }
-};
-
-const connectToWebSocket = (roomId, playerName, playerHash) => {
-  const websocket = new WebSocket(`ws://${url_serv}/start/${roomId}?name=${encodeURIComponent(playerName)}&player_hash=${playerHash || ''}`);
-
-  websocket.onopen = () => {
-    console.log('WebSocket connected');
-    loading.value = false;
-  };
-
-  websocket.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-
-    if (message.hash) {
-      localStorage.setItem('spyPlayerHash', message.hash);
-    }
-
-    const eventType = message.event;
-    if (eventType === 'GameCanBeStart') {
-      gameState.value = 'GameCanBeStart';
-      cur_world.value = message.world_spy;
-      time_game.value = parseInt(message.room.time_game) * 60;
-    } else if (eventType === 'YouAreSpy') {
-      gameState.value = 'GameCanBeStart';
-      time_game.value = parseInt(message.room.time_game) * 60;
-      isSpy.value = true;
-    }
-
-    Object.assign(room, message.room);
-  };
-
-  websocket.onclose = (event) => {
-    console.log('WebSocket closed:', event);
-  };
-
-  websocket.onerror = (error) => {
-    console.error('WebSocket error:', error);
-  };
-};
-
 const sendCreateRoomRequest = async () => {
   try {
     const roomName = playerName.value;
-    const encodedThemeStr = encodeURIComponent(theme_str.value); // Кодируем строку
+    const encodedThemeStr = encodeURIComponent(theme_str.value);
 
     console.log('Creating room with params:', {
       name: roomName,
@@ -138,14 +83,14 @@ const sendCreateRoomRequest = async () => {
     });
 
     const response = await axios.post(
-      `http://${url_serv}/create_room`,
+      `https://${url_serv}/create_room`,
       null,
       {
         params: {
           name: roomName,
           req_players: numPlayers.value,
           time_game: time_game.value,
-          theme_str: encodedThemeStr // Используем закодированную строку
+          theme_str: encodedThemeStr
         },
       }
     );
@@ -154,37 +99,19 @@ const sendCreateRoomRequest = async () => {
     console.log('Room created with ID:', roomId);
     localStorage.setItem('spyPlayerName', playerName.value);
     localStorage.setItem('spyRoomId', roomId);
+
+    if (!localStorage.getItem('spyPlayerHash')) {
+      localStorage.setItem('spyPlayerHash', uuidv4());
+    }
+
     router.push({ name: 'spyGameRoom', params: { id: roomId } }).then(() => {
-      window.location.reload(); // Перезагружаем страницу для повторного подключения
+      window.location.reload();
     });
   } catch (error) {
     console.error('Error creating room:', error);
     errorMessage.value = "Произошла ошибка при создании комнаты. Пожалуйста, попробуйте снова.";
   }
 };
-
-
-onMounted(async () => {
-  const playerNameFromStorage = localStorage.getItem('spyPlayerName');
-  const roomId = route.params.id;
-  const playerHash = localStorage.getItem('spyPlayerHash');
-  localStorage.removeItem('spyTimerTimeLeft');
-  localStorage.removeItem('spyIsRunning');
-
-
-  if (!playerNameFromStorage || !roomId) {
-    return;
-  }
-
-  const exists = await checkRoomExists(roomId);
-  if (exists) {
-    playerName.value = playerNameFromStorage;
-    qrCodeValue.value = `${network_url}/spy/room/${roomId}`;
-    connectToWebSocket(roomId, playerNameFromStorage, playerHash);
-  } else {
-    router.push('/');
-  }
-});
 </script>
 
 <style scoped>

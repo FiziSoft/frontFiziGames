@@ -21,6 +21,7 @@
 import axios from "axios";
 import { ref, computed } from "vue";
 import { useRouter, useRoute } from 'vue-router';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = useRouter();
 const route = useRoute();
@@ -30,21 +31,35 @@ const isButtonActive = computed(() => {
   return playerName.value.trim().length > 0;
 });
 
+
+const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com";
+
+
 const redirectToRoomPage = async () => {
   try {
     const roomId = route.params.id;
     const encodedName = encodeURIComponent(playerName.value);
     localStorage.setItem('spyPlayerName', playerName.value);
 
+    if (!localStorage.getItem('spyPlayerHash')) {
+      localStorage.setItem('spyPlayerHash', uuidv4());
+    }
+
+    const playerHash = localStorage.getItem('spyPlayerHash');
+
     // Проверяем, существует ли комната
-    const response = await axios.get(`http://127.0.0.1:7000/rooms/${roomId}`);
+    const response = await axios.get(`https://${url_serv}/rooms/${roomId}`);
     if (response.status === 200 && response.data) {
-      // Комната существует, подключаемся к ней
+      alert("ok")
       localStorage.setItem('spyRoomId', roomId);
-      router.push({ name: 'spyGameRoom', params: { id: roomId } });
+      router.push({ name: 'spyGameRoom', params: { id: roomId, playerHash } }).then(() => {
+        window.location.reload(); // Обновляем страницу один раз после перенаправления
+      });
     }
   } catch (error) {
     if (error.response && error.response.status === 404) {
+      alert("ne ok")
+
       errorMessage.value = "Комната не существует. Пожалуйста, проверьте ID комнаты и попробуйте снова.";
     } else {
       console.error('Error checking room:', error);

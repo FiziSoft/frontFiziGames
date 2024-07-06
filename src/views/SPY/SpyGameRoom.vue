@@ -10,11 +10,11 @@
       <!-- <tr v-for="i in connectedPlayers" :key="i.id" class="formElement">
               <td class="tableElement">{{ i.name }}</td>
             </tr> -->
-    <div>
+    <!-- <div>
       <ul v-if="true">
         <li v-for="(player, key) in connectedPlayers" :key="key">{{ player.name }}</li> 
       </ul>
-    </div>
+    </div> -->
 
 
     <div v-if="loading">
@@ -109,7 +109,7 @@ const route = useRoute();
 const router = useRouter();
 const room = reactive({ name: '', players: [], theme: [] });
 const qrCodeValue = ref('');
-const url_serv = "127.0.0.1:7000"
+const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com"
 
 const connectToWebSocket = (roomId, playerName, playerHash) => {
   const websocket = new WebSocket(`ws://${url_serv}/start/${roomId}?name=${encodeURIComponent(playerName)}&player_hash=${playerHash || ''}`);
@@ -165,7 +165,7 @@ const connectToWebSocket = (roomId, playerName, playerHash) => {
 
 const checkRoomExists = async (roomId) => {
   try {
-    const response = await axios.get(`http://${url_serv}/rooms/${roomId}`);
+    const response = await axios.get(`https://${url_serv}/rooms/${roomId}`);
     return response.status === 200 && response.data;
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -199,7 +199,7 @@ const isButtonActive = computed(() => {
 const voteForPlayer = async (playerId) => {
   const roomId = route.params.id;
   try {
-    await axios.post(`http://127.0.0.1:7000/vote`, null, {
+    await axios.post(`https://${url_serv}/vote`, null, {
       params: { room_id: roomId, player_id: playerId }
     });
   } catch (error) {
@@ -212,7 +212,7 @@ const voteForPlayer = async (playerId) => {
 const guessWord = async (word) => {
   const roomId = route.params.id;
   try {
-    await axios.post(`http://127.0.0.1:7000/guess`, null, {
+    await axios.post(`https://${url_serv}/guess`, null, {
       params: { room_id: roomId, word: word }
     });
   } catch (error) {
