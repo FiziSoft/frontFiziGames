@@ -109,7 +109,7 @@ const cur_players = JSON.parse(localStorage.players)
 users.value = cur_players
 }
 catch{
-  alert('ddd')
+ console.log("перший вхід")
 }
 
 let player = 
