@@ -1,77 +1,46 @@
 <template>
-
-<div class="mainContainer">
-    
-
-    
-    <div class="mainHeader ">
-        <div>{{nameGame}}</div>
+    <div class="mainContainer">
+      <div class="mainHeader">
+        <div>{{ nameGame }}</div>
+      </div>
+      <div class="mainBody">
+        <slot></slot>
+      </div>
+      <FooterComponent />
     </div>
-    <div class="mainBody">
-    <slot></slot>
-    </div>
-    <div class="mainFooter">
-        <span class="menuFizi">FiziGames </span>
-    </div>
-</div>
-
-
-</template>    
-
-<script setup>
-import { toRefs, defineProps } from 'vue';
-
-const onClickLeft = () => history.back();
-
-import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-
-
-const props = defineProps({
-    nameGame:{
-        type: String,
-        required: true,
+  </template>
+  
+  <script setup>
+  import { defineProps } from 'vue'
+  import FooterComponent from '@/components/FooterComponent.vue'
+  
+  const props = defineProps({
+    nameGame: {
+      type: String,
+      required: true,
     },
-});
-</script>
-
-<style lang="sass" scoped>
-
-
-.mainHeader
+  })
+  </script>
+  
+  <style lang="sass" scoped>
+  .mainContainer
+    display: flex
+    flex-direction: column
+    min-height: 100vh
+  
+  .mainHeader
     width: 100%
     display: flex
     justify-content: center
-
     text-align: center
     font-size: 40px
-    font-weight: 100 
+    font-weight: 100
     height: 90px
-
-.mainBody
-    
+    padding: 10px
+  
+  .mainBody
     margin: 10px
     width: 100%
-
-    flex: 1 1 auto
-
-
-.mainFooter
-    display: flex   
-    justify-content: center
-    align-items: center
-
-
-    width: 100%
-
-    padding: 30px
-    height: 50px
-    background: #434444
-    
-
-   
-
-</style>
+    flex: 1
+  </style>
+  

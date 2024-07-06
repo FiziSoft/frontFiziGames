@@ -109,23 +109,6 @@ const continueGame = () => {
 margin-bottom: 60px;
 }
 
-.delete-button {
-  background-color: transparent;
-  border: none;
-  color: white;
-  padding: 10px 15px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 5px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s;
-}
-
-.delete-button:hover {
-  background-color: #ff3333;
-}
 
 .containerFormCreate_5sec {
   width: 450px;

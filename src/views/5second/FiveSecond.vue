@@ -1,29 +1,32 @@
 <template>
-  <div class="game-container">
-    <div class="player-list">
-      <div v-for="(player, index) in five_second_users" :key="index" :class="{'current-player': index === currentPlayer}">
-        <p>{{ player.name }} - {{ player.score }} очков</p>
+  <GameLayout nameGame="5 секунд">
+    <div class="game-container">
+      <div class="player-list">
+        <div v-for="(player, index) in five_second_users" :key="index" :class="{'current-player': index === currentPlayer}">
+          <p>{{ player.name }} - {{ player.score }} очков</p>
+        </div>
+      </div>
+
+      <div class="card" v-if="currentQuestion && !gameOver">
+        <p>{{ currentQuestion.question }}</p>
+      </div>
+      <div class="controls" v-if="!gameOver">
+        <button class="btn-grad" @click="startGame" :disabled="isRunning">Почати</button>
+        <p v-if="isRunning" class="timer">{{ timeLeft }}</p>
+      </div>
+      <div v-if="gameOver" class="modal">
+        <button class="btn-grad" @click="playerAnswered(true)">Смог ответить</button>
+        <button class="btn-grad" @click="playerAnswered(false)">Не смог ответить</button>
       </div>
     </div>
-
-    <div class="card" v-if="currentQuestion && !gameOver">
-      <p>{{ currentQuestion.question }}</p>
-    </div>
-    <div class="controls" v-if="!gameOver">
-      <button class="btn-grad" @click="startGame" :disabled="isRunning">Start</button>
-      <p v-if="isRunning" class="timer">{{ timeLeft }}</p>
-    </div>
-    <div v-if="gameOver" class="modal">
-      <button class="btn-grad" @click="playerAnswered(true)">Смог ответить</button>
-      <button class="btn-grad" @click="playerAnswered(false)">Не смог ответить</button>
-    </div>
-  </div>
+  </GameLayout>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import questions from './questions.json'
+import GameLayout from '../GameLayout.vue'
 
 // Импорт аудиофайла
 import alarmSound from '@/assets/sound/alarm.mp3'
@@ -120,23 +123,55 @@ router.beforeEach((to, from, next) => {
 </script>
 
 <style scoped>
+:root {
+  --bg-color: #f9f9f9;
+  --text-color: #000;
+  --btn-bg-color: linear-gradient(to right, #ff758c, #ff7eb3);
+  --modal-bg-color: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] {
+  --bg-color: #333;
+  --text-color: #fff;
+  --btn-bg-color: linear-gradient(to right, #6a11cb, #2575fc);
+  --modal-bg-color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] {
+  --bg-color: #f9f9f9;
+  --text-color: #000;
+  --btn-bg-color: linear-gradient(to right, #ffdd00, #fbb034);
+  --modal-bg-color: rgba(0, 0, 0, 0.8);
+}
+
 .game-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   height: 100vh;
-  color: black;
+  padding: 10px;
+  color: var(--text-color);
 }
 
 .card {
-  background-color: #f9f9f9;
+  background-color: #fff; /* Устанавливаем белый фон для карточки */
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
   margin: 20px 0;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 450px;
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #000 !important;
+}
+
+.card p {
+  font-size: 1.5em; /* Увеличиваем размер текста */
 }
 
 .controls {
@@ -146,21 +181,10 @@ router.beforeEach((to, from, next) => {
   margin-top: 20px;
 }
 
-.btn-grad {
-  padding: 10px 20px;
-  font-size: 16px;
-  margin: 10px;
-  cursor: pointer;
-}
-
-.btn-grad:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
 
 .modal {
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
+  background-color: var(--modal-bg-color);
+  color: var(--text-color);
   padding: 20px;
   border-radius: 8px;
   text-align: center;
@@ -174,8 +198,8 @@ router.beforeEach((to, from, next) => {
 
 .timer {
   font-weight: 100;
-  font-size: 40px;
-  color: bisque;
+  font-size: 50px; /* Увеличиваем размер таймера */
+  color: var(--text-color);
 }
 
 .player-list {
@@ -183,15 +207,47 @@ router.beforeEach((to, from, next) => {
 }
 
 .player-list div {
-  margin: 5px 0;
-  color: white; /* Устанавливаем белый цвет текста для всех игроков */
+  margin: 10px 0; /* Увеличиваем отступы между игроками */
+  color: var(--text-color); /* Устанавливаем цвет текста для всех игроков */
+  font-size: 1.2em; /* Увеличиваем размер текста для списка игроков */
 }
 
 .current-player {
   font-weight: bold;
   background-color: #d3d3d3;
-  padding: 5px;
+  padding: 10px; /* Увеличиваем отступы для текущего игрока */
   border-radius: 5px;
   color: black !important; /* Устанавливаем черный цвет текста для текущего игрока */
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 15px;
+    font-size: 18px; /* Увеличиваем размер текста в карточке на планшетах */
+  }
+  .btn-grad {
+    font-size: 18px; /* Увеличиваем размер текста кнопок на планшетах */
+    padding: 12px 24px; /* Увеличиваем размер кнопок на планшетах */
+  }
+  .timer {
+    font-size: 40px; /* Увеличиваем размер таймера на планшетах */
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 20px;
+    font-size: 16px; /* Увеличиваем размер текста в карточке на мобильных устройствах */
+  }
+  .btn-grad {
+    font-size: 16px; /* Увеличиваем размер текста кнопок на мобильных устройствах */
+    padding: 10px 20px; /* Увеличиваем размер кнопок на мобильных устройствах */
+  }
+  .timer {
+    font-size: 35px; /* Увеличиваем размер таймера на мобильных устройствах */
+  }
+  .player-list div {
+    font-size: 1.5em; /* Увеличиваем размер текста для списка игроков на мобильных устройствах */
+  }
 }
 </style>

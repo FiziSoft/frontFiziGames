@@ -1,7 +1,34 @@
-
 $color-gradient: linear-gradient(to right, #DA22FF 0%, #9733EE 51%, #DA22FF 100%)
 $borderRadius: 40px
 $shadowBox: 0px 5px 10px 0px rgba(0, 0, 0, 0.3)
+
+$theme1-bg: #ff7e5f
+$theme1-text: #000
+$theme1-gradient: linear-gradient(to right, #ff7e5f, #ffb27d)
+$theme1-btn-gradient: linear-gradient(to right, #ff4e50, #f9d423)
+$theme1-btn-delete: #000
+$theme1-fizi-gradient: linear-gradient(to right, #6A82FB, #FC5C7D)
+
+$theme2-bg: #9733ee
+$theme2-text: #fff
+$theme2-gradient: linear-gradient(to right, #9733ee, #da22ff)
+$theme2-btn-gradient: linear-gradient(to right, #6a11cb, #2575fc)
+$theme2-btn-delete: #fff
+$theme2-fizi-gradient: linear-gradient(to right, #FF5F6D, #FFC371)
+
+$theme3-bg: #f9f9a1
+$theme3-text: #000
+$theme3-gradient: linear-gradient(to right, #f9f9a1, #fce16b)
+$theme3-btn-gradient: linear-gradient(to right, #ffdd00, #fbb034)
+$theme3-btn-delete: #000
+$theme3-fizi-gradient: linear-gradient(to right, #00F260, #0575E6)
+
+$theme4-bg: #f8c4d4
+$theme4-text: #000
+$theme4-gradient: linear-gradient(to right, #f8c4d4, #f7a3b0)
+$theme4-btn-gradient: linear-gradient(to right, #ff758c, #ff7eb3)
+$theme4-btn-delete: #000
+$theme4-fizi-gradient: linear-gradient(to right, #8E2DE2, #4A00E0)
 
 *, *::before, *::after
   margin: 0
@@ -13,22 +40,38 @@ h1, h2, h3, h4, a, button, input
   font-weight: inherit
   font-size: inherit
   font-family: "Shantell Sans", cursive
-  color: #fff
+  color: var(--text-color)
 
 a
-  color: #fff
+  color: var(--text-color)
 
 button
-  color: #fff
+  color: var(--text-color)
+
+.delete-button
+  background-color: transparent
+  border: none
+  color: var(--btn-delete-color)
+  padding: 10px 15px
+  font-size: 16px
+  cursor: pointer
+  border-radius: 5px
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  transition: background-color 0.3s, color 0.3s
+
+  &:hover
+    background-color: rgba(0, 0, 0, 0.1)
 
 .foo
   width: 200px
-  border: !important$borderRadius
-  background-color: !important$color-gradient
+  border: $borderRadius !important
+  background-color: $color-gradient !important
   text-align: center
 
 .timer
-  color: #fff
+  color: var(--text-color)
   font-size: 3em
   padding: 40px
 
@@ -41,17 +84,14 @@ html, body
   padding: 0
   font-weight: 300
   font-family: "Shantell Sans", cursive
-  font-weight: 300
-  color: #fff
-  background: rgb(65,41,90)
-  background: linear-gradient(90deg, rgba(65,41,90,1) 0%, rgba(47,7,67,1) 100%)
+  color: var(--text-color)
+  background: var(--bg-color)
 
 input
-
   background: transparent
   font-weight: 100
   outline: 0
-  color: #fff
+  color: var(--text-color)
   padding-left: 30px
 
 .bold
@@ -59,13 +99,13 @@ input
   font-size: 27px
 
 .appContainer
-  position: absolut
+  position: absolute
   height: 100%
   width: 100%
 
 .menuFizi
   font-size: 25px
-  background: $color-gradient
+  background: var(--fizi-gradient)
   -webkit-background-clip: text
   -webkit-text-fill-color: transparent
 
@@ -74,25 +114,22 @@ input
 
 .btn-grad
   width: 100%
-  background-image: $color-gradient
+  background-image: var(--btn-gradient-color)
   margin-top: 25px
   padding: 25px 45px
   text-align: center
   text-transform: uppercase
-  // transition: 0.5s
   background-size: 200% auto
-  color: white
+  color: var(--text-color)
   border-radius: $borderRadius
-  perspective: 1000px/* Добавим перспективу */
+  perspective: 1000px /* Добавим перспективу */
   display: inline-block /* Добавим блоковое поведение для кнопки */
+  animation: gradient-scroll 3s linear infinite /* Анимация прокрутки фона */
 
-  /* Анимация прокрутки фона */
-  animation: gradient-scroll 3s linear infinite
-
-.btn-grad:hover
-  background-position: right center
-  color: #fff
-  text-decoration: none
+  &:hover
+    background-position: right center
+    color: var(--text-color)
+    text-decoration: none
 
 .btn-gard:disabled
   background-image: none
@@ -107,6 +144,8 @@ input
   display: flex
   justify-content: center
   text-align: left
+  flex-direction: column /* Для мобильных устройств */
+  align-items: center /* Центровка содержимого */
 
 .formCreate
   display: flex
@@ -114,7 +153,8 @@ input
   justify-content: center
   justify-items: center
   align-items: center
-  width: 450px
+  width: 90% /* Уменьшение ширины для мобильных устройств */
+  max-width: 450px /* Максимальная ширина для больших экранов */
   border: 1px solid rgba(255, 255, 255, 0.1)
   padding: 40px
   margin-top: 35px
@@ -129,7 +169,7 @@ input
   align-items: center
 
 .formElement_tod
-  width: 50%
+  width: 100% /* Адаптация для мобильных устройств */
   padding: 10px
   display: flex
   justify-content: space-around
@@ -139,28 +179,20 @@ input
 
 .input-gradient
   text-align: center
-  width: 50%
+  width: 100% /* Адаптация для мобильных устройств */
+  max-width: 50% /* Максимальная ширина для больших экранов */
   border-radius: $borderRadius
   padding: 20px
   margin: 20px 0
   border: 1px solid rgba(255, 255, 255, 0.1)
-
   box-shadow: $shadowBox
-  color: #fff
+  color: var(--text-color)
 
-  &:focus
+  &:focus, &:hover
     box-shadow: none
     border-bottom: 1px
     border-style: solid
-    border-image: $color-gradient 1
-    border-radius: $borderRadius
-
-  &:hover
-    cursor: auto
-    box-shadow: none
-    border-bottom: 1px
-    border-style: solid
-    border-image: $color-gradient 1
+    border-image: var(--gradient-color) 1
     border-radius: $borderRadius
 
 .mainContainer
@@ -172,53 +204,77 @@ input
   width: 100%
   text-align: center
 
-.btn_rock
+.btn_rock, .btn_paper, .btn_sci
   text-align: center
   margin: 20px
   width: 150px
   height: 150px
-  background-image: url("./PRS/rock.svg")
   background-repeat: no-repeat
   background-color: unset
   border-radius: 15px
 
-  &:hover
+.btn_rock
+  background-image: url("./PRS/rock.svg")
 
 .btn_paper
-  margin: 20px
-  width: 150px
-  height: 150px
   background-image: url("./PRS/toilet-paper.svg")
-  background-repeat: no-repeat
   background-size: contain
-  background-color: unset
-
-  &:hover
 
 .btn_sci
-  margin: 20px
-  width: 150px
-  height: 150px
   background-image: url("./PRS/scissors.svg")
-  background-repeat: no-repeat
-  background-color: unset
-
-  &:hover
 
 .waiting
   animation: flicker 4s infinite
 
-  @keyframes flicker
-    0%
-      opacity: 1
-    100%
-      opacity: 0
+@keyframes flicker
+  0%
+    opacity: 1
+
+  100%
+    opacity: 0
 
 .name_button
-  // width: 150px
   padding: 10px 20px
   margin-bottom: 20px
   font-size: 1.5rem
   background-color: transparent
-  border-bottom: 1px solid
+  border-bottom: 1px солидный
   border-radius: 12px
+
+@media (max-width: 768px)
+  .timer
+    font-size: 2em
+    padding: 20px
+
+  .mainPage
+    font-size: 1.5em
+
+  .formCreate
+    width: 90%
+    padding: 20px
+
+  .input-gradient
+    width: 90%
+
+  .btn_rock, .btn_paper, .btn_sci
+    width: 100px
+    height: 100px
+
+@media (max-width: 480px)
+  .timer
+    font-size: 1.5em
+    padding: 10px
+
+  .mainPage
+    font-size: 1.2em
+
+  .formCreate
+    width: 100%
+    padding: 15px
+
+  .input-gradient
+    width: 100%
+
+  .btn_rock, .btn_paper, .btn_sci
+    width: 80px
+    height: 80px
