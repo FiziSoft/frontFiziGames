@@ -18,7 +18,6 @@
 
 <script setup>
 import { ref } from 'vue';
-import FooterComponent from '@/components/FooterComponent.vue';
 
 // const network_url = ref('http://localhost:8080');
 const network_url = 'https://salty-crag-94803-5b1ef9ad0209.herokuapp.com';

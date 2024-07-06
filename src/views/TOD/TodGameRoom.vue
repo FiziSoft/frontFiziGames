@@ -1,16 +1,9 @@
 <template>
   <GameLayout nameGame="Правда або Дія">
-    <WebSocketComponent :name="cur_player.name" :body="share_info" :title="cur_title" :roomId="roomId" ref="websocketComponent" />
-
-    <!-- <button @click="setOnView">ddddddddddddddddddddd</button> -->
-    <div class="container">
-      <!-- <input v-if="isVisible('button3')" v-model.number="rotationDuration" type="number" placeholder="Время вращения (сек)" /> -->
-      <!-- <button @click="resetState" class="button">Сброс</button> -->
-    </div>
+    <!-- <WebSocketComponent :name="cur_player.name" :body="share_info" :title="cur_title" :roomId="roomId" ref="websocketComponent" /> -->
 
     <div class="containerFormCreate">
       <div class="formCreate" v-if="choise_div===true">
-        <!-- <div class="formCreate" > -->
         <div class="nameCurPlayer">
           <h1>{{ cur_player.name }}</h1>
         </div>
@@ -211,13 +204,9 @@ const get_cur_truth = (index) => {
 const go_truths = () => {
   if (truths.value.length === 0) return;
 
-  cur_truth.value = get_truth();
-
-  if (count_truth.value < truths.value.length - 1) {
-    count_truth.value++;
-  } else {
-    count_truth.value = 0;
-  }
+  // Выбираем случайный вопрос
+  count_truth.value = Math.floor(Math.random() * truths.value.length);
+  cur_truth.value = truths.value[count_truth.value];
 
   choise_div.value = false;
   truth_div.value = true;
@@ -228,20 +217,12 @@ const go_truths = () => {
   setOnView();
 };
 
-const get_truth = () => {
-  return truths.value[count_truth.value];
-};
-
 const go_dares = () => {
   if (dares.value.length === 0) return;
 
-  cur_dare.value = get_dares();
-
-  if (count_dares.value < dares.value.length - 1) {
-    count_dares.value++;
-  } else {
-    count_dares.value = 0;
-  }
+  // Выбираем случайное действие
+  count_dares.value = Math.floor(Math.random() * dares.value.length);
+  cur_dare.value = dares.value[count_dares.value];
 
   choise_div.value = false;
   truth_div.value = false;
@@ -251,12 +232,6 @@ const go_dares = () => {
   share_info.value = dares.value[count_dares.value].task;
   setOnView();
 };
-
-const get_dares = () => {
-  return dares.value[count_dares.value];
-};
-
-// JSON данные уже импортированы, поэтому нет необходимости загружать их через fetch
 </script>
 
 <style lang="sass">
