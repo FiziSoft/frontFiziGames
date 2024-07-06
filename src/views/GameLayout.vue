@@ -26,6 +26,8 @@
     display: flex
     flex-direction: column
     min-height: 100vh
+    margin: 0
+    padding: 0
   
   .mainHeader
     width: 100%
@@ -34,7 +36,7 @@
     text-align: center
     font-size: 40px
     font-weight: 100
-    height: 90px
+    // height: 90px
     padding: 10px
   
   .mainBody

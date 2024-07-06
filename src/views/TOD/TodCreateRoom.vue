@@ -1,24 +1,8 @@
 <style>
 
-.delete-button {
-            background-color: transparent; /* Красный цвет кнопки */
-            border: none;
-            color: white;
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s;
-        }
 
-        .delete-button:hover {
-            background-color: #ff3333; /* Более темный красный при наведении */
-        }
 .containerFormCreate_tod {
-  width: 250px;
+  width: 200px;
   display: flex;
   color:aliceblue;
   justify-content: center;
@@ -32,7 +16,7 @@
 
 <template>
     <GameLayout nameGame="Правда або Дія">
-    <br>
+ 
     <div class="containerFormCreate">    
     <form @submit.prevent="addNewPlayer" class="formCreate">
 
