@@ -18,9 +18,10 @@
             background-color: #ff3333; /* Более темный красный при наведении */
         }
 .containerFormCreate_tod {
-  width: 450px;
+  width: 250px;
   display: flex;
   color:aliceblue;
+  justify-content: center;
 }
         
 </style>
@@ -76,12 +77,7 @@
 
   <ShareButton @share="handleShare" />
 
-      <DIV>
-        <ul>
-          <li v-for="(i, key) in users" :key="key">{{ i.name }} {{ i.isBoy }} {{ key }}</li>
-        </ul>
-      </DIV>
-
+     
 
 
 

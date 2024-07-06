@@ -15,8 +15,8 @@
         <p v-if="isRunning" class="timer">{{ timeLeft }}</p>
       </div>
       <div v-if="gameOver" class="modal">
-        <button class="btn-grad" @click="playerAnswered(true)">Смог ответить</button>
-        <button class="btn-grad" @click="playerAnswered(false)">Не смог ответить</button>
+        <button class="btn-grad" @click="playerAnswered(true)">+</button>
+        <button class="btn-grad" @click="playerAnswered(false)">-</button>
       </div>
     </div>
   </GameLayout>

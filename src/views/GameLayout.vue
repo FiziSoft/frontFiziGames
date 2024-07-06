@@ -6,7 +6,6 @@
       <div class="mainBody">
         <slot></slot>
       </div>
-      <FooterComponent />
     </div>
   </template>
   

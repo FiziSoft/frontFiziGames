@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button @click="sendMessage" ref="sendButton" id="sendButton">Отправить сообщение</button>
+    <!-- <button @click="sendMessage" ref="sendButton" id="sendButton">Отправить сообщение</button> -->
     <ShareButton @share="handleShare" :url="todViewLink" text="Слідкуй за грою онлайн"/>
   </div>
 

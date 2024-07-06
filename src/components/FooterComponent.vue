@@ -105,6 +105,9 @@ onMounted(() => {
   background: var(--bg-color)
   position: sticky
   bottom: 0
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1) // Добавляем тень
+  border-top: 1px solid rgba(0, 0, 0, 0.1) // Добавляем верхнюю границу
+
 
 .menuFizi
   background: none
