@@ -90,7 +90,8 @@ if (userHash) {
 }
 
 const sendPlayerChoiceToServer = (choice) => {
-  websocket.send(choice)
+  const data = JSON.stringify({ choice: choice })
+  websocket.send(data)
   resultMessage.value = `Ви обрали ${choice}`
   choiseGet.value = false
   showChoice.value = false
