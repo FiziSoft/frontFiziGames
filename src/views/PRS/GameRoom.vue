@@ -84,9 +84,9 @@ const userHash = localStorage.getItem('hash')
 let websocket
 
 if (userHash) {
-  websocket = new WebSocket(`wss://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}&player_hash=${userHash}`)
+  websocket = new WebSocket(`ws://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}&player_hash=${userHash}`)
 } else {
-  websocket = new WebSocket(`wss://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}`)
+  websocket = new WebSocket(`ws://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}`)
 }
 
 const sendPlayerChoiceToServer = (choice) => {
