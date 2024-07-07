@@ -38,7 +38,7 @@ const isButtonActive = computed(() => {
 
 const sendCreateRoomRequest = async () => {
   try {
-    const response = await axios.post("http://rsp-f1c55df7ba69.herokuapp.com/create_room", {
+    const response = await axios.post("https://rsp-f1c55df7ba69.herokuapp.com/create_room", {
       name: playerName.value,
       req_players: numPlayers.value
     });
