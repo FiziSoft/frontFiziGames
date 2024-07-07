@@ -203,6 +203,8 @@ input
   min-height: 100%
   width: 100%
   text-align: center
+  margin: 0
+  padding: 0
 
 .btn_rock, .btn_paper, .btn_sci
   text-align: center
@@ -215,13 +217,18 @@ input
 
 .btn_rock
   background-image: url("./PRS/rock.svg")
-
+  background-repeat: no-repeat
+  background-position: center
 .btn_paper
   background-image: url("./PRS/toilet-paper.svg")
   background-size: contain
+  background-repeat: no-repeat
+  background-position: center
 
 .btn_sci
   background-image: url("./PRS/scissors.svg")
+  background-repeat: no-repeat
+  background-position: center
 
 .waiting
   animation: flicker 4s infinite
@@ -238,7 +245,7 @@ input
   margin-bottom: 20px
   font-size: 1.5rem
   background-color: transparent
-  border-bottom: 1px солидный
+  border-bottom: 1px solid
   border-radius: 12px
 
 @media (max-width: 768px)

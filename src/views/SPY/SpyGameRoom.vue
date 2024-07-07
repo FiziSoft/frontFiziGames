@@ -94,6 +94,7 @@ import GameLayout from '../GameLayout.vue';
 import TimerFizi from '@/components/TimerFizi.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import ButtonHome from '@/components/ButtonHome.vue';
+import {url_serv} from './SpyCreateRoom.vue'
 
 const loading = ref(true);
 const gameState = ref('WaitPlayers');
@@ -109,7 +110,6 @@ const route = useRoute();
 const router = useRouter();
 const room = reactive({ name: '', players: [], theme: [] });
 const qrCodeValue = ref('');
-const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com"
 
 const connectToWebSocket = (roomId, playerName, playerHash) => {
   const websocket = new WebSocket(`wss://${url_serv}/start/${roomId}?name=${encodeURIComponent(playerName)}&player_hash=${playerHash || ''}`);
