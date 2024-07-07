@@ -22,7 +22,7 @@
       <div v-if="gameState === 'WaitPlayers'">
         <div class="waiting">Очікуємо на гравців</div>
         <br>
-        <a :href="`/connect/${room.id}`">http://localhost:8080/connect/{{ room.id }}</a>
+        <a :href="`/connect/${room.id}`">https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/connect/{{ room.id }}</a>
         <br>
         <qrcode-vue :value="qrCodeValue" :size="200" level="L" />
       </div>
@@ -84,9 +84,9 @@ const userHash = localStorage.getItem('hash')
 let websocket
 
 if (userHash) {
-  websocket = new WebSocket(`ws://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}&player_hash=${userHash}`)
+  websocket = new WebSocket(`wss://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}&player_hash=${userHash}`)
 } else {
-  websocket = new WebSocket(`ws://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}`)
+  websocket = new WebSocket(`wss://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}`)
 }
 
 const sendPlayerChoiceToServer = (choice) => {
