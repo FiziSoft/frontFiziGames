@@ -112,7 +112,7 @@ const qrCodeValue = ref('');
 const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com"
 
 const connectToWebSocket = (roomId, playerName, playerHash) => {
-  const websocket = new WebSocket(`ws://${url_serv}/start/${roomId}?name=${encodeURIComponent(playerName)}&player_hash=${playerHash || ''}`);
+  const websocket = new WebSocket(`wss://${url_serv}/start/${roomId}?name=${encodeURIComponent(playerName)}&player_hash=${playerHash || ''}`);
 
   websocket.onopen = () => {
     console.log('WebSocket connected');
