@@ -23,7 +23,6 @@
         <div class="waiting">Очікуємо на гравців</div>
         <br>
         <TelegramShareButton :url="qrCodeValue" :text="textShare" />
-       
       </div>
       <div v-if="gameState === 'GameCanBeStart'">
         <button @click="showPopup" class="choose-btn">Зробити вибір</button>
@@ -79,7 +78,7 @@ const closePopup = () => {
 }
 
 const qrCodeValue = `https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/rsp-connect/${route.params.id}`
-const textShare ="Давай грати на FiziGames у Камінь-Ножиці-Бумага"
+const textShare = "Давай грати на FiziGames у Камінь-Ножиці-Бумага"
 const userHash = localStorage.getItem('hash')
 let websocket
 
@@ -111,11 +110,15 @@ const initializeWebSocket = () => {
   }
 
   websocket.onopen = () => {
-    console.log('WebSocket connection established.');
+    console.log('WebSocket connection established.')
   }
 
-  websocket.onclose = () => {
-    console.log('WebSocket connection closed.');
+  websocket.onclose = (event) => {
+    console.log(`WebSocket connection closed: ${event.code}, ${event.reason}`)
+  }
+
+  websocket.onerror = (error) => {
+    console.error('WebSocket error:', error)
   }
 }
 
