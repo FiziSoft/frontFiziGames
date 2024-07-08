@@ -22,7 +22,7 @@
       <div v-if="gameState === 'WaitPlayers'">
         <div class="waiting">Очікуємо на гравців</div>
         <br>
-        <a :href="`/connect/${room.id}`">https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/room/{{ room.id }}</a>
+        <a :href="`/connect/${room.id}`">https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/rsp-connect/{{ room.id }}</a>
         <br>
         <qrcode-vue :value="qrCodeValue" :size="200" level="L" />
       </div>
@@ -78,7 +78,7 @@ const closePopup = () => {
   showResult.value = false
 }
 
-const qrCodeValue = `https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/connect/${route.params.id}`
+const qrCodeValue = `https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/rsp-connect/${route.params.id}`
 
 const userHash = localStorage.getItem('hash')
 let websocket
