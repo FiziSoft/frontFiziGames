@@ -138,8 +138,10 @@ const playAgain = () => {
 }
 
 onMounted(() => {
-  initializeWebSocket()
-})
+  setTimeout(() => {
+    initializeWebSocket();
+  }, 2000);
+});
 </script>
 
 <style scoped lang="sass">
