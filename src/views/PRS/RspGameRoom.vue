@@ -140,7 +140,7 @@ const playAgain = () => {
 onMounted(() => {
   setTimeout(() => {
     initializeWebSocket();
-  }, 2000);
+  }, 500);
 });
 </script>
 
