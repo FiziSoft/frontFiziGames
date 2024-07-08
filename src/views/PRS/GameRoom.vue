@@ -58,7 +58,7 @@ import GameLayout from '../GameLayout.vue'
 const pName = localStorage.getItem('playerName')
 const route = useRoute()
 const router = useRouter()
-let choiseGet = ref(true)
+let choiceGet = ref(true)
 let gameState = ref('WaitPlayers')
 const room = reactive({
   name: '',
@@ -93,12 +93,12 @@ const sendPlayerChoiceToServer = (choice) => {
   const data = JSON.stringify({ choice: choice })
   websocket.send(data)
   resultMessage.value = `Ви обрали ${choice}`
-  choiseGet.value = false
+  choiceGet.value = false
   showChoice.value = false
 }
 
 const playAgain = () => {
-  choiseGet.value = true
+  choiceGet.value = true
   showResult.value = false
   gameState.value = 'GameCanBeStart'
   showPopup()
@@ -116,7 +116,7 @@ websocket.onmessage = function (event) {
     gameState.value = 'GameCanBeStart'
     showPopup()
   } else if (['Win', 'Draw', 'Lose'].includes(eventType)) {
-    choiseGet.value = false
+    choiceGet.value = false
     resultMessage.value = eventType === 'Win' ? 'Виграш' : eventType === 'Draw' ? 'Нічия' : 'Програш'
     showResult.value = true
   }
