@@ -51,8 +51,8 @@ const cur_world = ref('');
 const room = reactive({ name: '', players: [], theme: [] });
 const loading = ref(true);
 const qrCodeValue = ref('');
-// const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com";
-const url_serv = "127.0.0.1:7000";
+const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com";
+// const url_serv = "127.0.0.1:7000";
 
 
 const getThemes = async () => {

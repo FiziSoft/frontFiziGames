@@ -29,7 +29,7 @@ const isButtonActive = computed(() => {
 const redirectToRoomPage = async () => {
   const roomId = route.params.id;
   localStorage.setItem('playerName', playerName.value);
-  router.push({ name: 'GameRoom', params: { id: roomId } });
+  router.push({ name: 'RspGameRoom', params: { id: roomId } });
 };
 </script>
     

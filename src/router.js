@@ -1,8 +1,8 @@
 import {createWebHistory, createRouter} from 'vue-router'
 import MainPage from './views/MainPage.vue'
-import CreateRoom from './views/PRS/CreateRoom.vue'
-import GameRoom from './views/PRS/GameRoom.vue'
-import ConnectToRoom from './views/PRS/ConnectToRoom.vue'
+import RspCreateRoom from './views/PRS/RspCreateRoom.vue'
+import RspGameRoom from './views/PRS/RspGameRoom.vue'
+import RspConnectToRoom from './views/PRS/RspConnectToRoom.vue'
 import GameLayout from './views/GameLayout.vue'
 import spyCreateRoom from './views/SPY/SpyCreateRoom.vue'
 import spyGameRoom from './views/SPY/SpyGameRoom.vue'
@@ -24,9 +24,9 @@ const routes = [
     },
 
     {
-        path: '/CreateRoom',
-        name: "CreateRoom",
-        component: CreateRoom
+        path: '/rsp-CreateRoom',
+        name: "RspCreateRoom",
+        component: RspCreateRoom
     },
 
     {
@@ -36,9 +36,9 @@ const routes = [
     },
 
     {
-        path: '/room/:id',
-        name: "GameRoom",
-        component: GameRoom
+        path: '/rsp-room/:id',
+        name: "RspGameRoom",
+        component: RspGameRoom
     },
 
     {
@@ -49,9 +49,10 @@ const routes = [
     },
 
     {
-        path: '/connect/:id',
-        name: "Connect",
-        component: ConnectToRoom
+        path: '/rsp-connect/:id',
+        name: "RspConnect",
+        component: RspConnectToRoom,
+        props: true
     },
 
     {

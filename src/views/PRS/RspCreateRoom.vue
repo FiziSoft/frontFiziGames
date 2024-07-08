@@ -45,7 +45,7 @@ const sendCreateRoomRequest = async () => {
 
     const roomId = response.data.id;
     localStorage.setItem('playerName', playerName.value);
-    router.push({ name: 'GameRoom', params: { id: roomId } });
+    router.push({ name: 'RspGameRoom', params: { id: roomId } });
   } catch (error) {
     console.error('Error creating room:', error);
   }
