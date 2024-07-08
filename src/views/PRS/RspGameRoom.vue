@@ -54,6 +54,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import QrcodeVue from 'qrcode.vue'
 import GameLayout from '../GameLayout.vue'
+import TelegramShareButton from '@/components/TelegramShareButton.vue'
 
 const pName = localStorage.getItem('playerName')
 const route = useRoute()
