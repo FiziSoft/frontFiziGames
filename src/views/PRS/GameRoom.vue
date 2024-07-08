@@ -11,9 +11,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="i in room.players" :key="i.id" class="formElement">
-              <td class="tableElement">{{ i.name }}</td>
-              <td class="tableElement">{{ i.score }}</td>
+            <tr v-for="player in room.players" :key="player.id" class="formElement">
+              <td class="tableElement">{{ player.name }}</td>
+              <td class="tableElement">{{ player.score }}</td>
             </tr>
           </tbody>
         </table>
@@ -22,7 +22,7 @@
       <div v-if="gameState === 'WaitPlayers'">
         <div class="waiting">Очікуємо на гравців</div>
         <br>
-        <a :href="`/connect/${room.id}`">https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/connect/{{ room.id }}</a>
+        <a :href="`/connect/${room.id}`">https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/room/{{ room.id }}</a>
         <br>
         <qrcode-vue :value="qrCodeValue" :size="200" level="L" />
       </div>
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import QrcodeVue from 'qrcode.vue'
 import GameLayout from '../GameLayout.vue'
@@ -83,10 +83,40 @@ const qrCodeValue = `https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/connect
 const userHash = localStorage.getItem('hash')
 let websocket
 
-if (userHash) {
-  websocket = new WebSocket(`wss://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}&player_hash=${userHash}`)
-} else {
-  websocket = new WebSocket(`wss://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}`)
+const initializeWebSocket = () => {
+  if (userHash) {
+    websocket = new WebSocket(`wss://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}&player_hash=${userHash}`)
+  } else {
+    websocket = new WebSocket(`wss://rsp-f1c55df7ba69.herokuapp.com/start/${route.params.id}?name=${pName}`)
+  }
+
+  websocket.onmessage = function (event) {
+    const message = JSON.parse(event.data)
+
+    const eventType = message.event
+    if (message.hash) {
+      localStorage.setItem('hash', message.hash)
+    }
+
+    if (eventType === 'GameCanBeStart') {
+      gameState.value = 'GameCanBeStart'
+      showPopup()
+    } else if (['Win', 'Draw', 'Lose'].includes(eventType)) {
+      choiceGet.value = false
+      resultMessage.value = eventType === 'Win' ? 'Виграш' : eventType === 'Draw' ? 'Нічия' : 'Програш'
+      showResult.value = true
+    }
+
+    Object.assign(room, message['room'])
+  }
+
+  websocket.onopen = () => {
+    console.log('WebSocket connection established.');
+  }
+
+  websocket.onclose = () => {
+    console.log('WebSocket connection closed.');
+  }
 }
 
 const sendPlayerChoiceToServer = (choice) => {
@@ -104,25 +134,9 @@ const playAgain = () => {
   showPopup()
 }
 
-websocket.onmessage = function (event) {
-  const message = JSON.parse(event.data)
-
-  const eventType = message.event
-  if (message.hash) {
-    localStorage.setItem('hash', message.hash)
-  }
-
-  if (eventType === 'GameCanBeStart') {
-    gameState.value = 'GameCanBeStart'
-    showPopup()
-  } else if (['Win', 'Draw', 'Lose'].includes(eventType)) {
-    choiceGet.value = false
-    resultMessage.value = eventType === 'Win' ? 'Виграш' : eventType === 'Draw' ? 'Нічия' : 'Програш'
-    showResult.value = true
-  }
-
-  Object.assign(room, message['room'])
-}
+onMounted(() => {
+  initializeWebSocket()
+})
 </script>
 
 <style scoped lang="sass">
