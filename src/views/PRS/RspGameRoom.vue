@@ -23,8 +23,7 @@
         <div class="waiting">Очікуємо на гравців</div>
         <br>
         <TelegramShareButton :url="qrCodeValue" :text="textShare" />
-        <br>
-        <qrcode-vue :value="qrCodeValue" :size="200" level="L" />
+       
       </div>
       <div v-if="gameState === 'GameCanBeStart'">
         <button @click="showPopup" class="choose-btn">Зробити вибір</button>
