@@ -22,7 +22,7 @@
       <div v-if="gameState === 'WaitPlayers'">
         <div class="waiting">Очікуємо на гравців</div>
         <br>
-        <a :href="`/connect/${room.id}`">https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/rsp-connect/{{ room.id }}</a>
+        <TelegramShareButton :url="qrCodeValue" :text="textShare" />
         <br>
         <qrcode-vue :value="qrCodeValue" :size="200" level="L" />
       </div>
@@ -79,7 +79,7 @@ const closePopup = () => {
 }
 
 const qrCodeValue = `https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/rsp-connect/${route.params.id}`
-
+const textShare ="Давай грати на FiziGames у Камінь-Ножиці-Бумага"
 const userHash = localStorage.getItem('hash')
 let websocket
 

@@ -24,13 +24,13 @@ const routes = [
     },
 
     {
-        path: '/rsp-CreateRoom',
+        path: '/rsp-createRoom',
         name: "RspCreateRoom",
         component: RspCreateRoom
     },
 
     {
-        path: '/spy/CreateRoom',
+        path: '/spy/createRoom',
         name: "spyCreateRoom",
         component: spyCreateRoom
     },

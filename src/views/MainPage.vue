@@ -23,8 +23,8 @@ import { ref } from 'vue';
 const network_url = 'https://salty-crag-94803-5b1ef9ad0209.herokuapp.com';
 
 const games = ref([
-  { name: 'Камінь Ножиці Бумага', url: '/rsp-CreateRoom', icon: 'fa-solid fa-hands-asl-interpreting' },
-  { name: 'Шпіон', url: '/spy/CreateRoom', icon: 'fa-solid fa-user-secret' },
+  { name: 'Камінь Ножиці Бумага', url: '/rsp-createRoom', icon: 'fa-solid fa-hands-asl-interpreting' },
+  { name: 'Шпіон', url: '/spy/createRoom', icon: 'fa-solid fa-user-secret' },
   { name: 'Правда або Дія', url: '/tod', icon: 'fa-solid fa-hat-wizard' },
   { name: '5 Секунд', url: '/five-second', icon: 'fa-solid fa-stopwatch' },
 ]);
