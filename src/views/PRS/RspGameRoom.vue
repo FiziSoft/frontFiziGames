@@ -80,7 +80,7 @@ const closePopup = () => {
   showResult.value = false
 }
 
-const qrCodeValue = `https://${serv_url}/rsp-connect/${route.params.id}`
+const qrCodeValue = `https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/rsp-connect/${route.params.id}`
 const textShare = "Давай грати на FiziGames у Камінь-Ножиці-Бумага"
 const userHash = localStorage.getItem('hash')
 let websocket
