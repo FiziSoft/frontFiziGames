@@ -17,6 +17,14 @@
             </button>
           </div>
         </div>
+
+        <div class="formElement_5sec">
+          <label for="gameType">Виберіть тип гри:</label>
+          <select id="gameType" v-model="gameType" class="input_5sec">
+            <option value="3">Три слова</option>
+            <option value="5">П'ять слів</option>
+          </select>
+        </div>
         
         <button @click="addUser" class="btn-grad">Додати гравця</button>
         <button type="submit" class="btn-grad" v-on:click="startGame">Почати гру</button>
@@ -27,7 +35,7 @@
 
     <div>
       <ul>
-        <li v-for="(i, key) in users" :key="key">{{ i.name }} {{ i.isBoy }} {{ key }}</li>
+        <li v-for="(i, key) in five_second_users" :key="key">{{ i.name }} {{ i.isBoy }} {{ key }}</li>
       </ul>
     </div>
   </GameLayout>
@@ -37,12 +45,12 @@
 import GameLayout from '../GameLayout.vue';
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useRoute } from 'vue-router';
 
 const router = useRouter();
 
 const five_second_users = ref([]);
 const hasSavedData = ref(false);
+const gameType = ref('3'); // Добавляем переменную для хранения выбранного типа игры
 
 onMounted(() => {
   // Проверяем наличие сохраненных данных
@@ -79,9 +87,14 @@ const saveUsers = () => {
 const startGame = () => {
   // Генерация уникального ID комнаты
   const roomId = Math.random().toString(36).substr(2, 9);
+  // Обнуление очков всех игроков
+  five_second_users.value = five_second_users.value.map(user => ({ ...user, score: 0 }));
+  // Сохранение типа игры
+  localStorage.setItem('five_second_game_type', gameType.value);
   // Очищаем старые данные игры
   localStorage.removeItem('five_second_game_state');
   saveUsers();
+  // Передаем выбранный тип игры в параметрах маршрута
   router.push({ name: 'five-second-room', params: { roomId } });
 };
 
@@ -94,7 +107,6 @@ const continueGame = () => {
 </script>
 
 <style scoped>
-
 .input_5sec {
   margin-left: 25px;
 }
@@ -106,9 +118,26 @@ const continueGame = () => {
   cursor: pointer;
   font-size: 18px;
   height: 50px;
-margin-bottom: 60px;
+  margin-bottom: 60px;
 }
 
+.delete-button {
+  background-color: transparent;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.delete-button:hover {
+  background-color: #ff3333;
+}
 
 .containerFormCreate_5sec {
   width: 450px;
@@ -135,5 +164,13 @@ margin-bottom: 60px;
 .gender-selection {
   display: flex;
   align-items: center;
+}
+
+#gameType {
+  margin-left: 10px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
 }
 </style>

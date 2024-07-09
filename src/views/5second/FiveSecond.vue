@@ -8,10 +8,11 @@
       </div>
 
       <div class="card" v-if="currentQuestion && !gameOver">
-        <p>{{ currentQuestion.question }}</p>
+        <h3 class="gameTypeText">{{ gameTypeText }}</h3>
+        <p><strong>{{ currentQuestion.question }}</strong></p>
       </div>
       <div class="controls" v-if="!gameOver">
-        <button class="btn-grad" @click="startGame" :disabled="isRunning">Почати</button>
+        <button class="btn-grad" @click="startGame">Почати</button>
         <p v-if="isRunning" class="timer">{{ timeLeft }}</p>
       </div>
       <div v-if="gameOver" class="modal">
@@ -23,13 +24,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import questions from './questions.json'
+import questionsThree from './questions3.json'
+import questionsFive from './questions5.json'
 import GameLayout from '../GameLayout.vue'
 
 // Импорт аудиофайла
-import alarmSound from '@/assets/sound/alarm.mp3'
+import alarmSound from '@/assets/sound/tic5sec.mp3'
 
 const alarm = new Audio(alarmSound)
 
@@ -43,11 +45,16 @@ const gameOver = ref(false)
 const currentPlayer = ref(0)
 const five_second_users = ref([])
 
+const gameType = ref(localStorage.getItem('five_second_game_type') || '3')
+const questions = ref([])
+
 let timer = null
 
 const startGame = () => {
   if (isRunning.value) return
 
+  alarm.play() // Проигрывание аудио при нажатии на кнопку "Почати"
+  
   isRunning.value = true
   gameOver.value = false
   timeLeft.value = 5
@@ -59,13 +66,12 @@ const startGame = () => {
       clearInterval(timer)
       isRunning.value = false
       gameOver.value = true
-      alarm.play() // Проигрывание аудио
     }
   }, 1000)
 }
 
 const nextQuestion = () => {
-  currentQuestion.value = questions[Math.floor(Math.random() * questions.length)]
+  currentQuestion.value = questions.value[Math.floor(Math.random() * questions.value.length)]
   gameOver.value = false
   currentPlayer.value = (currentPlayer.value + 1) % five_second_users.value.length
   saveGameState()
@@ -82,7 +88,8 @@ const saveGameState = () => {
   const gameState = {
     currentPlayer: currentPlayer.value,
     five_second_users: five_second_users.value,
-    roomId: route.params.roomId
+    roomId: route.params.roomId,
+    gameType: gameType.value
   }
   localStorage.setItem('five_second_game_state', JSON.stringify(gameState))
 }
@@ -92,7 +99,9 @@ const loadGameState = () => {
   if (savedState) {
     const gameState = JSON.parse(savedState)
     currentPlayer.value = gameState.currentPlayer
-    five_second_users.value = gameState.five_second_users.map(user => ({ ...user, score: user.score || 0 }));
+    five_second_users.value = gameState.five_second_users.map(user => ({ ...user, score: user.score || 0 }))
+    gameType.value = gameState.gameType
+    questions.value = gameType.value === '3' ? questionsThree : questionsFive
   }
 }
 
@@ -100,19 +109,28 @@ const clearGameState = () => {
   localStorage.removeItem('five_second_game_state')
 }
 
+const gameTypeText = computed(() => {
+  return gameType.value === '3' ? 'Назви три' : 'Назви п\'ять'
+})
+
 onMounted(() => {
   const roomId = route.params.roomId
   // Load players from localStorage
   const savedUsers = JSON.parse(localStorage.getItem('five_second_users')) || []
   five_second_users.value = savedUsers.map(user => ({ ...user, score: user.score || 0 }))
   loadGameState()
+  
+  // Устанавливаем вопросы в зависимости от типа игры
+  questions.value = gameType.value === '3' ? questionsThree : questionsFive
+
   if (!currentQuestion.value) {
-    currentQuestion.value = questions[Math.floor(Math.random() * questions.length)]
+    currentQuestion.value = questions.value[Math.floor(Math.random() * questions.value.length)]
   }
 })
 
 watch(five_second_users, saveGameState, { deep: true })
 watch(currentPlayer, saveGameState)
+watch(gameType, saveGameState)
 
 router.beforeEach((to, from, next) => {
   if (to.name === 'five-second-room' && from.name !== 'five-second-room') {
@@ -144,6 +162,11 @@ router.beforeEach((to, from, next) => {
   --modal-bg-color: rgba(0, 0, 0, 0.8);
 }
 
+.gameTypeText {
+  color: #000;
+  font-size: 25px;
+}
+
 .game-container {
   display: flex;
   flex-direction: column;
@@ -165,9 +188,14 @@ router.beforeEach((to, from, next) => {
   max-width: 450px;
   min-height: 100px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   color: #000 !important;
+}
+
+.card h3 {
+  margin: 0;
 }
 
 .card p {
@@ -180,7 +208,6 @@ router.beforeEach((to, from, next) => {
   align-items: center;
   margin-top: 20px;
 }
-
 
 .modal {
   background-color: var(--modal-bg-color);
