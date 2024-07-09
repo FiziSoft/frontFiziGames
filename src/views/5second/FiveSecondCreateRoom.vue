@@ -31,7 +31,7 @@
       </form>
     </div>
 
-    <ShareButton @share="handleShare" />
+    <!-- <ShareButton @share="handleShare" /> -->
 
    
   </GameLayout>
