@@ -108,6 +108,7 @@ const initializeWebSocket = () => {
       resultMessage.value = eventType === 'Win' ? 'Виграш' : eventType === 'Draw' ? 'Нічия' : 'Програш';
       showResult.value = true;
     } else if (eventType === 'NewPlayerConnected') {
+      alert(`Новий гравець приєднався: ${message.player_name}`)
       Object.assign(room, message['room'])
     }
 
