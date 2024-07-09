@@ -32,8 +32,8 @@ import GameLayout from "../GameLayout.vue";
 const playerName = ref(localStorage.getItem('playerName'))
 const numPlayers = ref(null);
 const router = useRouter();
-const serv_url = "localhost:8000"
-// const serv_url = "rsp-f1c55df7ba69.herokuapp.com"
+// const serv_url = "localhost:8000"
+const serv_url = "rsp-f1c55df7ba69.herokuapp.com"
 
 const isButtonActive = computed(() => {
   return playerName.value && numPlayers.value;
@@ -41,7 +41,7 @@ const isButtonActive = computed(() => {
 
 const sendCreateRoomRequest = async () => {
   try {
-    const response = await axios.post(`http://${serv_url}/create_room`, {
+    const response = await axios.post(`https://${serv_url}/create_room`, {
       name: playerName.value,
       req_players: numPlayers.value
     });

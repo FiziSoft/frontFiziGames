@@ -54,10 +54,8 @@ import QrcodeVue from 'qrcode.vue'
 import GameLayout from '../GameLayout.vue'
 import TelegramShareButton from '@/components/TelegramShareButton.vue'
 
-
-const serv_url = "localhost:8000"
-// const serv_url = "rsp-f1c55df7ba69.herokuapp.com"
-
+// const serv_url = "localhost:8000"
+const serv_url = "rsp-f1c55df7ba69.herokuapp.com"
 
 const pName = localStorage.getItem('playerName')
 const route = useRoute()
@@ -82,16 +80,16 @@ const closePopup = () => {
   showResult.value = false
 }
 
-const qrCodeValue = `http://${serv_url}/rsp-connect/${route.params.id}`
+const qrCodeValue = `https://${serv_url}/rsp-connect/${route.params.id}`
 const textShare = "Давай грати на FiziGames у Камінь-Ножиці-Бумага"
 const userHash = localStorage.getItem('hash')
 let websocket
 
 const initializeWebSocket = () => {
   if (userHash) {
-    websocket = new WebSocket(`ws://${serv_url}/start/${route.params.id}?name=${pName}&player_hash=${userHash}`)
+    websocket = new WebSocket(`wss://${serv_url}/start/${route.params.id}?name=${pName}&player_hash=${userHash}`)
   } else {
-    websocket = new WebSocket(`ws//${serv_url}/start/${route.params.id}?name=${pName}`)
+    websocket = new WebSocket(`wss://${serv_url}/start/${route.params.id}?name=${pName}`)
   }
 
   websocket.onmessage = function (event) {
@@ -103,15 +101,15 @@ const initializeWebSocket = () => {
     }
 
     if (eventType === 'GameCanBeStart') {
-    gameState.value = 'GameCanBeStart';
-    showPopup();
-} else if (['Win', 'Draw', 'Lose'].includes(eventType)) {
-   
-    choiceGet.value = false;
-    resultMessage.value = eventType === 'Win' ? 'Виграш' : eventType === 'Draw' ? 'Нічия' : 'Програш';
-    showResult.value = true;
-    alert(eventType)
-}
+      gameState.value = 'GameCanBeStart';
+      showPopup();
+    } else if (['Win', 'Draw', 'Lose'].includes(eventType)) {
+      choiceGet.value = false;
+      resultMessage.value = eventType === 'Win' ? 'Виграш' : eventType === 'Draw' ? 'Нічия' : 'Програш';
+      showResult.value = true;
+    } else if (eventType === 'NewPlayerConnected') {
+      Object.assign(room, message['room'])
+    }
 
     Object.assign(room, message['room'])
   }
