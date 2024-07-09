@@ -33,11 +33,7 @@
 
     <ShareButton @share="handleShare" />
 
-    <div>
-      <ul>
-        <li v-for="(i, key) in five_second_users" :key="key">{{ i.name }} {{ i.isBoy }} {{ key }}</li>
-      </ul>
-    </div>
+   
   </GameLayout>
 </template>
 
