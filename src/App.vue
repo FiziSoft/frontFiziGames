@@ -28,7 +28,7 @@
     display: flex
     flex-direction: column
     min-height: 100vh
-  
+    height: 100%
   router-view
     flex: 1
   </style>

@@ -22,7 +22,10 @@ import axios from "axios";
 import { ref, computed } from "vue";
 import { useRouter, useRoute } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
-import {url_serv} from './SpyCreateRoom.vue'
+
+
+// const url_serv = "127.0.0.1:7000";
+const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com";
 
 const router = useRouter();
 const route = useRoute();

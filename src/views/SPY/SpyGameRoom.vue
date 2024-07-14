@@ -1,25 +1,14 @@
 <template>
   <GameLayout nameGame="Шпіон">
-
     <div>
       <h2>Доедналися до гри:</h2>
-      <ul v-if="true">
+      <ul v-if="room.players.length">
         <li v-for="(player, key) in room.players" :key="key">{{ player.name }}</li> 
       </ul>
     </div>
-      <!-- <tr v-for="i in connectedPlayers" :key="i.id" class="formElement">
-              <td class="tableElement">{{ i.name }}</td>
-            </tr> -->
-    <!-- <div>
-      <ul v-if="true">
-        <li v-for="(player, key) in connectedPlayers" :key="key">{{ player.name }}</li> 
-      </ul>
-    </div> -->
-
 
     <div v-if="loading">
       Loading...
-     
     </div>
     <div v-else class="containerFormCreate">
       <div v-if="gameState === 'WaitPlayers'">
@@ -94,7 +83,11 @@ import GameLayout from '../GameLayout.vue';
 import TimerFizi from '@/components/TimerFizi.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import ButtonHome from '@/components/ButtonHome.vue';
-import {url_serv} from './SpyCreateRoom.vue'
+
+
+const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com";
+
+// const url_serv = "127.0.0.1:7000";
 
 const loading = ref(true);
 const gameState = ref('WaitPlayers');
@@ -112,6 +105,7 @@ const room = reactive({ name: '', players: [], theme: [] });
 const qrCodeValue = ref('');
 
 const connectToWebSocket = (roomId, playerName, playerHash) => {
+  console.log(`Connecting to WebSocket for room ${roomId} as player ${playerName} with hash ${playerHash}`);
   const websocket = new WebSocket(`wss://${url_serv}/start/${roomId}?name=${encodeURIComponent(playerName)}&player_hash=${playerHash || ''}`);
 
   websocket.onopen = () => {
@@ -184,18 +178,6 @@ const isButtonActive = computed(() => {
   return playerName.value.trim().length > 0;
 });
 
-// const redirectToRoomPage = async () => {
-//   const roomId = route.params.id;
-//   const exists = await checkRoomExists(roomId);
-//   if (exists) {
-//     localStorage.setItem('spyPlayerName', playerName.value);
-//     localStorage.setItem('spyRoomId', roomId);
-//     router.push({ name: 'spyGameRoom', params: { id: roomId } }).then(() => {
-//       location.reload(); // Перезагружаем страницу для повторного подключения
-//     });
-//   }
-// };
-
 const voteForPlayer = async (playerId) => {
   const roomId = route.params.id;
   try {
@@ -239,22 +221,21 @@ onMounted(async () => {
   const exists = await checkRoomExists(roomId);
   if (exists) {
     playerName.value = playerNameFromStorage;
-    qrCodeValue.value = `http://localhost:8080/spy/connect/${roomId}`;
+    qrCodeValue.value = `https://salty-crag-94803-5b1ef9ad0209.herokuapp.com//spy/connect/${roomId}`;
     connectToWebSocket(roomId, playerNameFromStorage, playerHash);
   } else {
     router.push('/');
   }
 });
 
-const connectedPlayers= ref([])
+const connectedPlayers = ref([]);
 
 watch(() => room.players, (newPlayers) => {
-  connectedPlayers.value.push(newPlayers)
+  connectedPlayers.value = newPlayers;
   console.log('Players updated:', newPlayers);
-  console.log('Players added:', connectedPlayers.value.length);
+  console.log('Connected players:', connectedPlayers.value.length);
 });
 </script>
-
 
 <style scoped>
 .error-message {
