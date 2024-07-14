@@ -221,7 +221,7 @@ onMounted(async () => {
   const exists = await checkRoomExists(roomId);
   if (exists) {
     playerName.value = playerNameFromStorage;
-    qrCodeValue.value = `https://salty-crag-94803-5b1ef9ad0209.herokuapp.com//spy/connect/${roomId}`;
+    qrCodeValue.value = `https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/spy/connect/${roomId}`;
     connectToWebSocket(roomId, playerNameFromStorage, playerHash);
   } else {
     router.push('/');
