@@ -15,6 +15,10 @@ import BattleSeeCreateRoom from './views/BattleSee/BattleSeeCreateRoom'
 import TruthDareCrud from './views/TOD/TruthDareCrud'
 import FiveSecond from './views/5second/FiveSecond.vue'
 import FiveSecondCreateRoom from './views/5second/FiveSecondCreateRoom.vue'
+import CodenamesCreate from './views/Codenames/CodenamesCreate.vue'
+import CodenamesGameBoard from './views/Codenames/CodenamesGameBoard.vue'
+import CodenamesPlayerView from './views/Codenames/CodenamesPlayerView.vue'
+
 
 const routes = [
     {
@@ -107,6 +111,26 @@ const routes = [
         name: 'five-second-room',
         component: FiveSecond,
     }
+    ,
+    {
+        path: '/codenames',
+        name: 'codenames-create',
+        component: CodenamesCreate,
+    }
+    ,
+    {
+        path: '/codenames/game-board/:gameId', 
+        name: 'codenames-gameboard', 
+        component: CodenamesGameBoard, 
+        props: true 
+    }
+    ,
+  {
+    path: '/codenames/player-view/:gameId',
+    name: 'codenames-player-view',
+    component: CodenamesPlayerView,
+    props: true
+  }
 ]
 
 export const router = createRouter({
