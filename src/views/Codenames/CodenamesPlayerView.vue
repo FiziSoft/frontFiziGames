@@ -69,62 +69,6 @@
   </script>
   
   <style>
-  .grid {
-    display: grid;
-    gap: 10px;
-  }
-  
-  .grid-12 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .grid-16 {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  
-  .grid-20 {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  
-  .grid-25 {
-    grid-template-columns: repeat(5, 1fr);
-  }
-  
-  .word {
-    padding: 20px;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    transition: background-color 0.3s;
-  }
-  
-  .word.revealed {
-    background-color: lightgray;
-  }
-  
-  .word.red.revealed {
-    background-color: #FF6666;
-    color: white;
-  }
-  
-  .word.blue.revealed {
-    background-color: #00bfff;
-    color: white;
-  }
-  
-  .word.neutral.revealed {
-    background-color: gray;
-    color: white;
-  }
-  
-  .word.bomb.revealed {
-    background-color: black;
-    color: white;
-  }
-  
-  @media (max-width: 600px) {
-    .grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
+ 
   </style>
   

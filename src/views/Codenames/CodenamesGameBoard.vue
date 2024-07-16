@@ -23,10 +23,10 @@
           {{ word }}
         </div>
       </div>
-      <div class="buttons">
-        <button @click="confirmStartGame">Начать игру</button>
-        <button v-if="gameStarted" @click="toggleShowColors">Скрыть/Показать карту</button>
-        <button @click="toggleShowOnlyRevealed">Показати тільки відкриті ячейки</button>
+      <div class="buttonsCode">
+        <button class="btn-grad" @click="confirmStartGame">Начать игру</button>
+        <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">Скрыть/Показать карту</button>
+        <!-- <button @click="toggleShowOnlyRevealed">Показати тільки відкриті ячейки</button> -->
       </div>
     </div>
     <div v-if="showModal" class="modal">
@@ -113,9 +113,9 @@ const toggleReveal = () => {
   });
 };
 
-const toggleShowOnlyRevealed = () => {
-  showOnlyRevealed.value = !showOnlyRevealed.value;
-};
+// const toggleShowOnlyRevealed = () => {
+//   showOnlyRevealed.value = !showOnlyRevealed.value;
+// };
 
 const toggleShowColors = () => {
   showColors.value = !showColors.value;
@@ -148,132 +148,6 @@ onMounted(() => {
 });
 </script>
 
-<style>
-.grid {
-  display: grid;
-  gap: 10px;
-}
+<style lang="sass">
 
-.grid-12 {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.grid-16 {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.grid-20 {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.grid-25 {
-  grid-template-columns: repeat(5, 1fr);
-}
-
-.word {
-  padding: 20px;
-  cursor: pointer;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s, border 0.3s;
-  text-align: center;
-}
-
-.word.revealed {
-  background-color: lightgray;
-}
-
-.word.red.revealed {
-  background-color: #FF6666;
-  color: white;
-}
-
-.word.blue.revealed {
-  background-color: #6666FF;
-  color: white;
-}
-
-.word.neutral.revealed {
-  background-color: gray;
-  color: white;
-}
-
-.word.bomb.revealed {
-  background-color: black;
-  color: white;
-}
-
-.red-border {
-  border: 2px solid #FF6666;
-}
-
-.blue-border {
-  border: 2px solid #6666FF;
-}
-
-.neutral-border {
-  border: 2px solid gray;
-}
-
-.bomb-border {
-  border: 2px solid black;
-}
-
-.buttons {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
-}
-
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s;
-  border-radius: 8px;
-  border: none;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-button:hover {
-  background-color: #ddd;
-}
-
-button:active {
-  box-shadow: none;
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.modal-content button {
-  margin-top: 10px;
-  width: 80px;
-}
-
-@media (max-width: 600px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  button {
-    width: 100%;
-    font-size: 14px;
-  }
-}
 </style>

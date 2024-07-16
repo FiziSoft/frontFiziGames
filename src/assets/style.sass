@@ -285,3 +285,113 @@ input
   .btn_rock, .btn_paper, .btn_sci
     width: 80px
     height: 80px
+
+// Code Names -----------------------------------------------------
+.grid
+  display: grid
+  gap: 10px
+
+  &-12
+    grid-template-columns: repeat(3, 1fr)
+
+  &-16
+    grid-template-columns: repeat(4, 1fr)
+
+  &-20
+    grid-template-columns: repeat(4, 1fr)
+
+  &-25
+    grid-template-columns: repeat(5, 1fr)
+
+.word
+  padding: 20px
+  cursor: pointer
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1)
+  text-align: center
+  transition: background-color 0.3s, border 0.3s
+  border-radius: 12px
+  width: 120px
+  border: 1px solid rgba(0, 0, 0, 0.3)
+
+  &.revealed
+    background-color: lightgray
+
+  &.red.revealed
+    background-color: #FF6666
+    color: white
+
+  &.blue.revealed
+    background-color: #00bfff
+    color: white
+
+  &.neutral.revealed
+    background-color: gray
+    color: white
+
+  &.bomb.revealed
+    background-color: black
+    color: white
+
+  &.red-border
+    border: 2px solid #FF6666
+
+  &.blue-border
+    border: 2px solid #00bfff
+
+  &.neutral-border
+    border: 2px solid gray
+
+  &.bomb-border
+    border: 2px solid black
+
+.buttonCode
+  padding: 10px 20px
+  font-size: 16px
+  cursor: pointer
+  transition: background-color 0.3s, box-shadow 0.3s
+  border-radius: 8px
+  border: none
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1)
+  margin: 20px
+
+  &:hover
+    background-color: #ddd
+
+  &:active
+    box-shadow: none
+
+.modal
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  background: rgba(0, 0, 0, 0.5)
+  display: flex
+  justify-content: center
+  align-items: center
+
+.modal-content
+  background: white
+  padding: 20px
+  border-radius: 8px
+  text-align: center
+
+  button
+    margin-top: 10px
+    width: 80px
+
+@media (max-width: 600px)
+  .grid
+    grid-template-columns: repeat(2, 1fr)
+
+  button
+    width: 100%
+    font-size: 14px
+
+.buttonsCode
+  display: flex
+  margin: 20px
+  width: 400px
+  height: 100px
+  text-align: center
