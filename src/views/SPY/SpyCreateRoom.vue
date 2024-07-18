@@ -12,7 +12,7 @@
         </div>
         <div class="formElement">
           <label class="btn-gradient-1" for="time_game">Час на гру:</label>
-          <input v-model="time_game" type="text" id="time_game" class="input-gradient">
+          <input v-model="time_game" type="number" id="time_game" class="input-gradient">
         </div>
         <div class="formElement">
           <Dropdown_my :items="themes" v-model="theme_str" label="Тема гри:" />

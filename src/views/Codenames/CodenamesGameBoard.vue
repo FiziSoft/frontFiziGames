@@ -1,46 +1,56 @@
 <template>
   <GameLayout nameGame="Кодові імена">
     <div class="containerCodenames">
-      <div class="progress">
-        <div class="team">
-          <span class="team-name">Сині: </span>
-          <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }}</span>
-        </div>
-        <div class="team">
-          <span class="team-name">Червоні: </span>
-          <span class="team-progress">{{ redRevealedCount }} / {{ redTotal }}</span>
-        </div>
-        <br>
+      <!-- Анимация загрузки -->
+      <div v-if="!wordsLoaded" class="loading-spinner">
+        <div class="spinner"></div>
       </div>
-      <div class="grid">
-        <div
-          v-for="word in words"
-          :key="word"
-          class="word"
-          :class="{
-            revealed: !!revealedWords[word],
-            red: revealedWords[word] === 'red',
-            blue: revealedWords[word] === 'blue',
-            neutral: revealedWords[word] === 'neutral',
-            bomb: revealedWords[word] === 'bomb',
-            'red-border': showColors && board[word] === 'red',
-            'blue-border': showColors && board[word] === 'blue',
-            'neutral-border': showColors && board[word] === 'neutral',
-            'bomb-border': showColors && board[word] === 'bomb'
-          }"
-          @click="revealWord(word)"
-        >
-          {{ word }}
-        </div>
-      </div>
-      <div class="buttonsCode">
-        <button class="btn-grad" v-if="info_share" @click="confirmStartGame">Почати гру</button>
-        <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">{{ showColors ? 'скрити' : 'показати' }}</button>
-        <button class="btn-grad" v-if="info_share" @click="showTelegramShareModal = true">Додати капітана</button>
 
-        <button class="btn-grad" v-if="!gameStarted" @click="refreshWords">Оновити слова</button>
+      <!-- Основное содержимое -->
+      <div v-else>
+        <div class="progress">
+          <div class="team">
+            <span class="team-name">Сині: </span>
+            <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }}</span>
+          </div>
+          <div class="team">
+            <span class="team-name">Червоні: </span>
+            <span class="team-progress">{{ redRevealedCount }} / {{ redTotal }}</span>
+          </div>
+          <br>
+        </div>
+        <div class="grid">
+          <div
+            v-for="word in words"
+            :key="word"
+            class="word"
+            :class="{
+              revealed: !!revealedWords[word],
+              red: revealedWords[word] === 'red',
+              blue: revealedWords[word] === 'blue',
+              neutral: revealedWords[word] === 'neutral',
+              bomb: revealedWords[word] === 'bomb',
+              'red-border': showColors && board[word] === 'red',
+              'blue-border': showColors && board[word] === 'blue',
+              'neutral-border': showColors && board[word] === 'neutral',
+              'bomb-border': showColors && board[word] === 'bomb'
+            }"
+            @click="revealWord(word)"
+          >
+            {{ word }}
+          </div>
+        </div>
+        <div class="buttonsCode">
+          <button class="btn-grad" v-if="info_share" @click="confirmStartGame">Почати гру</button>
+          <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">{{ showColors ? 'скрити' : 'показати' }}</button>
+          <button class="btn-grad" v-if="info_share" @click="showTelegramShareModal = true">Додати капітана</button>
+          <button class="btn-grad" v-if="!gameStarted" @click="refreshWords">Оновити слова</button>
+        </div>
       </div>
     </div>
+    <ShareButton :url="url_share" text='Давай грати в "Кодові імена"'></ShareButton>
+    
+    <!-- Модальное окно для отображения победителя -->
     <div v-if="showModal" class="modal-unique">
       <div class="modal-content-unique">
         <p v-if="bombSelected">Ваша команда програла</p>
@@ -86,8 +96,7 @@ const showTelegramShareModal = ref(false);
 const winner = ref(null);
 const bombSelected = ref(false);
 const url_captan_share = window.location.href;
-
-
+const wordsLoaded = ref(false);  // Состояние для отслеживания загрузки слов
 
 let socket;
 const url_share = `https://fizigames-799b6804c93a.herokuapp.com/codenames/player-view/${gameId.value}`;
@@ -141,6 +150,8 @@ const connectWebSocket = () => {
 
         redTotal.value = Object.values(message.board).filter(role => role === 'red').length;
         blueTotal.value = Object.values(message.board).filter(role => role === 'blue').length;
+
+        wordsLoaded.value = true;  // Устанавливаем состояние загрузки слов
       } else if (message.type === "startGame") {
         gameStarted.value = true;
         showColors.value = true;
@@ -223,13 +234,20 @@ const filteredWords = computed(() => {
 onMounted(() => {
   if (gameId.value) {
     connectWebSocket();
+
+    // Запускаем таймер на 3 секунды для проверки загрузки слов
+    setTimeout(() => {
+      if (!wordsLoaded.value) {
+        location.reload(); // Обновляем страницу, если слова не загружены
+      }
+    }, 3000);
   } else {
     console.error("Missing gameId");
   }
 });
 </script>
 
-<style>
+<style scoped>
 .button_finish {
   width: 150px;
   margin: 25px;
@@ -258,5 +276,27 @@ onMounted(() => {
   padding: 20px;
   border-radius: 8px;
   text-align: center;
+}
+
+/* Анимация загрузки */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Высота экрана */
+}
+
+.spinner {
+  border: 8px solid rgba(0, 0, 0, 0.1);
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

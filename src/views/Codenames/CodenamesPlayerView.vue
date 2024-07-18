@@ -1,31 +1,39 @@
 <template>
   <GameLayout nameGame="Кодові імена">
     <div class="containerCodenames">
-      <div class="progress">
-        <div class="team">
-          <span class="team-name">Сині: </span>
-          <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }}</span>
-        </div>
-        <div class="team">
-          <span class="team-name">Червоні: </span>
-          <span class="team-progress">{{ redRevealedCount }} / {{ redTotal }}</span>
-        </div>
-        <br>
+      <!-- Анимация загрузки -->
+      <div v-if="!wordsLoaded" class="loading-spinner">
+        <div class="spinner"></div>
       </div>
-      <div :class="`grid grid-${words.length}`">
-        <div
-          v-for="word in words"
-          :key="word"
-          class="word"
-          :class="{ 
-            revealed: !!revealedWords[word], 
-            red: revealedWords[word] === 'red', 
-            blue: revealedWords[word] === 'blue', 
-            neutral: revealedWords[word] === 'neutral', 
-            bomb: revealedWords[word] === 'bomb' 
-          }"
-        >
-          {{ word }}
+
+      <!-- Основное содержимое -->
+      <div v-else>
+        <div class="progress">
+          <div class="team">
+            <span class="team-name">Сині: </span>
+            <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }}</span>
+          </div>
+          <div class="team">
+            <span class="team-name">Червоні: </span>
+            <span class="team-progress">{{ redRevealedCount }} / {{ redTotal }}</span>
+          </div>
+          <br>
+        </div>
+        <div :class="`grid grid-${words.length}`">
+          <div
+            v-for="word in words"
+            :key="word"
+            class="word"
+            :class="{ 
+              revealed: !!revealedWords[word], 
+              red: revealedWords[word] === 'red', 
+              blue: revealedWords[word] === 'blue', 
+              neutral: revealedWords[word] === 'neutral', 
+              bomb: revealedWords[word] === 'bomb' 
+            }"
+          >
+            {{ word }}
+          </div>
         </div>
       </div>
     </div>
@@ -174,5 +182,27 @@ onMounted(() => {
   padding: 20px;
   border-radius: 8px;
   text-align: center;
+}
+
+/* Анимация загрузки */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Высота экрана */
+}
+
+.spinner {
+  border: 8px solid rgba(0, 0, 0, 0.1);
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
