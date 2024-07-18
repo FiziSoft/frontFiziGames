@@ -35,8 +35,8 @@
       </div>
       <div class="buttonsCode">
         <button class="btn-grad" v-if="info_share" @click="confirmStartGame">Почати гру</button>
-        <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">On/Off</button>
-        <button class="btn-grad" @click="showTelegramShareModal = true">Додати капітана</button>
+        <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">{{ showColors ? 'скрити' : 'показати' }}</button>
+        <button class="btn-grad" v-if="info_share" @click="showTelegramShareModal = true">Додати капітана</button>
 
         <button class="btn-grad" v-if="!gameStarted" @click="refreshWords">Оновити слова</button>
       </div>
@@ -182,6 +182,7 @@ const toggleShowColors = () => {
 const confirmStartGame = () => {
   info_share.value = false;
   gameStarted.value = true;
+  showColors.value = true;
 };
 
 const startGame = () => {
