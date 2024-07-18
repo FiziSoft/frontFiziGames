@@ -4,14 +4,17 @@ import {router} from "./router"
 import './assets/style.sass'
 import './assets/neonCheckbox.scss'
 import store from './components/store'
-import axios from 'axios'
 
-axios.defaults.baseURL = 'http://localhost:8000' 
 
 const app = createApp(App)
 
 app.use(router)
 app.use(store)
+
+app.config.globalProperties.$globalState = {
+    user: 'John Doe',
+    theme: 'light',
+  };
 
 
 app.mount('#app')

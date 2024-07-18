@@ -17,7 +17,9 @@
       </div>
       <div v-else-if="gameState === 'GameCanBeStart'">
         <h1 v-if="isSpy" class="spy-notice">Ви шпіон!</h1>
-        <h2 v-if="!isSpy">{{ cur_world }}</h2>
+        <div class="cur_word">
+          <h2 v-if="!isSpy">{{ cur_world }}</h2>
+        </div>
         <table class="formCreate">
           <thead>
             <tr>
@@ -238,6 +240,12 @@ watch(() => room.players, (newPlayers) => {
 </script>
 
 <style scoped>
+.cur_word {
+font-size: large;
+text-align: center;
+}
+
+
 .error-message {
   color: red;
   margin-top: 10px;

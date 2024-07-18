@@ -5,7 +5,7 @@
     <div class="containerFormCreate">
       <div class="formCreate" v-if="choise_div===true">
         <div class="nameCurPlayer">
-          <h1>{{ cur_player.name }}</h1>
+          <h1>{{ cur_player.name }} {{  }} </h1>
         </div>
         <transition name="fade">
           <button v-if="isVisible('button1')" ref="button1" v-show="truth_div===true" @click="go_truths(), setOnView()" class="btn-grad">Правда</button>
