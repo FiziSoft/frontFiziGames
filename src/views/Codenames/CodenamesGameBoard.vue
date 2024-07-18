@@ -36,17 +36,25 @@
       <div class="buttonsCode">
         <button class="btn-grad" v-if="info_share" @click="confirmStartGame">Почати гру</button>
         <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">On/Off</button>
+        <button class="btn-grad" @click="showTelegramShareModal = true">Додати капітана</button>
+
         <button class="btn-grad" v-if="!gameStarted" @click="refreshWords">Оновити слова</button>
       </div>
     </div>
-    <div v-if="showModal" class="modal">
-      <div class="modal-content">
+    <div v-if="showModal" class="modal-unique">
+      <div class="modal-content-unique">
         <p v-if="bombSelected">Ваша команда програла</p>
         <p v-else>Команда {{ winner }} виграла!</p>
         <div>
           <button class="button_finish" @click="restartGame">Почати нову гру</button>
           <button class="button_finish" @click="changeWordsCount">Змінити кількість слів</button>
         </div>
+      </div>
+    </div>
+    <div v-if="showTelegramShareModal" class="modal-unique">
+      <div class="modal-content-unique">
+        <TelegramShareButton :url="url_captan_share" text="Ти капітан, давай грати" />
+        <button class="button_finish" @click="showTelegramShareModal = false">Закрити</button>
       </div>
     </div>
     <div class="info_captain" v-show="info_share"> 
@@ -61,6 +69,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import GameLayout from '../GameLayout.vue';
 import ShareButton from '@/components/ShareButton.vue';
+import TelegramShareButton from '@/components/TelegramShareButton.vue';  // Предполагая, что этот компонент существует
 
 const route = useRoute();
 const router = useRouter();
@@ -73,8 +82,12 @@ const showColors = ref(false);
 const showModal = ref(false);
 const gameStarted = ref(false);
 const info_share = ref(true);
+const showTelegramShareModal = ref(false);
 const winner = ref(null);
 const bombSelected = ref(false);
+const url_captan_share = window.location.href;
+
+
 
 let socket;
 const url_share = `https://fizigames-799b6804c93a.herokuapp.com/codenames/player-view/${gameId.value}`;
@@ -169,7 +182,6 @@ const toggleShowColors = () => {
 const confirmStartGame = () => {
   info_share.value = false;
   gameStarted.value = true;
-  // showModal.value = true;
 };
 
 const startGame = () => {
@@ -216,16 +228,34 @@ onMounted(() => {
 });
 </script>
 
-
 <style>
 .button_finish {
   width: 150px;
   margin: 25px;
   padding: 20px;
-  /* border: 1px solid; */
   border-radius: 12px;
   color: white !important; 
   background: linear-gradient(to right, #DA22FF 0%, #9733EE 100%);
   box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
+}
+
+.modal-unique {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content-unique {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
 }
 </style>
