@@ -1,77 +1,81 @@
 <template>
   <GameLayout nameGame="Шпіон">
-    <div>
-      <h2>Доедналися до гри:</h2>
-      <ul v-if="room.players.length">
-        <li v-for="(player, key) in room.players" :key="key">{{ player.name }}</li> 
-      </ul>
-    </div>
-
     <div v-if="loading">
-      Loading...
-    </div>
-    <div v-else class="containerFormCreate">
-      <div v-if="gameState === 'WaitPlayers'">
-        <div class="waiting">Очікуємо на гравців</div>
-        <TelegramShareButton :url="qrCodeValue" text="Давай грати в Шпіона" />
+      <div class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading...</p>
       </div>
-      <div v-else-if="gameState === 'GameCanBeStart'">
-        <h1 v-if="isSpy" class="spy-notice">Ви шпіон!</h1>
-        <div class="cur_word">
-          <h2 v-if="!isSpy">{{ cur_world }}</h2>
+    </div>
+    <div v-else>
+      <div>
+        <h2>Доедналися до гри:</h2>
+        <ul v-if="room.players.length">
+          <li v-for="(player, key) in room.players" :key="key">{{ player.name }}</li> 
+        </ul>
+      </div>
+      <div class="containerFormCreate">
+        <div v-if="gameState === 'WaitPlayers'">
+          <div class="waiting">Очікуємо на гравців</div>
+          <TelegramShareButton :url="qrCodeValue" text="Давай грати в Шпіона" />
         </div>
-        <table class="formCreate">
-          <thead>
-            <tr>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="i in filteredPlayers" :key="i.id" class="formElement">
-              <td class="tableElement">{{ i.name }}</td>
-            </tr>
-            <TimerFizi :timeInSeconds="time_game" :autoStart="true" 
-              timerTimeLeftKey="spyTimerTimeLeft"
-              timerIsRunningKey="spyIsRunning"
-              lastUpdateTimeKey="spylastUpdateTime"/>
-          </tbody>
-        </table>
-        <div class="spyDiv" v-if="isSpy">
-          <div>
-            <ul>
-              <li v-for="word in room.theme" :key="word">{{ word }}</li>
-            </ul>
+        <div v-else-if="gameState === 'GameCanBeStart'">
+          <h1 v-if="isSpy" class="spy-notice">Ви шпіон!</h1>
+          <div class="cur_word">
+            <h2 v-if="!isSpy">{{ cur_world }}</h2>
+          </div>
+          <table class="formCreate">
+            <thead>
+              <tr>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="i in filteredPlayers" :key="i.id" class="formElement">
+                <td class="tableElement">{{ i.name }}</td>
+              </tr>
+              <TimerFizi :timeInSeconds="time_game" :autoStart="true" 
+                timerTimeLeftKey="spyTimerTimeLeft"
+                timerIsRunningKey="spyIsRunning"
+                lastUpdateTimeKey="spylastUpdateTime"/>
+            </tbody>
+          </table>
+          <div class="spyDiv" v-if="isSpy">
+            <div>
+              <ul>
+                <li v-for="word in room.theme" :key="word">{{ word }}</li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-      <div v-if="showVotingModal" class="modal">
-        <div class="modal-content">
-          <span class="close" @click="showVotingModal = false">&times;</span>
-          <h2>Выберите шпиона</h2>
-          <button v-for="player in filteredPlayers" :key="player.id" @click="voteForPlayer(player.id)">
-            {{ player.name }}
-          </button>
+        <div v-if="showVotingModal" class="modal">
+          <div class="modal-content">
+            <span class="close" @click="showVotingModal = false">&times;</span>
+            <h2>Выберите шпиона</h2>
+            <button v-for="player in filteredPlayers" :key="player.id" @click="voteForPlayer(player.id)">
+              {{ player.name }}
+            </button>
+          </div>
         </div>
-      </div>
-      <div v-if="showGuessingModal" class="modal">
-        <div class="modal-content">
-          <span class="close" @click="showGuessingModal = false">&times;</span>
-          <h2>Выберите загаданное слово</h2>
-          <button v-for="word in room.theme" :key="word" @click="guessWord(word)">
-            {{ word }}
-          </button>
+        <div v-if="showGuessingModal" class="modal">
+          <div class="modal-content">
+            <span class="close" @click="showGuessingModal = false">&times;</span>
+            <h2>Выберите загаданное слово</h2>
+            <button v-for="word in room.theme" :key="word" @click="guessWord(word)">
+              {{ word }}
+            </button>
+          </div>
         </div>
-      </div>
-      <div v-if="showResultModal" class="modal">
-        <div class="modal-content">
-          <span class="close" @click="showResultModal = false">&times;</span>
-          <h2>Результат игры</h2>
-          <p>{{ gameResult }}</p>
-          <ButtonHome></ButtonHome>
+        <div v-if="showResultModal" class="modal">
+          <div class="modal-content">
+            <span class="close" @click="showResultModal = false">&times;</span>
+            <h2>Результат игры</h2>
+            <p>{{ gameResult }}</p>
+            <ButtonHome></ButtonHome>
+          </div>
         </div>
-      </div>
-      <div v-if="errorMessage" class="error-message">
-        {{ errorMessage }}
+        <div v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
       </div>
     </div>
   </GameLayout>
@@ -228,6 +232,7 @@ onMounted(async () => {
     } else {
       router.push('/');
     }
+    loading.value = false;
   }, 2000);
 });
 
@@ -241,6 +246,35 @@ watch(() => room.players, (newPlayers) => {
 </script>
 
 <style scoped>
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.spinner {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .cur_word {
   font-size: large;
 }
