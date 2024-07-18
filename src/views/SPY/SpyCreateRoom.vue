@@ -11,7 +11,7 @@
           <input v-model="numPlayers" class="input-gradient" placeholder=" " type="number" />
         </div>
         <div class="formElement">
-          <label class="btn-gradient-1" for="time_game">Час на гру:</label>
+          <label class="btn-gradient-1" for="time_game">Час на гру (хв):</label>
           <input v-model="time_game" type="number" id="time_game" class="input-gradient">
         </div>
         <div class="formElement">

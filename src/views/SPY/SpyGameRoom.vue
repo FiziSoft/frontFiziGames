@@ -129,11 +129,11 @@ const connectToWebSocket = (roomId, playerName, playerHash) => {
     if (eventType === 'GameCanBeStart') {
       gameState.value = 'GameCanBeStart';
       cur_world.value = message.world_spy;
-      time_game.value = parseInt(message.room.time_game);
+      time_game.value = parseInt(message.room.time_game)*60;
       isSpy.value = false; // Обнуляем значение
     } else if (eventType === 'YouAreSpy') {
       gameState.value = 'GameCanBeStart';
-      time_game.value = parseInt(message.room.time_game);
+      time_game.value = parseInt(message.room.time_game)*60;
       isSpy.value = true;
       cur_world.value = ''; // Очистим текущее слово
     } else if (eventType === 'VotingStarted') {
@@ -233,7 +233,7 @@ onMounted(async () => {
       router.push('/');
     }
     loading.value = false;
-  }, 2000);
+  }, 1000);
 });
 
 const connectedPlayers = ref([]);
