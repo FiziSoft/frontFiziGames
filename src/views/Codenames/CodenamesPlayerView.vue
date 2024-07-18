@@ -68,6 +68,9 @@ const blueTotal = ref(0);
 const showWinnerModal = ref(false);
 const winnerMessage = ref('');
 
+// Состояние для отслеживания загрузки слов
+const wordsLoaded = ref(false);
+
 const connectWebSocket = () => {
   const wsUrl = `wss://codenames-72ce2135032c.herokuapp.com/ws/${gameId.value}`;
   console.log(`Connecting to WebSocket at ${wsUrl}`);
@@ -92,6 +95,8 @@ const connectWebSocket = () => {
         // Подсчитываем общее количество слов для каждой команды
         redTotal.value = Object.values(message.board).filter(role => role === 'red').length;
         blueTotal.value = Object.values(message.board).filter(role => role === 'blue').length;
+
+        wordsLoaded.value = true; // Устанавливаем состояние загрузки слов
       }
     };
 
@@ -127,6 +132,13 @@ const closeWinnerModal = () => {
 onMounted(() => {
   if (gameId.value) {
     connectWebSocket();
+
+    // Запускаем таймер на 3 секунды для проверки загрузки слов
+    setTimeout(() => {
+      if (!wordsLoaded.value) {
+        location.reload(); // Обновляем страницу, если слова не загружены
+      }
+    }, 3000);
   } else {
     console.error("Missing gameId");
   }
@@ -150,7 +162,6 @@ onMounted(() => {
   
   margin: 20px;
   padding: 15px;
-  /* border: 1px solid; */
   border-radius: 12px;
   color: white !important; 
   background: linear-gradient(to right, #DA22FF 0%, #9733EE 100%);
