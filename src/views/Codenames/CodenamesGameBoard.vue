@@ -240,7 +240,7 @@ onMounted(() => {
       if (!wordsLoaded.value) {
         location.reload(); // Обновляем страницу, если слова не загружены
       }
-    }, 3000);
+    }, 2000);
   } else {
     console.error("Missing gameId");
   }

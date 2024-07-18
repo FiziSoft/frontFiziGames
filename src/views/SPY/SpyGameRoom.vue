@@ -237,6 +237,16 @@ watch(() => room.players, (newPlayers) => {
   console.log('Players updated:', newPlayers);
   console.log('Connected players:', connectedPlayers.value.length);
 });
+
+watch(() => room.players.length, (newLength) => {
+  if (newLength === 0) {
+    setTimeout(() => {
+      if (room.players.length === 0) {
+        location.reload(); // Обновляем страницу, если список игроков все еще пуст
+      }
+    }, 3000);
+  }
+});
 </script>
 
 <style scoped>
