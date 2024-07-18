@@ -100,7 +100,7 @@ input
 
 .appContainer
   position: absolute
-  height: 100%
+  // height: 100%
   width: 100%
 
 .menuFizi
@@ -287,30 +287,31 @@ input
     height: 80px
 
 // Code Names -----------------------------------------------------
+.containerCodenames
+  margin: 0 auto
+  max-width: 700px
+  font-size: 18px
+  display: flex
+  justify-content: center
+  text-align: left
+  flex-direction: column /* Для мобильных устройств */
+  align-items: center /* Центровка содержимого */
+
 .grid
-  display: grid
-  gap: 10px
-
-  &-12
-    grid-template-columns: repeat(3, 1fr)
-
-  &-16
-    grid-template-columns: repeat(4, 1fr)
-
-  &-20
-    grid-template-columns: repeat(4, 1fr)
-
-  &-25
-    grid-template-columns: repeat(5, 1fr)
+  display: flex
+  flex-wrap: wrap
+  justify-content: center
+  gap: 15px
 
 .word
+  flex: 1 0 120px
+  max-width: 120px
   padding: 20px
   cursor: pointer
   box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1)
   text-align: center
   transition: background-color 0.3s, border 0.3s
   border-radius: 12px
-  width: 120px
   border: 1px solid rgba(0, 0, 0, 0.3)
 
   &.revealed
@@ -381,17 +382,31 @@ input
     margin-top: 10px
     width: 80px
 
+@media (max-width: 1200px)
+  .word
+    flex: 1 0 calc(25% - 15px)
+    max-width: calc(25% - 15px)
+
+@media (max-width: 900px)
+  .word
+    flex: 1 0 calc(25% - 15px)
+    max-width: calc(25% - 15px)
+
 @media (max-width: 600px)
-  .grid
-    grid-template-columns: repeat(2, 1fr)
+  .word
+    flex: 1 0 calc(33.33% - 15px)
+    max-width: calc(33.33% - 15px)
 
-  button
-    width: 100%
-    font-size: 14px
+@keyframes blink
+  0%
+    opacity: 1
+  50%
+    opacity: 0.3
+  100%
+    opacity: 1
 
-.buttonsCode
-  display: flex
-  margin: 20px
-  width: 400px
-  height: 100px
-  text-align: center
+.info_captain
+  position: absolute
+  bottom: 150px
+  left: 100px
+  animation: blink 3s infinite

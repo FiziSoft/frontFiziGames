@@ -1,18 +1,17 @@
 <template>
-  <GameLayout nameGame="Code names">
-    <div>
-      <h2>Слова</h2>
-      <div :class="`grid grid-${words.length}`">
+  <GameLayout nameGame="Кодові імена">
+    <div class="containerCodenames">
+      <div class="grid">
         <div
-          v-for="word in filteredWords"
+          v-for="word in words"
           :key="word"
           class="word"
-          :class="{ 
-            revealed: !!revealedWords[word], 
-            red: revealedWords[word] === 'red', 
-            blue: revealedWords[word] === 'blue', 
-            neutral: revealedWords[word] === 'neutral', 
-            bomb: revealedWords[word] === 'bomb', 
+          :class="{
+            revealed: !!revealedWords[word],
+            red: revealedWords[word] === 'red',
+            blue: revealedWords[word] === 'blue',
+            neutral: revealedWords[word] === 'neutral',
+            bomb: revealedWords[word] === 'bomb',
             'red-border': showColors && board[word] === 'red',
             'blue-border': showColors && board[word] === 'blue',
             'neutral-border': showColors && board[word] === 'neutral',
@@ -24,9 +23,9 @@
         </div>
       </div>
       <div class="buttonsCode">
-        <button class="btn-grad" @click="confirmStartGame">Начать игру</button>
-        <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">Скрыть/Показать карту</button>
-        <!-- <button @click="toggleShowOnlyRevealed">Показати тільки відкриті ячейки</button> -->
+        <button class="btn-grad" v-if="info_share" @click="confirmStartGame">Почати гру</button>
+        <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">On/Off</button>
+        <button class="btn-grad" v-if="!gameStarted" @click="refreshWords">Оновити слова</button>
       </div>
     </div>
     <div v-if="showModal" class="modal">
@@ -36,7 +35,10 @@
         <button @click="closeModal">Нет</button>
       </div>
     </div>
-    <ShareButton :url="url_share"></ShareButton>
+    <div class="info_captain" v-show="info_share"> 
+      <i class="fa-solid fa-arrow-left"></i> пошерся своїм друзям
+    </div>
+    <ShareButton :url="url_share" text="Поділитися"></ShareButton>
   </GameLayout>
 </template>
 
@@ -47,7 +49,7 @@ import GameLayout from '../GameLayout.vue';
 import ShareButton from '@/components/ShareButton.vue';
 
 const route = useRoute();
-const gameId = route.params.gameId;
+const gameId = ref(route.params.gameId);
 const words = ref([]);
 const revealedWords = ref({});
 const board = ref({});
@@ -55,15 +57,16 @@ const showOnlyRevealed = ref(false);
 const showColors = ref(false);
 const showModal = ref(false);
 const gameStarted = ref(false);
+const info_share = ref(true)
 
 let socket;
-const url_share = `http://localhost:8080/codenames/player-view/${gameId}`;
+const url_share = `https://fizigames-799b6804c93a.herokuapp.com/codenames/player-view/${gameId.value}`;
 
 const connectWebSocket = () => {
-  const wsUrl = `ws://localhost:8001/ws/${gameId}`;
+  const wsUrl = `wss://codenames-72ce2135032c.herokuapp.com/ws/${gameId.value}`;
   console.log(`Connecting to WebSocket at ${wsUrl}`);
   try {
-    socket = new WebSocket(wsUrl);
+    socket = new WebSocket(wsUrl);   
 
     socket.onopen = () => {
       console.log('WebSocket connection established');
@@ -74,15 +77,18 @@ const connectWebSocket = () => {
       const message = JSON.parse(event.data);
       if (message.type === "reveal") {
         revealedWords.value[message.word] = message.role;
+        console.log(`Revealed word: ${message.word}, role: ${message.role}`);
       } else if (message.type === "initialize") {
         words.value = message.words;
         board.value = message.board;
         gameStarted.value = message.gameStarted;
         showColors.value = gameStarted.value;
         revealedWords.value = message.revealedWords;
+        console.log("Initialized game state:", message);
       } else if (message.type === "startGame") {
         gameStarted.value = true;
         showColors.value = true;
+        console.log("Game started");
       }
     };
 
@@ -113,15 +119,12 @@ const toggleReveal = () => {
   });
 };
 
-// const toggleShowOnlyRevealed = () => {
-//   showOnlyRevealed.value = !showOnlyRevealed.value;
-// };
-
 const toggleShowColors = () => {
   showColors.value = !showColors.value;
 };
 
 const confirmStartGame = () => {
+  info_share.value = false
   showModal.value = true;
 };
 
@@ -136,6 +139,11 @@ const closeModal = () => {
   showModal.value = false;
 };
 
+const refreshWords = () => {
+  socket.send(JSON.stringify({ type: "refreshWords" }));
+  console.log("Requested words refresh");
+};
+
 const filteredWords = computed(() => {
   if (showOnlyRevealed.value) {
     return words.value.filter(word => revealedWords.value[word]);
@@ -144,10 +152,10 @@ const filteredWords = computed(() => {
 });
 
 onMounted(() => {
-  connectWebSocket();
+  if (gameId.value) {
+    connectWebSocket();
+  } else {
+    console.error("Missing gameId");
+  }
 });
 </script>
-
-<style lang="sass">
-
-</style>
