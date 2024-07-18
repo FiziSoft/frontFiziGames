@@ -86,7 +86,6 @@ import TimerFizi from '@/components/TimerFizi.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import ButtonHome from '@/components/ButtonHome.vue';
 
-
 const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com";
 
 // const url_serv = "127.0.0.1:7000";
@@ -211,23 +210,25 @@ const filteredPlayers = computed(() => {
 });
 
 onMounted(async () => {
-  const playerNameFromStorage = localStorage.getItem('spyPlayerName');
-  const roomId = route.params.id;
-  const playerHash = localStorage.getItem('spyPlayerHash');
+  setTimeout(async () => {
+    const playerNameFromStorage = localStorage.getItem('spyPlayerName');
+    const roomId = route.params.id;
+    const playerHash = localStorage.getItem('spyPlayerHash');
 
-  if (!playerNameFromStorage || !roomId) {
-    router.push('/');
-    return;
-  }
+    if (!playerNameFromStorage || !roomId) {
+      router.push('/');
+      return;
+    }
 
-  const exists = await checkRoomExists(roomId);
-  if (exists) {
-    playerName.value = playerNameFromStorage;
-    qrCodeValue.value = `https://fizigames-799b6804c93a.herokuapp.com/spy/connect/${roomId}`;
-    connectToWebSocket(roomId, playerNameFromStorage, playerHash);
-  } else {
-    router.push('/');
-  }
+    const exists = await checkRoomExists(roomId);
+    if (exists) {
+      playerName.value = playerNameFromStorage;
+      qrCodeValue.value = `https://fizigames-799b6804c93a.herokuapp.com/spy/connect/${roomId}`;
+      connectToWebSocket(roomId, playerNameFromStorage, playerHash);
+    } else {
+      router.push('/');
+    }
+  }, 2000);
 });
 
 const connectedPlayers = ref([]);
@@ -241,9 +242,8 @@ watch(() => room.players, (newPlayers) => {
 
 <style scoped>
 .cur_word {
-font-size: large;
+  font-size: large;
 }
-
 
 .error-message {
   color: red;
