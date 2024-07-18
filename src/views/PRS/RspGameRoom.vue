@@ -48,11 +48,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, defineProps } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import QrcodeVue from 'qrcode.vue'
 import GameLayout from '../GameLayout.vue'
 import TelegramShareButton from '@/components/TelegramShareButton.vue'
 
+// const serv_url = "localhost:8000"
 const serv_url = "rsp-f1c55df7ba69.herokuapp.com"
 
 const pName = localStorage.getItem('playerName')
@@ -63,7 +65,6 @@ let gameState = ref('WaitPlayers')
 const room = reactive({
   name: '',
   players: [],
-  required_players: 0,
 })
 
 const showChoice = ref(false)
@@ -146,16 +147,6 @@ onMounted(() => {
   setTimeout(() => {
     initializeWebSocket();
   }, 500);
-});
-
-watch(() => room.name, (newName) => {
-  if (!newName) {
-    setTimeout(() => {
-      if (!room.name) {
-        location.reload(); // Обновляем страницу, если имя комнаты все еще пусто
-      }
-    }, 3000);
-  }
 });
 </script>
 
