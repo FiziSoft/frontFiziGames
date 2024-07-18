@@ -20,8 +20,8 @@
 <script setup>
 import { ref } from 'vue';
 
-const network_url = ref('http://localhost:8080');
-// const network_url = 'https://fizigames-799b6804c93a.herokuapp.com';
+// const network_url = ref('http://localhost:8080');
+const network_url = 'https://fizigames-799b6804c93a.herokuapp.com';
 
 
 
