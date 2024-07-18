@@ -54,7 +54,7 @@ const redirectToRoomPage = async () => {
     // Проверяем, существует ли комната
     const response = await axios.get(`https://${url_serv}/rooms/${roomId}`);
     if (response.status === 200 && response.data) {
-      alert("ok")
+     
       localStorage.setItem('spyRoomId', roomId);
       router.push({ name: 'spyGameRoom', params: { id: roomId, playerHash } }).then(() => {
         window.location.reload(); // Обновляем страницу один раз после перенаправления
@@ -62,7 +62,7 @@ const redirectToRoomPage = async () => {
     }
   } catch (error) {
     if (error.response && error.response.status === 404) {
-      alert("ne ok")
+     
 
       errorMessage.value = "Комната не существует. Пожалуйста, проверьте ID комнаты и попробуйте снова.";
     } else {
