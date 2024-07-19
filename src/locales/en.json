@@ -29,6 +29,9 @@
         "name": "Codenames",
         "description": "Codenames is a team game where players try to guess words using clues. Two teams compete to be the first to find all their code words on the board. A clue consists of one word and a number indicating the number of related words."
       }
-    }
+    },
+    "select_theme": "Select Theme",
+    "select_language": "Select Language",
+    "close": "Close"
   }
   

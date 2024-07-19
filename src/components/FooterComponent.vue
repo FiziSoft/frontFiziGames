@@ -1,21 +1,40 @@
 <template>
-  <div class="mainFooter">
-    <button class="menuFizi" @click="goToHome">FiziGames</button>
-    <div class="theme-selector">
-      <select @change="changeTheme($event)" :value="currentTheme">
-        <option value="default" style="background: #6a11cb;">{{ $t('themes.default') }}</option>
-        <option value="theme1" style="background: #ff7e5f;">{{ $t('themes.theme1') }}</option>
-        <option value="theme2" style="background: #9733ee;">{{ $t('themes.theme2') }}</option>
-        <option value="theme3" style="background: #f9f9a1;">{{ $t('themes.theme3') }}</option>
-        <option value="theme4" style="background: #f8c4d4;">{{ $t('themes.theme4') }}</option>
-      </select>
+  <div>
+    <div class="mainFooter">
+      <button class="menuBurger" @click="toggleModal">
+        <i :class="isModalOpen ? 'fa fa-chevron-down' : 'fa fa-bars'"></i>
+      </button>
+      <span class="menuFizi">FiziGames</span>
     </div>
-    <div class="language-selector">
-      <select @change="changeLanguage($event)" :value="locale">
-        <option value="uk" style="background-image: url('@/assets/locales/ukraine.svg');">Українська</option>
-        <option value="ru" style="background-image: url('@/assets/locales/rus.svg');">Русский</option>
-        <option value="en" style="background-image: url('@/assets/locales/en.svg');">English</option>
-      </select>
+
+    <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal">
+      <div class="modal-content">
+        <button class="menuBurger" @click="toggleModal">
+          <i class="fa fa-chevron-down"></i>
+        </button>
+        <span class="menuFizi">FiziGames</span>
+        <div class="modal-body">
+          <div class="modal-section">
+            <label>{{ $t('select_theme') }}</label>
+            <select @change="changeTheme($event)" :value="currentTheme">
+              <option value="default">{{ $t('themes.default') }}</option>
+              <option value="theme1">{{ $t('themes.theme1') }}</option>
+              <option value="theme2">{{ $t('themes.theme2') }}</option>
+              <option value="theme3">{{ $t('themes.theme3') }}</option>
+              <option value="theme4">{{ $t('themes.theme4') }}</option>
+            </select>
+          </div>
+          <div class="modal-section">
+            <label>{{ $t('select_language') }}</label>
+            <select @change="changeLanguage($event)" :value="locale">
+              <option value="uk">Українська</option>
+              <option value="ru">Русский</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <button class="close-button" @click="toggleModal">{{ $t('close') }}</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -28,6 +47,7 @@ import { useI18n } from 'vue-i18n';
 const router = useRouter();
 const { locale } = useI18n();
 const currentTheme = ref('default');
+const isModalOpen = ref(false);
 
 const themes = {
   default: {
@@ -101,6 +121,10 @@ const changeLanguage = (event) => {
   localStorage.setItem('language', lang);
 };
 
+const toggleModal = () => {
+  isModalOpen.value = !isModalOpen.value;
+};
+
 onMounted(() => {
   const savedTheme = localStorage.getItem('theme') || 'default';
   currentTheme.value = savedTheme;
@@ -117,55 +141,80 @@ onMounted(() => {
   justify-content: space-between
   align-items: center
   width: 100%
-  padding: 30px
+  padding: 10px 20px
   height: 50px
   background: var(--bg-color)
   position: sticky
   bottom: 0
-  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1) // Добавляем тень
-  border-top: 1px solid rgba(0, 0, 0, 0.1) // Добавляем верхнюю границу
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1)
+  border-top: 1px solid rgba(0, 0, 0, 0.1)
 
-  @media (max-width: 768px)
-    flex-direction: column
-    padding: 15px
-
-.menuFizi
+.menuBurger
   background: none
   border: none
+  font-size: 24px
+  cursor: pointer
+  color: var(--text-color)
+
+.menuFizi
+  font-size: 18px
+  color: var(--text-color)
+
+.modal-overlay
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  background: rgba(0, 0, 0, 0.5)
+  display: flex
+  justify-content: center
+  align-items: flex-end
+
+.modal-content
+  background: var(--bg-color)
+  width: 100%
+  padding: 20px
+  border-top-left-radius: 20px
+  border-top-right-radius: 20px
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2)
+  display: flex
+  flex-direction: column
+  align-items: center
+
+.modal-body
+  width: 100%
+  display: flex
+  flex-direction: column
+  align-items: center
+
+.modal-section
+  margin: 15px 0
+  width: 80%
+
+.modal-section label
+  display: block
+  margin-bottom: 5px
+  font-size: 16px
+  color: var(--text-color)
+
+.modal-section select
+  width: 100%
+  padding: 10px
+  border-radius: 5px
+  border: 1px solid var(--text-color)
+  background: transparent
+  color: var(--text-color)
   font-size: 16px
   cursor: pointer
+
+.close-button
+  margin-top: 20px
   padding: 10px 20px
+  background: var(--btn-gradient-color)
+  border: none
   border-radius: 5px
-  text-transform: uppercase
-  background-clip: text
-  -webkit-background-clip: text
-  color: transparent
-  background-image: var(--fizi-gradient)
-
-.theme-selector select
-  padding: 5px
-  border-radius: 5px
-  border: 1px solid var(--text-color)
-  background: transparent
-  color: var(--text-color)
+  color: var(--btn-delete-color)
   font-size: 16px
   cursor: pointer
-  width: 150px
-
-.language-selector select
-  padding: 5px
-  border-radius: 5px
-  border: 1px solid var(--text-color)
-  background: transparent
-  color: var(--text-color)
-  font-size: 16px
-  cursor: pointer
-  background-repeat: no-repeat
-  background-position: left center
-  background-size: 20px 20px
-
-.language-selector select option
-  background-size: 20px 20px
-  background-repeat: no-repeat
-  padding-left: 25px // Оставляем место для иконки флага
 </style>
