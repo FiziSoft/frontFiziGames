@@ -2,18 +2,18 @@
   <div class="mainFooter">
     <button class="menuFizi" @click="goToHome">FiziGames</button>
     <div class="theme-selector">
-      <select @change="changeTheme($event)">
-        <option value="default" :data-label="$t('themes.default')" style="background: #6a11cb;">{{ $t('themes.default') }}</option>
-        <option value="theme1" :data-label="$t('themes.theme1')" style="background: #ff7e5f;">{{ $t('themes.theme1') }}</option>
-        <option value="theme2" :data-label="$t('themes.theme2')" style="background: #9733ee;">{{ $t('themes.theme2') }}</option>
-        <option value="theme3" :data-label="$t('themes.theme3')" style="background: #f9f9a1;">{{ $t('themes.theme3') }}</option>
-        <option value="theme4" :data-label="$t('themes.theme4')" style="background: #f8c4d4;">{{ $t('themes.theme4') }}</option>
+      <select @change="changeTheme($event)" :value="currentTheme">
+        <option value="default" style="background: #6a11cb;">{{ $t('themes.default') }}</option>
+        <option value="theme1" style="background: #ff7e5f;">{{ $t('themes.theme1') }}</option>
+        <option value="theme2" style="background: #9733ee;">{{ $t('themes.theme2') }}</option>
+        <option value="theme3" style="background: #f9f9a1;">{{ $t('themes.theme3') }}</option>
+        <option value="theme4" style="background: #f8c4d4;">{{ $t('themes.theme4') }}</option>
       </select>
     </div>
     <div class="language-selector">
-      <select @change="changeLanguage($event)">
+      <select @change="changeLanguage($event)" :value="locale">
         <option value="uk" style="background-image: url('@/assets/locales/ukraine.svg');">Українська</option>
-        <option value="ru" style="background-image: url('src/locales/rus.svg');">Русский</option>
+        <option value="ru" style="background-image: url('@/assets/locales/rus.svg');">Русский</option>
         <option value="en" style="background-image: url('@/assets/locales/en.svg');">English</option>
       </select>
     </div>
@@ -106,7 +106,7 @@ onMounted(() => {
   currentTheme.value = savedTheme;
   applyTheme(savedTheme);
 
-  const savedLanguage = localStorage.getItem('language') || 'en';
+  const savedLanguage = localStorage.getItem('language') || 'uk';
   locale.value = savedLanguage;
 });
 </script>
@@ -124,6 +124,10 @@ onMounted(() => {
   bottom: 0
   box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1) // Добавляем тень
   border-top: 1px solid rgba(0, 0, 0, 0.1) // Добавляем верхнюю границу
+
+  @media (max-width: 768px)
+    flex-direction: column
+    padding: 15px
 
 .menuFizi
   background: none
@@ -146,7 +150,7 @@ onMounted(() => {
   color: var(--text-color)
   font-size: 16px
   cursor: pointer
-  width: 110px
+  width: 150px
 
 .language-selector select
   padding: 5px
