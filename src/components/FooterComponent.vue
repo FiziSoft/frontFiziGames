@@ -201,6 +201,7 @@ onMounted(() => {
   display: flex
   flex-direction: column
   align-items: center
+  color: #000 // устанавливаем цвет текста черным
 
 .modal-body
   width: 100%
