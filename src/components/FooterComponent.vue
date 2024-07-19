@@ -7,7 +7,7 @@
       <span class="menuFizi">FiziGames</span>
     </div>
 
-    <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal">
+    <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal" @touchstart="handleTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
       <div class="modal-content">
         <button class="menuBurger" @click="toggleModal">
           <i class="fa fa-chevron-down"></i>
@@ -48,14 +48,16 @@ const router = useRouter();
 const { locale } = useI18n();
 const currentTheme = ref('default');
 const isModalOpen = ref(false);
+let touchStartY = 0;
+let touchEndY = 0;
 
 const themes = {
   default: {
     '--bg-color': 'linear-gradient(90deg, rgba(65,41,90,1) 0%, rgba(47,7,67,1) 100%)',
-    '--text-color': '#fff',
+    '--text-color': '#000',
     '--gradient-color': 'linear-gradient(to right, #DA22FF 0%, #9733EE 51%, #DA22FF 100%)',
     '--btn-gradient-color': 'linear-gradient(to right, #DA22FF, #9733EE)',
-    '--btn-delete-color': '#fff',
+    '--btn-delete-color': '#000',
     '--fizi-gradient': 'linear-gradient(to right, #FF512F, #DD2476)',
     '--border-color': '#ddd'
   },
@@ -70,10 +72,10 @@ const themes = {
   },
   theme2: {
     '--bg-color': '#9733ee',
-    '--text-color': '#fff',
+    '--text-color': '#000',
     '--gradient-color': 'linear-gradient(to right, #9733ee, #da22ff)',
     '--btn-gradient-color': 'linear-gradient(to right, #6a11cb, #2575fc)',
-    '--btn-delete-color': '#fff',
+    '--btn-delete-color': '#000',
     '--fizi-gradient': 'linear-gradient(to right, #FF5F6D, #FFC371)',
     '--border-color': '#ddd'
   },
@@ -125,6 +127,20 @@ const toggleModal = () => {
   isModalOpen.value = !isModalOpen.value;
 };
 
+const handleTouchStart = (event) => {
+  touchStartY = event.touches[0].clientY;
+};
+
+const handleTouchMove = (event) => {
+  touchEndY = event.touches[0].clientY;
+};
+
+const handleTouchEnd = () => {
+  if (touchStartY - touchEndY > 50) {
+    isModalOpen.value = false;
+  }
+};
+
 onMounted(() => {
   const savedTheme = localStorage.getItem('theme') || 'default';
   currentTheme.value = savedTheme;
@@ -144,21 +160,22 @@ onMounted(() => {
   padding: 10px 20px
   height: 50px
   background: var(--bg-color)
-  position: sticky
+  position: fixed
   bottom: 0
   box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1)
   border-top: 1px solid rgba(0, 0, 0, 0.1)
+  z-index: 1000
 
 .menuBurger
   background: none
   border: none
   font-size: 24px
   cursor: pointer
-  color: var(--text-color)
+  color: #000
 
 .menuFizi
   font-size: 18px
-  color: var(--text-color)
+  color: #000
 
 .modal-overlay
   position: fixed
@@ -170,10 +187,13 @@ onMounted(() => {
   display: flex
   justify-content: center
   align-items: flex-end
+  z-index: 999
 
 .modal-content
   background: var(--bg-color)
   width: 100%
+  max-width: 500px
+  height: 70%
   padding: 20px
   border-top-left-radius: 20px
   border-top-right-radius: 20px
@@ -190,21 +210,21 @@ onMounted(() => {
 
 .modal-section
   margin: 15px 0
-  width: 80%
+  width: 100%
 
 .modal-section label
   display: block
   margin-bottom: 5px
   font-size: 16px
-  color: var(--text-color)
+  color: #000
 
 .modal-section select
   width: 100%
   padding: 10px
   border-radius: 5px
-  border: 1px solid var(--text-color)
+  border: 1px solid #000
   background: transparent
-  color: var(--text-color)
+  color: #000
   font-size: 16px
   cursor: pointer
 
@@ -214,7 +234,7 @@ onMounted(() => {
   background: var(--btn-gradient-color)
   border: none
   border-radius: 5px
-  color: var(--btn-delete-color)
+  color: #000
   font-size: 16px
   cursor: pointer
 </style>
