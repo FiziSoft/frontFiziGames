@@ -4,17 +4,14 @@ import {router} from "./router"
 import './assets/style.sass'
 import './assets/neonCheckbox.scss'
 import store from './components/store'
-
+import i18n from './i18n'
 
 const app = createApp(App)
 
 app.use(router)
 app.use(store)
 
-app.config.globalProperties.$globalState = {
-    user: 'John Doe',
-    theme: 'light',
-  };
+app.use(i18n);
 
 
 app.mount('#app')

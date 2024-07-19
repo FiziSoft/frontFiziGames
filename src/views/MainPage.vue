@@ -1,19 +1,19 @@
 <template>
   <div class="mainContainer mainPage body_main_page">
-    <div class="text-gradient">Fizi Games</div>
+    <div class="text-gradient">{{ $t('welcome') }}</div>
     <hr>
     <br>
-    <div>Найкращі настільні ігри Онлайн для компаній</div>
-    <div class="name_game" v-for="game in games" :key="game.name">
+    <div>{{ $t('best_online_games') }}</div>
+    <div class="name_game" v-for="game in games" :key="game.key">
       <a :href="network_url + game.url">
         <h1>
           <i :class="game.icon"></i>
-          <div class="game-name">{{ game.name }}</div>
+          <div class="game-name">{{ $t(`games.${game.key}.name`) }}</div>
         </h1>
       </a>
       <button @click="openModal(game)" class="info-button">
         <i class="fa-regular fa-circle-question"></i>
-        </button>
+      </button>
     </div>
     <br>
     <ModalMain v-if="selectedGame" :game="selectedGame" @close="selectedGame = null" />
@@ -24,39 +24,34 @@
 import { ref } from 'vue';
 import ModalMain from '@/components/ModalMain.vue';
 
-// const network_url = 'https://fizigames-799b6804c93a.herokuapp.com';
-const network_url = 'http://localhost:8080';
+const network_url = 'https://fizigames-799b6804c93a.herokuapp.com';
+// const network_url = 'http://localhost:8080';
 
 const games = ref([
   {
-    name: 'Камінь Ножиці Бумага',
+    key: 'rsp',
     url: '/rsp-createRoom',
     icon: 'fa-solid fa-hands-asl-interpreting',
-    description: 'Камінь Ножиці Бумага — классическая игра на удачу и стратегию. Два игрока одновременно выбирают одну из трех фигур: камень, ножницы или бумагу. Камень побеждает ножницы, ножницы побеждают бумагу, а бумага побеждает камень.'
   },
   {
-    name: 'Шпіон',
+    key: 'spy',
     url: '/spy/createRoom',
     icon: 'fa-solid fa-user-secret',
-    description: 'Шпіон — это игра, в которой игроки пытаются выяснить, кто из них шпион, задавая вопросы друг другу. Один игрок получает роль шпиона и пытается выяснить загаданое слово, не раскрывая своей личности.'
   },
   {
-    name: 'Правда або Дія',
+    key: 'tod',
     url: '/tod',
     icon: 'fa-solid fa-hat-wizard',
-    description: 'Правда або Дія — это классическая игра для вечеринок, где игроки по очереди выбирают между правдой и действием. Выбор правды означает, что игрок должен честно ответить на вопрос, а действие — выполнить задание.'
   },
   {
-    name: '5 Секунд',
+    key: 'five_second',
     url: '/five-second',
     icon: 'fa-solid fa-stopwatch',
-    description: '5 Секунд — это быстрая и веселая игра, в которой игроки должны назвать три вещи за пять секунд. Например, три вида фруктов или три известных фильма. Если игрок не успевает, ход переходит к следующему.'
   },
   {
-    name: 'Code Names',
+    key: 'codenames',
     url: '/codenames',
     icon: 'fa-solid fa-sitemap',
-    description: 'Code Names — это командная игра, в которой игроки пытаются отгадать слова, используя подсказки. Две команды соревнуются, чтобы первыми найти все свои слова-коды на поле. Подсказка состоит из одного слова и числа, которое указывает на количество связанных слов.'
   },
 ]);
 
@@ -96,6 +91,7 @@ const openModal = (game) => {
   color: inherit
   display: flex
   align-items: center
+  flex: 1 // Для равномерного распределения пространства между элементами
 
 .name_game h1
   display: flex
@@ -103,6 +99,7 @@ const openModal = (game) => {
   gap: 10px
   font-size: 1.5em
   width: 100%
+  margin: 0 // Удаление дополнительных отступов для выравнивания
 
 .name_game i
   font-size: 1.5em
@@ -110,7 +107,7 @@ const openModal = (game) => {
   text-align: center
 
 .game-name
-  flex: 0 0 80%
+  flex: 1 // Выравнивание названия игр
   text-align: left
 
 .name_game:hover
@@ -123,6 +120,7 @@ const openModal = (game) => {
   cursor: pointer
   font-size: 1.2em
   color: inherit
+  margin-left: 10px // Добавление отступа слева для выравнивания
 
 @mixin gradient-text
   background: linear-gradient(45deg, #ff6b6b, #f06595, #cc5de8, #845ef7, #5c7cfa, #339af0, #22b8cf, #20c997, #51cf66, #94d82d, #fcc419, #ff922b, #ff6b6b)

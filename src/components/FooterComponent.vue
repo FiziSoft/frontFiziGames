@@ -3,23 +3,31 @@
     <button class="menuFizi" @click="goToHome">FiziGames</button>
     <div class="theme-selector">
       <select @change="changeTheme($event)">
-        <option value="default" style="background: #6a11cb;"></option>
-        <option value="theme1" style="background: #ff7e5f;"></option>
-        <option value="theme2" style="background: #9733ee;"></option>
-        <option value="theme3" style="background: #f9f9a1;"></option>
-        <option value="theme4" style="background: #f8c4d4;"></option>
+        <option value="default" :data-label="$t('themes.default')" style="background: #6a11cb;">{{ $t('themes.default') }}</option>
+        <option value="theme1" :data-label="$t('themes.theme1')" style="background: #ff7e5f;">{{ $t('themes.theme1') }}</option>
+        <option value="theme2" :data-label="$t('themes.theme2')" style="background: #9733ee;">{{ $t('themes.theme2') }}</option>
+        <option value="theme3" :data-label="$t('themes.theme3')" style="background: #f9f9a1;">{{ $t('themes.theme3') }}</option>
+        <option value="theme4" :data-label="$t('themes.theme4')" style="background: #f8c4d4;">{{ $t('themes.theme4') }}</option>
+      </select>
+    </div>
+    <div class="language-selector">
+      <select @change="changeLanguage($event)">
+        <option value="uk" style="background-image: url('@/assets/locales/ukraine.svg');">Українська</option>
+        <option value="ru" style="background-image: url('src/locales/rus.svg');">Русский</option>
+        <option value="en" style="background-image: url('@/assets/locales/en.svg');">English</option>
       </select>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
-const router = useRouter()
-
-const currentTheme = ref('default')
+const router = useRouter();
+const { locale } = useI18n();
+const currentTheme = ref('default');
 
 const themes = {
   default: {
@@ -67,31 +75,40 @@ const themes = {
     '--fizi-gradient': 'linear-gradient(to right, #8E2DE2, #4A00E0)',
     '--border-color': '#000'
   },
-}
+};
 
 const applyTheme = (theme) => {
-  const root = document.documentElement
-  const themeProperties = themes[theme]
+  const root = document.documentElement;
+  const themeProperties = themes[theme];
   for (const prop in themeProperties) {
-    root.style.setProperty(prop, themeProperties[prop])
+    root.style.setProperty(prop, themeProperties[prop]);
   }
-  localStorage.setItem('theme', theme)
-}
+  localStorage.setItem('theme', theme);
+};
 
 const goToHome = () => {
-  router.push('/') // переход на главный экран
-}
+  router.push('/'); // переход на главный экран
+};
 
 const changeTheme = (event) => {
-  currentTheme.value = event.target.value
-  applyTheme(currentTheme.value)
-}
+  currentTheme.value = event.target.value;
+  applyTheme(currentTheme.value);
+};
+
+const changeLanguage = (event) => {
+  const lang = event.target.value;
+  locale.value = lang;
+  localStorage.setItem('language', lang);
+};
 
 onMounted(() => {
-  const savedTheme = localStorage.getItem('theme') || 'default'
-  currentTheme.value = savedTheme
-  applyTheme(savedTheme)
-})
+  const savedTheme = localStorage.getItem('theme') || 'default';
+  currentTheme.value = savedTheme;
+  applyTheme(savedTheme);
+
+  const savedLanguage = localStorage.getItem('language') || 'en';
+  locale.value = savedLanguage;
+});
 </script>
 
 <style lang="sass">
@@ -107,7 +124,6 @@ onMounted(() => {
   bottom: 0
   box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1) // Добавляем тень
   border-top: 1px solid rgba(0, 0, 0, 0.1) // Добавляем верхнюю границу
-
 
 .menuFizi
   background: none
@@ -130,5 +146,22 @@ onMounted(() => {
   color: var(--text-color)
   font-size: 16px
   cursor: pointer
-  width: 70px
+  width: 110px
+
+.language-selector select
+  padding: 5px
+  border-radius: 5px
+  border: 1px solid var(--text-color)
+  background: transparent
+  color: var(--text-color)
+  font-size: 16px
+  cursor: pointer
+  background-repeat: no-repeat
+  background-position: left center
+  background-size: 20px 20px
+
+.language-selector select option
+  background-size: 20px 20px
+  background-repeat: no-repeat
+  padding-left: 25px // Оставляем место для иконки флага
 </style>
