@@ -12,12 +12,18 @@
           <div class="team">
             <span class="team-name">Сині: </span>
             <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }}</span>
+            <span class="team-players">Гравців: {{ bluePlayersCount }}</span>
           </div>
           <div class="team">
             <span class="team-name">Червоні: </span>
             <span class="team-progress">{{ redRevealedCount }} / {{ redTotal }}</span>
+            <span class="team-players">Гравців: {{ redPlayersCount }}</span>
           </div>
           <br>
+          <div class="current-team">
+            <span>Ваша команда: {{ userTeam }}</span>
+            <button class="my_button" @click="changeTeam">Змінити команду</button>
+          </div>
         </div>
         <div :class="`grid grid-${words.length}`">
           <div
@@ -31,6 +37,7 @@
               neutral: revealedWords[word] === 'neutral', 
               bomb: revealedWords[word] === 'bomb' 
             }"
+            @click="confirmRevealWord(word)"
           >
             {{ word }}
           </div>
@@ -46,10 +53,29 @@
         <button @click="closeWinnerModal">OK</button>
       </div>
     </div>
+
+    <!-- Модальное окно для выбора команды -->
+    <div v-if="showTeamSelectionModal" class="modal-unique">
+      <div class="modal-content-unique">
+        <p>За яку команду гратимеш?</p>
+        <button @click="selectTeam('червоні')">Червоні</button>
+        <button @click="selectTeam('сині')">Сині</button>
+      </div>
+    </div>
+
+    <!-- Модальное окно для подтверждения выбора слова -->
+    <div v-if="showConfirmRevealModal" class="modal-unique">
+      <div class="modal-content-unique">
+        <p>Точно?</p>
+        <button class="my_button" @click="revealWord(selectedWord)">Так</button>
+        <button class="my_button" @click="closeConfirmRevealModal">Ні</button>
+      </div>
+    </div>
   </GameLayout>
 </template>
 
 <script setup>
+// eslint-disable-next-line
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import GameLayout from '../GameLayout.vue';
@@ -72,12 +98,26 @@ const blueRevealedCount = computed(() => Object.values(revealedWords.value).filt
 const redTotal = ref(0);
 const blueTotal = ref(0);
 
+// Количество игроков в каждой команде
+const redPlayersCount = ref(0);
+const bluePlayersCount = ref(0);
+
 // Состояние модального окна победителя
 const showWinnerModal = ref(false);
 const winnerMessage = ref('');
 
 // Состояние для отслеживания загрузки слов
 const wordsLoaded = ref(false);
+
+// Состояние для выбора команды
+const showTeamSelectionModal = ref(!localStorage.getItem('userTeam'));
+
+// Состояние для подтверждения выбора слова
+const showConfirmRevealModal = ref(false);
+const selectedWord = ref('');
+
+// Состояние команды пользователя
+const userTeam = ref(localStorage.getItem('userTeam') || '');
 
 const connectWebSocket = () => {
   const wsUrl = `wss://codenames-72ce2135032c.herokuapp.com/ws/${gameId.value}`;
@@ -104,7 +144,14 @@ const connectWebSocket = () => {
         redTotal.value = Object.values(message.board).filter(role => role === 'red').length;
         blueTotal.value = Object.values(message.board).filter(role => role === 'blue').length;
 
+        // Подсчитываем количество игроков в каждой команде
+        redPlayersCount.value = message.redPlayersCount;
+        bluePlayersCount.value = message.bluePlayersCount;
+
         wordsLoaded.value = true; // Устанавливаем состояние загрузки слов
+      } else if (message.type === "updateTeams") {
+        redPlayersCount.value = message.redPlayersCount;
+        bluePlayersCount.value = message.bluePlayersCount;
       }
     };
 
@@ -128,13 +175,48 @@ const checkForWinner = () => {
     winnerMessage.value = 'Команда Червоні виграла!';
     showWinnerModal.value = true;
   } else if (Object.values(revealedWords.value).includes('bomb')) {
-    winnerMessage.value = `Ваша команда програла!`;
+    if (userTeam.value === 'червоні') {
+      winnerMessage.value = 'Ваша команда програла!';
+    } else {
+      winnerMessage.value = 'Команда Червоні виграла!';
+    }
     showWinnerModal.value = true;
   }
 };
 
 const closeWinnerModal = () => {
   showWinnerModal.value = false;
+};
+
+const confirmRevealWord = (word) => {
+  selectedWord.value = word;
+  showConfirmRevealModal.value = true;
+};
+
+const revealWord = (word) => {
+  if (revealedWords.value[word] || winnerMessage.value) return;
+
+  console.log(`Revealing word: ${word}`);
+  socket.send(JSON.stringify({ type: "reveal", word }));
+  showConfirmRevealModal.value = false;
+};
+
+const closeConfirmRevealModal = () => {
+  showConfirmRevealModal.value = false;
+};
+
+const selectTeam = (team) => {
+  // Сохраняем выбор команды в localStorage
+  localStorage.setItem('userTeam', team);
+  userTeam.value = team;
+  showTeamSelectionModal.value = false;
+
+  // Сообщаем серверу о выборе команды
+  socket.send(JSON.stringify({ type: "selectTeam", team }));
+};
+
+const changeTeam = () => {
+  showTeamSelectionModal.value = true;
 };
 
 onMounted(() => {
@@ -164,17 +246,17 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+  color: #000 !important;
 }
 
-.modal-unique button {
-  
+.my_button {
+  width: 100px;
   margin: 20px;
   padding: 15px;
   border-radius: 12px;
-  color: white !important; 
+  color: white !important;
   background: linear-gradient(to right, #DA22FF 0%, #9733EE 100%);
   box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
-
 }
 
 .modal-content-unique {
