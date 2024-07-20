@@ -43,12 +43,14 @@
         <div class="buttonsCode">
           <button class="btn-grad" v-if="info_share" @click="confirmStartGame">Почати гру</button>
           <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">{{ showColors ? 'скрити' : 'показати' }}</button>
-          <button class="btn-grad" v-if="info_share" @click="showTelegramShareModal = true">Додати капітана</button>
+          <div class="groupShare">
+            <button class="btn-grad" v-if="info_share" @click="showTelegramShareModalUser = true">Додати гравців</button>
+            <button class="btn-grad" v-if="info_share" @click="showTelegramShareModalCaptain = true">Додати капітана</button>
+          </div>
           <button class="btn-grad" v-if="!gameStarted" @click="refreshWords">Оновити слова</button>
         </div>
       </div>
     </div>
-    <ShareButton :url="url_share" text='Давай грати в "Кодові імена"'></ShareButton>
     
     <!-- Модальное окно для отображения победителя -->
     <div v-if="showModal" class="modal-unique">
@@ -61,16 +63,19 @@
         </div>
       </div>
     </div>
-    <div v-if="showTelegramShareModal" class="modal-unique">
+    <div v-if="showTelegramShareModalCaptain" class="modal-unique">
       <div class="modal-content-unique">
         <TelegramShareButton :url="url_captan_share" text="Ти капітан, давай грати" />
-        <button class="button_finish" @click="showTelegramShareModal = false">Закрити</button>
+        <button class="button_finish" @click="showTelegramShareModalCaptain = false">Закрити</button>
       </div>
     </div>
-    <div class="info_captain" v-show="info_share"> 
-      <i class="fa-solid fa-arrow-left"></i> пошерся своїм друзям
+    <div v-if="showTelegramShareModalUser" class="modal-unique">
+      <div class="modal-content-unique">
+        <TelegramShareButton :url="url_share" text="Доеднуйся до нас у гру Кодові імена!" />
+        <button class="button_finish" @click="showTelegramShareModalUser = false">Закрити</button>
+      </div>
     </div>
-    <ShareButton :url="url_share" text="Поділитися"></ShareButton>
+    
   </GameLayout>
 </template>
 
@@ -92,7 +97,9 @@ const showColors = ref(false);
 const showModal = ref(false);
 const gameStarted = ref(false);
 const info_share = ref(true);
-const showTelegramShareModal = ref(false);
+const showTelegramShareModalUser = ref(false);
+const showTelegramShareModalCaptain = ref(false);
+
 const winner = ref(null);
 const bombSelected = ref(false);
 const url_captan_share = window.location.href;
@@ -248,6 +255,13 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
+.groupShare {
+  width: 100%;
+  display: flex;
+  padding: 10px;
+}
+
 .button_finish {
   width: 150px;
   margin: 25px;

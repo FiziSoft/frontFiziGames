@@ -4,7 +4,7 @@
       <div class="text-gradient">{{ $t('welcome') }}</div>
       <div class="locale-container">
         <select v-model="currentLocale" @change="changeLocale" class="locale-selector">
-          <option value="uk">Ua</option>
+          <option value="ua">Ua</option>
           <option value="ru">Ru</option>
           <option value="en">En</option>
         </select>
@@ -35,6 +35,7 @@ import { useI18n } from 'vue-i18n';
 import ModalMain from '@/components/ModalMain.vue';
 
 const network_url = 'https://fizigames-799b6804c93a.herokuapp.com';
+// const network_url = 'http://localhost:8080';
 
 const games = ref([
   {
