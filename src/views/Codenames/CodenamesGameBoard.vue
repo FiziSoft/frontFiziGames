@@ -259,6 +259,11 @@ onMounted(() => {
   if (gameId.value) {
     isCaptain.value = !!route.query.isCaptain;
     connectWebSocket();
+    setTimeout(() => {
+      if (!wordsLoaded.value) {
+        location.reload(); // Обновляем страницу, если слова не загружены
+      }
+    }, 1000);
   } else {
     console.error("Missing gameId");
   }
