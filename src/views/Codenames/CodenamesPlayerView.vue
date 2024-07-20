@@ -131,6 +131,11 @@ const connectWebSocket = () => {
     socket.onopen = () => {
       console.log('WebSocket connection established');
       socket.send(JSON.stringify({ type: "joinGame", playerId: playerId.value }));
+
+      // Если игрок уже выбирал команду, сообщаем серверу
+      if (userTeam.value) {
+        socket.send(JSON.stringify({ type: "selectTeam", team: userTeam.value, playerId: playerId.value }));
+      }
     };
 
     socket.onmessage = (event) => {
@@ -200,7 +205,7 @@ const revealWord = (word) => {
   if (revealedWords.value[word] || winnerMessage.value) return;
 
   console.log(`Revealing word: ${word}`);
-  socket.send(JSON.stringify({ type: "reveal", word, playerId: playerId.value }));
+  socket.send(JSON.stringify({ type: "reveal", word, playerId: playerId.value, revealingPlayerTeam: userTeam.value }));
   showConfirmRevealModal.value = false;
 };
 
