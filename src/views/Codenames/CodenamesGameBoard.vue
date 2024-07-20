@@ -259,11 +259,13 @@ onMounted(() => {
   if (gameId.value) {
     isCaptain.value = !!route.query.isCaptain;
     connectWebSocket();
+
+    // Запускаем таймер на 3 секунды для проверки загрузки слов
     setTimeout(() => {
       if (!wordsLoaded.value) {
         location.reload(); // Обновляем страницу, если слова не загружены
       }
-    }, 1000);
+    }, 2000);
   } else {
     console.error("Missing gameId");
   }
