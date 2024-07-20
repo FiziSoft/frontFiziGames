@@ -10,12 +10,14 @@
       <div v-else class="content">
         <div class="progress">
           <div class="team">
-            <span class="team-name">Сині: </span>
+            <span class="team-name">Сині ({{ bluePlayersCount }}): </span>
             <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }}</span>
+           
           </div>
           <div class="team">
-            <span class="team-name">Червоні: </span>
+            <span class="team-name">Червоні ({{ redPlayersCount }}): </span>
             <span class="team-progress">{{ redRevealedCount }} / {{ redTotal }}</span>
+          
           </div>
           <br>
         </div>
@@ -85,6 +87,7 @@ import { useRoute, useRouter } from 'vue-router';
 import GameLayout from '../GameLayout.vue';
 import ShareButton from '@/components/ShareButton.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';  // Предполагая, что этот компонент существует
+import { v4 as uuidv4 } from 'uuid';
 
 const route = useRoute();
 const router = useRouter();
@@ -114,6 +117,14 @@ const blueRevealedCount = computed(() => Object.values(revealedWords.value).filt
 const redTotal = ref(0);
 const blueTotal = ref(0);
 
+// Количество игроков в командах
+const redPlayersCount = ref(0);
+const bluePlayersCount = ref(0);
+
+// Уникальный идентификатор игрока
+const playerId = ref(localStorage.getItem('playerId') || uuidv4());
+localStorage.setItem('playerId', playerId.value);
+
 const checkForWinner = () => {
   if (redRevealedCount.value === redTotal.value) {
     winner.value = 'червоні';
@@ -132,6 +143,7 @@ const connectWebSocket = () => {
 
     socket.onopen = () => {
       console.log('WebSocket connection established');
+      socket.send(JSON.stringify({ type: "playerJoin", playerId: playerId.value, isCaptain: true }));
     };
 
     socket.onmessage = (event) => {
@@ -158,11 +170,18 @@ const connectWebSocket = () => {
         redTotal.value = Object.values(message.board).filter(role => role === 'red').length;
         blueTotal.value = Object.values(message.board).filter(role => role === 'blue').length;
 
+        // Обновляем количество игроков в командах
+        redPlayersCount.value = message.redPlayersCount;
+        bluePlayersCount.value = message.bluePlayersCount;
+
         wordsLoaded.value = true;  // Устанавливаем состояние загрузки слов
       } else if (message.type === "startGame") {
         gameStarted.value = true;
         showColors.value = true;
         console.log("Game started");
+      } else if (message.type === "updateTeams") {
+        redPlayersCount.value = message.redPlayersCount;
+        bluePlayersCount.value = message.bluePlayersCount;
       }
     };
 
@@ -255,7 +274,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 .groupShare {
   width: 100%;
   display: flex;
