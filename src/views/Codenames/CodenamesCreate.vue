@@ -33,7 +33,7 @@ setLocaleFromRoute();
 
 const createGame = async (numWords) => {
   try {
-    const response = await axios.post(`http://localhost:8001/create_game/${numWords}`, {
+    const response = await axios.post(`https://fizigames-799b6804c93a.herokuapp.com/create_game/${numWords}`, {
       locale: locale.value,
     });
     const { game_id } = response.data;
