@@ -172,13 +172,7 @@ const connectWebSocket = () => {
         redPlayersCount.value = message.redPlayersCount;
         bluePlayersCount.value = message.bluePlayersCount;
 
-        wordsLoaded.value = true;
-
-        // Устанавливаем локализацию, полученную с сервера
-        if (message.locale) {
-          locale.value = message.locale;
-          localStorage.setItem('language', message.locale);
-        }
+        wordsLoaded.value = true;  
       } else if (message.type === "startGame") {
         gameStarted.value = true;
         showColors.value = true;
