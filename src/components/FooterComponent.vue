@@ -1,13 +1,11 @@
 <template>
-  <div>
-    <div class="mainFooter">
-      <button class="menuBurger" @click="toggleModal">
-        <i :class="isModalOpen ? 'fa fa-chevron-down' : 'fa fa-bars'"></i>
-      </button>
-      <span class="menuFizi">FiziGames</span>
-    </div>
+  <div class="mainFooter">
+    <button class="menuBurger" @click="toggleModal">
+      <i :class="isModalOpen ? 'fa fa-chevron-down' : 'fa fa-bars'"></i>
+    </button>
+    <span class="menuFizi" @click="goToHome">FiziGames</span>
 
-    <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal" @touchstart="handleTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
+    <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal">
       <div class="modal-content">
         <button class="menuBurger" @click="toggleModal">
           <i class="fa fa-chevron-down"></i>
@@ -16,7 +14,7 @@
         <div class="modal-body">
           <div class="modal-section">
             <label>{{ $t('select_theme') }}</label>
-            <select @change="changeTheme($event)" :value="currentTheme">
+            <select @change="handleChangeTheme" :value="currentTheme">
               <option value="default">{{ $t('themes.default') }}</option>
               <option value="theme1">{{ $t('themes.theme1') }}</option>
               <option value="theme2">{{ $t('themes.theme2') }}</option>
@@ -26,7 +24,7 @@
           </div>
           <div class="modal-section">
             <label>{{ $t('select_language') }}</label>
-            <select @change="changeLanguage($event)" :value="locale">
+            <select @change="changeLanguage" :value="locale">
               <option value="uk">Українська</option>
               <option value="ru">Русский</option>
               <option value="en">English</option>
@@ -40,81 +38,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { inject, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 
 const router = useRouter();
 const { locale } = useI18n();
-const currentTheme = ref('default');
+const currentTheme = inject('currentTheme');
+const changeTheme = inject('changeTheme');
 const isModalOpen = ref(false);
-let touchStartY = 0;
-let touchEndY = 0;
-
-const themes = {
-  default: {
-    '--bg-color': 'linear-gradient(90deg, rgba(65,41,90,1) 0%, rgba(47,7,67,1) 100%)',
-    '--text-color': '#000',
-    '--gradient-color': 'linear-gradient(to right, #DA22FF 0%, #9733EE 51%, #DA22FF 100%)',
-    '--btn-gradient-color': 'linear-gradient(to right, #DA22FF, #9733EE)',
-    '--btn-delete-color': '#000',
-    '--fizi-gradient': 'linear-gradient(to right, #FF512F, #DD2476)',
-    '--border-color': '#ddd'
-  },
-  theme1: {
-    '--bg-color': '#ff7e5f',
-    '--text-color': '#000',
-    '--gradient-color': 'linear-gradient(to right, #ff7e5f, #ffb27d)',
-    '--btn-gradient-color': 'linear-gradient(to right, #ff4e50, #f9d423)',
-    '--btn-delete-color': '#000',
-    '--fizi-gradient': 'linear-gradient(to right, #6A82FB, #FC5C7D)',
-    '--border-color': '#000'
-  },
-  theme2: {
-    '--bg-color': '#9733ee',
-    '--text-color': '#000',
-    '--gradient-color': 'linear-gradient(to right, #9733ee, #da22ff)',
-    '--btn-gradient-color': 'linear-gradient(to right, #6a11cb, #2575fc)',
-    '--btn-delete-color': '#000',
-    '--fizi-gradient': 'linear-gradient(to right, #FF5F6D, #FFC371)',
-    '--border-color': '#ddd'
-  },
-  theme3: {
-    '--bg-color': '#f9f9a1',
-    '--text-color': '#000',
-    '--gradient-color': 'linear-gradient(to right, #f9f9a1, #fce16b)',
-    '--btn-gradient-color': 'linear-gradient(to right, #ffdd00, #fbb034)',
-    '--btn-delete-color': '#000',
-    '--fizi-gradient': 'linear-gradient(to right, #00F260, #0575E6)',
-    '--border-color': '#000'
-  },
-  theme4: {
-    '--bg-color': '#f8c4d4',
-    '--text-color': '#000',
-    '--gradient-color': 'linear-gradient(to right, #f8c4d4, #f7a3b0)',
-    '--btn-gradient-color': 'linear-gradient(to right, #ff758c, #ff7eb3)',
-    '--btn-delete-color': '#000',
-    '--fizi-gradient': 'linear-gradient(to right, #8E2DE2, #4A00E0)',
-    '--border-color': '#000'
-  },
-};
-
-const applyTheme = (theme) => {
-  const root = document.documentElement;
-  const themeProperties = themes[theme];
-  for (const prop in themeProperties) {
-    root.style.setProperty(prop, themeProperties[prop]);
-  }
-  localStorage.setItem('theme', theme);
-};
 
 const goToHome = () => {
-  router.push('/'); // переход на главный экран
+  router.push('/');
 };
 
-const changeTheme = (event) => {
-  currentTheme.value = event.target.value;
-  applyTheme(currentTheme.value);
+const toggleModal = () => {
+  isModalOpen.value = !isModalOpen.value;
+};
+
+const handleChangeTheme = (event) => {
+  changeTheme(event.target.value);
 };
 
 const changeLanguage = (event) => {
@@ -122,33 +65,6 @@ const changeLanguage = (event) => {
   locale.value = lang;
   localStorage.setItem('language', lang);
 };
-
-const toggleModal = () => {
-  isModalOpen.value = !isModalOpen.value;
-};
-
-const handleTouchStart = (event) => {
-  touchStartY = event.touches[0].clientY;
-};
-
-const handleTouchMove = (event) => {
-  touchEndY = event.touches[0].clientY;
-};
-
-const handleTouchEnd = () => {
-  if (touchStartY - touchEndY > 50) {
-    isModalOpen.value = false;
-  }
-};
-
-onMounted(() => {
-  const savedTheme = localStorage.getItem('theme') || 'default';
-  currentTheme.value = savedTheme;
-  applyTheme(savedTheme);
-
-  const savedLanguage = localStorage.getItem('language') || 'uk';
-  locale.value = savedLanguage;
-});
 </script>
 
 <style lang="sass">
@@ -165,17 +81,20 @@ onMounted(() => {
   box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1)
   border-top: 1px solid rgba(0, 0, 0, 0.1)
   z-index: 1000
+  
 
 .menuBurger
   background: none
   border: none
   font-size: 24px
   cursor: pointer
-  color: #000
+  color: var(--burger-color) !important
 
 .menuFizi
   font-size: 18px
-  color: #000
+  color: var(--text-color) !important
+  cursor: pointer
+  text-decoration: none
 
 .modal-overlay
   position: fixed
@@ -188,6 +107,7 @@ onMounted(() => {
   justify-content: center
   align-items: flex-end
   z-index: 999
+  
 
 .modal-content
   background: var(--bg-color)
@@ -201,7 +121,7 @@ onMounted(() => {
   display: flex
   flex-direction: column
   align-items: center
-  color: #000 // устанавливаем цвет текста черным
+  color: #000 !important
 
 .modal-body
   width: 100%
@@ -217,25 +137,25 @@ onMounted(() => {
   display: block
   margin-bottom: 5px
   font-size: 16px
-  color: #000
+  color: #000 !important
 
 .modal-section select
   width: 100%
   padding: 10px
   border-radius: 5px
-  border: 1px solid #000
-  background: transparent
-  color: #000
+  border: 1px solid #000 !important
+  background: #fff
+  color: #000 !important
   font-size: 16px
   cursor: pointer
 
 .close-button
   margin-top: 20px
   padding: 10px 20px
-  background: var(--btn-gradient-color)
+  background: var(--btn-gradient-color) !important
   border: none
   border-radius: 5px
-  color: #000
+  color: var(--text-color) !important
   font-size: 16px
   cursor: pointer
 </style>

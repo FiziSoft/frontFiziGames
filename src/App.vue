@@ -1,14 +1,18 @@
 <template>
     <div class="app-container">
-      <router-view></router-view>
+      <ThemeProvider>
+      <router-view />
       <FooterComponent @themeChange="handleThemeChange" />
+    </ThemeProvider>
+      
     </div>
   </template>
   
   <script setup>
   import { ref, onMounted } from 'vue';
   import FooterComponent from '@/components/FooterComponent.vue';
-  
+  import ThemeProvider from '@/components/ThemeProvider.vue';
+
   const currentTheme = ref('default');
   
   const handleThemeChange = (theme) => {
