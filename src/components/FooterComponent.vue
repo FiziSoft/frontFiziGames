@@ -25,7 +25,7 @@
           <div class="modal-section">
             <label>{{ $t('select_language') }}</label>
             <select @change="changeLanguage" :value="locale">
-              <option value="uk">Українська</option>
+              <option value="ua">Українська</option>
               <option value="ru">Русский</option>
               <option value="en">English</option>
             </select>

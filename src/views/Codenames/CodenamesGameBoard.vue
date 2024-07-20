@@ -7,7 +7,7 @@
       </div>
 
       <!-- Основное содержимое -->
-      <div v-else>
+      <div v-else class="content">
         <div class="progress">
           <div class="team">
             <span class="team-name">Сині: </span>
@@ -247,7 +247,7 @@ onMounted(() => {
       if (!wordsLoaded.value) {
         location.reload(); // Обновляем страницу, если слова не загружены
       }
-    }, 2000);
+    }, 3000); // Изменил таймер на 3000 мс
   } else {
     console.error("Missing gameId");
   }
@@ -260,6 +260,10 @@ onMounted(() => {
   width: 100%;
   display: flex;
   padding: 10px;
+}
+
+.containerCodenames {
+  padding-bottom: 100px; /* Нижний отступ для избегания перекрытия с футером */
 }
 
 .button_finish {
