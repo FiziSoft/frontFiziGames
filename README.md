@@ -32,3 +32,5 @@ wss://codenames-72ce2135032c.herokuapp.com/ws
 
 
 const wsUrl = `ws://localhost:8001/ws/${gameId.value}`;
+
+ws://localhost:8001
