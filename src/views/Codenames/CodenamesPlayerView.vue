@@ -20,7 +20,7 @@
           <br>
           <div class="current-team">
             <span>Ваша команда: {{ userTeam }}</span>
-            <button class="my_button" @click="changeTeam">Змінити команду</button>
+            <button class="reload_team" @click="changeTeam"><i class="fa-solid fa-retweet"></i></button>
           </div>
         </div>
         <div :class="`grid grid-${words.length}`">
@@ -138,7 +138,7 @@ const connectWebSocket = () => {
       const message = JSON.parse(event.data);
       if (message.type === "reveal") {
         revealedWords.value[message.word] = message.role;
-        checkForWinner();
+        checkForWinner(message.word, message.revealingPlayerTeam);
       } else if (message.type === "initialize") {
         words.value = message.words;
         revealedWords.value = message.revealedWords;
@@ -156,6 +156,11 @@ const connectWebSocket = () => {
       } else if (message.type === "updateTeams") {
         redPlayersCount.value = message.redPlayersCount;
         bluePlayersCount.value = message.bluePlayersCount;
+      } else if (message.type === "startGame") {
+        location.reload(); // Программное обновление страницы при начале новой игры
+      } else if (message.type === "winner") {
+        winnerMessage.value = `Команда ${message.winner} виграла!`;
+        showWinnerModal.value = true;
       }
     };
 
@@ -171,20 +176,14 @@ const connectWebSocket = () => {
   }
 };
 
-const checkForWinner = () => {
-  if (blueRevealedCount.value === blueTotal.value) {
-    winnerMessage.value = 'Команда Сині виграла!';
-    showWinnerModal.value = true;
+const checkForWinner = (word, revealingPlayerTeam) => {
+  if (board.value[word] === 'bomb') {
+    const winningTeam = revealingPlayerTeam === 'сині' ? 'червоні' : 'сині';
+    socket.send(JSON.stringify({ type: "winner", winner: winningTeam }));
+  } else if (blueRevealedCount.value === blueTotal.value) {
+    socket.send(JSON.stringify({ type: "winner", winner: 'сині' }));
   } else if (redRevealedCount.value === redTotal.value) {
-    winnerMessage.value = 'Команда Червоні виграла!';
-    showWinnerModal.value = true;
-  } else if (Object.values(revealedWords.value).includes('bomb')) {
-    if (userTeam.value === 'червоні') {
-      winnerMessage.value = 'Ваша команда програла!';
-    } else {
-      winnerMessage.value = 'Команда Червоні виграла!';
-    }
-    showWinnerModal.value = true;
+    socket.send(JSON.stringify({ type: "winner", winner: 'червоні' }));
   }
 };
 
@@ -236,7 +235,7 @@ onMounted(() => {
       if (!wordsLoaded.value) {
         location.reload(); // Обновляем страницу, если слова не загружены
       }
-    }, 3000);
+    }, 1000);
   } else {
     console.error("Missing gameId");
   }
@@ -255,6 +254,14 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   color: #000 !important;
+}
+
+.reload_team {
+  background-color: transparent;
+  padding: 5px;
+  border: 1px solid;
+  margin-left: 10px;
+  border-radius: 12px;
 }
 
 .my_button {
@@ -279,7 +286,7 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Высота экрана */
+  height: 100vh;
 }
 
 .spinner {

@@ -12,12 +12,10 @@
           <div class="team">
             <span class="team-name">Сині ({{ bluePlayersCount }}): </span>
             <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }}</span>
-           
           </div>
           <div class="team">
             <span class="team-name">Червоні ({{ redPlayersCount }}): </span>
             <span class="team-progress">{{ redRevealedCount }} / {{ redTotal }}</span>
-          
           </div>
           <br>
         </div>
@@ -57,7 +55,7 @@
     <!-- Модальное окно для отображения победителя -->
     <div v-if="showModal" class="modal-unique">
       <div class="modal-content-unique">
-        <p v-if="bombSelected">Ваша команда програла</p>
+        <p v-if="bombSelected">Перемогла команда {{ winner }}</p>
         <p v-else>Команда {{ winner }} виграла!</p>
         <div>
           <button class="button_finish" @click="restartGame">Почати нову гру</button>
@@ -77,11 +75,11 @@
         <button class="button_finish" @click="showTelegramShareModalUser = false">Закрити</button>
       </div>
     </div>
-    
   </GameLayout>
 </template>
 
 <script setup>
+// eslint-disable-next-line
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import GameLayout from '../GameLayout.vue';
@@ -125,8 +123,18 @@ const bluePlayersCount = ref(0);
 const playerId = ref(localStorage.getItem('playerId') || uuidv4());
 localStorage.setItem('playerId', playerId.value);
 
-const checkForWinner = () => {
-  if (redRevealedCount.value === redTotal.value) {
+// Состояние капитана
+const isCaptain = ref(false);
+
+// Состояние команды пользователя
+const userTeam = ref(localStorage.getItem('userTeam') || '');
+
+const checkForWinner = (revealingPlayerTeam, word) => {
+  if (revealedWords.value[word] === 'bomb') {
+    winner.value = revealingPlayerTeam === 'червоні' ? 'сині' : 'червоні';
+    bombSelected.value = true;
+    showModal.value = true;
+  } else if (redRevealedCount.value === redTotal.value) {
     winner.value = 'червоні';
     showModal.value = true;
   } else if (blueRevealedCount.value === blueTotal.value) {
@@ -143,7 +151,7 @@ const connectWebSocket = () => {
 
     socket.onopen = () => {
       console.log('WebSocket connection established');
-      socket.send(JSON.stringify({ type: "playerJoin", playerId: playerId.value, isCaptain: true }));
+      socket.send(JSON.stringify({ type: "playerJoin", playerId: playerId.value, isCaptain: isCaptain.value }));
     };
 
     socket.onmessage = (event) => {
@@ -151,13 +159,7 @@ const connectWebSocket = () => {
       const message = JSON.parse(event.data);
       if (message.type === "reveal") {
         revealedWords.value[message.word] = message.role;
-        if (message.role === 'bomb') {
-          bombSelected.value = true;
-          winner.value = blueRevealedCount.value > redRevealedCount.value ? 'червоні' : 'сині';
-          showModal.value = true;
-        } else {
-          checkForWinner();
-        }
+        checkForWinner(message.revealingPlayerTeam, message.word);
         console.log(`Revealed word: ${message.word}, role: ${message.role}`);
       } else if (message.type === "initialize") {
         words.value = message.words;
@@ -201,7 +203,7 @@ const revealWord = (word) => {
   if (revealedWords.value[word] || winner.value) return;
 
   console.log(`Revealing word: ${word}`);
-  socket.send(JSON.stringify({ type: "reveal", word }));
+  socket.send(JSON.stringify({ type: "reveal", word, playerId: playerId.value, playerTeam: userTeam.value }));
 };
 
 const toggleReveal = () => {
@@ -259,6 +261,7 @@ const filteredWords = computed(() => {
 
 onMounted(() => {
   if (gameId.value) {
+    isCaptain.value = !!route.query.isCaptain;
     connectWebSocket();
 
     // Запускаем таймер на 3 секунды для проверки загрузки слов
@@ -266,7 +269,7 @@ onMounted(() => {
       if (!wordsLoaded.value) {
         location.reload(); // Обновляем страницу, если слова не загружены
       }
-    }, 3000); // Изменил таймер на 3000 мс
+    }, 1000); // Изменил таймер на 3000 мс
   } else {
     console.error("Missing gameId");
   }
