@@ -26,3 +26,9 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
 https://salty-crag-94803-5b1ef9ad0209.herokuapp.com/
+
+
+wss://codenames-72ce2135032c.herokuapp.com/ws
+
+
+const wsUrl = `ws://localhost:8001/ws/${gameId.value}`;

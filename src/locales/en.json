@@ -1,37 +1,56 @@
 {
-    "welcome": "Fizi Games",
-    "best_online_games": "Best Online Board Games",
-    "themes": {
-      "default": "Darkness",
-      "theme1": "Sunset",
-      "theme2": "Purple",
-      "theme3": "Sunny",
-      "theme4": "Pink"
+  "welcome": "Fizi Games",
+  "best_online_games": "Best Online Board Games",
+  "themes": {
+    "default": "Darkness",
+    "theme1": "Sunset",
+    "theme2": "Purple",
+    "theme3": "Sunny",
+    "theme4": "Pink"
+  },
+  "games": {
+    "rsp": {
+      "name": "Rock Paper Scissors",
+      "description": "Rock Paper Scissors is a classic game of luck and strategy. Two players simultaneously choose one of three figures: rock, scissors, or paper. Rock beats scissors, scissors beat paper, and paper beats rock."
     },
-    "games": {
-      "rsp": {
-        "name": "Rock Paper Scissors",
-        "description": "Rock Paper Scissors is a classic game of luck and strategy. Two players simultaneously choose one of three figures: rock, scissors, or paper. Rock beats scissors, scissors beat paper, and paper beats rock."
-      },
-      "spy": {
-        "name": "Spy",
-        "description": "Spy is a game where players try to figure out who the spy is by asking each other questions. One player gets the role of the spy and tries to guess the secret word without revealing their identity."
-      },
-      "tod": {
-        "name": "Truth or Dare",
-        "description": "Truth or Dare is a classic party game where players take turns choosing between truth and dare. Choosing truth means the player must answer a question honestly, while a dare requires them to perform a task."
-      },
-      "five_second": {
-        "name": "5 Seconds",
-        "description": "5 Seconds is a fast and fun game where players must name three things in five seconds. For example, three types of fruits or three famous movies. If the player fails, the turn passes to the next player."
-      },
-      "codenames": {
-        "name": "Codenames",
-        "description": "Codenames is a team game where players try to guess words using clues. Two teams compete to be the first to find all their code words on the board. A clue consists of one word and a number indicating the number of related words."
-      }
+    "spy": {
+      "name": "Spy",
+      "description": "Spy is a game where players try to figure out who the spy is by asking each other questions. One player gets the role of the spy and tries to guess the secret word without revealing their identity."
     },
-    "select_theme": "Select Theme",
-    "select_language": "Select Language",
-    "close": "Close"
-  }
-  
+    "tod": {
+      "name": "Truth or Dare",
+      "description": "Truth or Dare is a classic party game where players take turns choosing between truth and dare. Choosing truth means the player must answer a question honestly, while a dare requires them to perform a task."
+    },
+    "five_second": {
+      "name": "5 Seconds",
+      "description": "5 Seconds is a fast and fun game where players must name three things in five seconds. For example, three types of fruits or three famous movies. If the player fails, the turn passes to the next player."
+    },
+    "codenames": {
+      "name": "Codenames",
+      "description": "Codenames is a team game where players try to guess words using clues. Two teams compete to be the first to find all their code words on the board. A clue consists of one word and a number indicating the number of related words.",
+      "title": "Code Names",
+      "create_game": "Create game with {count} words",
+      "teams": {
+        "blue": "Blue",
+        "red": "Red",
+        "your_team": "Your team",
+        "change_team": "Change team"
+      },
+      "start_game": "Start game",
+      "show_colors": "Show colors",
+      "hide_colors": "Hide colors",
+      "update_words": "Update words",
+      "winner_message": "{team} team won!",
+      "choose_team": "Choose your team",
+      "confirm_reveal": "Are you sure?",
+      "yes": "Yes",
+      "no": "No",
+      "add_players": "Add players",
+      "add_captain": "Add captain",
+      "play_codenames": "Let's play Code Names"
+    }
+  },
+  "select_theme": "Select Theme",
+  "select_language": "Select Language",
+  "close": "Close"
+}

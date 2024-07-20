@@ -1,5 +1,5 @@
 <template>
-  <GameLayout nameGame="Кодові імена">
+  <GameLayout :nameGame="$t('games.codenames.name')">
     <div class="containerCodenames">
       <!-- Анимация загрузки -->
       <div v-if="!wordsLoaded" class="loading-spinner">
@@ -10,16 +10,16 @@
       <div v-else>
         <div class="progress">
           <div class="team">
-            <span class="team-name">Сині ({{ bluePlayersCount }}): </span>
+            <span class="team-name">{{ $t('games.codenames.teams.blue') }} ({{ bluePlayersCount }}): </span>
             <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }}</span>
           </div>
           <div class="team">
-            <span class="team-name">Червоні ({{ redPlayersCount }}): </span>
+            <span class="team-name">{{ $t('games.codenames.teams.red') }} ({{ redPlayersCount }}): </span>
             <span class="team-progress">{{ redRevealedCount }} / {{ redTotal }}</span>
           </div>
           <br>
           <div class="current-team">
-            <span>Ваша команда: {{ userTeam }}</span>
+            <span>{{ $t('games.codenames.teams.your_team') }}: {{ userTeam }}</span>
             <button class="reload_team" @click="changeTeam"><i class="fa-solid fa-retweet"></i></button>
           </div>
         </div>
@@ -42,31 +42,31 @@
         </div>
       </div>
     </div>
-    <ShareButton :url="url_share" text='Давай грати в "Кодові імена"'></ShareButton>
+    <ShareButton :url="url_share" :text="$t('games.codenames.play_codenames')"></ShareButton>
     
     <!-- Модальное окно для отображения победителя -->
     <div v-if="showWinnerModal" class="modal-unique">
       <div class="modal-content-unique">
         <p>{{ winnerMessage }}</p>
-        <button @click="closeWinnerModal">OK</button>
+        <button @click="closeWinnerModal">{{ $t('close') }}</button>
       </div>
     </div>
 
     <!-- Модальное окно для выбора команды -->
     <div v-if="showTeamSelectionModal" class="modal-unique">
       <div class="modal-content-unique">
-        <p>За яку команду гратимеш?</p>
-        <button class="my_button" @click="selectTeam('червоні')">Червоні</button>
-        <button class="my_button" @click="selectTeam('сині')">Сині</button>
+        <p>{{ $t('games.codenames.choose_team') }}</p>
+        <button class="my_button" @click="selectTeam('red')">{{ $t('games.codenames.teams.red') }}</button>
+        <button class="my_button" @click="selectTeam('blue')">{{ $t('games.codenames.teams.blue') }}</button>
       </div>
     </div>
 
     <!-- Модальное окно для подтверждения выбора слова -->
     <div v-if="showConfirmRevealModal" class="modal-unique">
       <div class="modal-content-unique">
-        <p>Точно?</p>
-        <button class="my_button" @click="revealWord(selectedWord)">Так</button>
-        <button class="my_button" @click="closeConfirmRevealModal">Ні</button>
+        <p>{{ $t('games.codenames.confirm_reveal') }}</p>
+        <button class="my_button" @click="revealWord(selectedWord)">{{ $t('yes') }}</button>
+        <button class="my_button" @click="closeConfirmRevealModal">{{ $t('no') }}</button>
       </div>
     </div>
   </GameLayout>
@@ -76,9 +76,12 @@
 // eslint-disable-next-line
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import GameLayout from '../GameLayout.vue';
 import ShareButton from '@/components/ShareButton.vue';
 import { v4 as uuidv4 } from 'uuid';
+
+const { t, locale } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
@@ -158,13 +161,17 @@ const connectWebSocket = () => {
         bluePlayersCount.value = message.bluePlayersCount;
 
         wordsLoaded.value = true; // Устанавливаем состояние загрузки слов
+
+        // Устанавливаем локализацию
+        locale.value = message.locale;
+        localStorage.setItem('language', message.locale);
       } else if (message.type === "updateTeams") {
         redPlayersCount.value = message.redPlayersCount;
         bluePlayersCount.value = message.bluePlayersCount;
       } else if (message.type === "startGame") {
         location.reload(); // Программное обновление страницы при начале новой игры
       } else if (message.type === "winner") {
-        winnerMessage.value = `Команда ${message.winner} виграла!`;
+        winnerMessage.value = t('games.codenames.winner_message', { team: message.winner });
         showWinnerModal.value = true;
       }
     };
@@ -183,12 +190,12 @@ const connectWebSocket = () => {
 
 const checkForWinner = (word, revealingPlayerTeam) => {
   if (board.value[word] === 'bomb') {
-    const winningTeam = revealingPlayerTeam === 'сині' ? 'червоні' : 'сині';
+    const winningTeam = revealingPlayerTeam === 'blue' ? 'red' : 'blue';
     socket.send(JSON.stringify({ type: "winner", winner: winningTeam }));
   } else if (blueRevealedCount.value === blueTotal.value) {
-    socket.send(JSON.stringify({ type: "winner", winner: 'сині' }));
+    socket.send(JSON.stringify({ type: "winner", winner: 'blue' }));
   } else if (redRevealedCount.value === redTotal.value) {
-    socket.send(JSON.stringify({ type: "winner", winner: 'червоні' }));
+    socket.send(JSON.stringify({ type: "winner", winner: 'red' }));
   }
 };
 

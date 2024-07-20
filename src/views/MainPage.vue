@@ -14,7 +14,7 @@
     <br>
     <div>{{ $t('best_online_games') }}</div>
     <div class="name_game" v-for="game in games" :key="game.key">
-      <a :href="network_url + game.url">
+      <a :href="`${network_url}${game.url}?locale=${currentLocale}`">
         <h1>
           <i :class="game.icon"></i>
           <div class="game-name">{{ $t(`games.${game.key}.name`) }}</div>
@@ -84,6 +84,7 @@ onMounted(() => {
   locale.value = savedLanguage;
 });
 </script>
+
 
 <style lang="sass">
 .mainContainer

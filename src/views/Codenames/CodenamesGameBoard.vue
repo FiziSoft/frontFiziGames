@@ -1,5 +1,5 @@
 <template>
-  <GameLayout nameGame="Кодові імена">
+  <GameLayout :nameGame="$t('games.codenames.name')">
     <div class="containerCodenames">
       <!-- Анимация загрузки -->
       <div v-if="!wordsLoaded" class="loading-spinner">
@@ -10,11 +10,11 @@
       <div v-else class="content">
         <div class="progress">
           <div class="team">
-            <span class="team-name">Сині ({{ bluePlayersCount }}): </span>
+            <span class="team-name">{{ $t('games.codenames.teams.blue') }} ({{ bluePlayersCount }}): </span>
             <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }}</span>
           </div>
           <div class="team">
-            <span class="team-name">Червоні ({{ redPlayersCount }}): </span>
+            <span class="team-name">{{ $t('games.codenames.teams.red') }} ({{ redPlayersCount }}): </span>
             <span class="team-progress">{{ redRevealedCount }} / {{ redTotal }}</span>
           </div>
           <br>
@@ -41,13 +41,13 @@
           </div>
         </div>
         <div class="buttonsCode">
-          <button class="btn-grad" v-if="info_share" @click="confirmStartGame">Почати гру</button>
-          <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">{{ showColors ? 'скрити' : 'показати' }}</button>
+          <button class="btn-grad" v-if="info_share" @click="confirmStartGame">{{ $t('games.codenames.start_game') }}</button>
+          <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">{{ showColors ? $t('games.codenames.hide_colors') : $t('games.codenames.show_colors') }}</button>
           <div class="groupShare">
-            <button class="btn-grad" v-if="info_share" @click="showTelegramShareModalUser = true">Додати гравців</button>
-            <button class="btn-grad" v-if="info_share" @click="showTelegramShareModalCaptain = true">Додати капітана</button>
+            <button class="btn-grad" v-if="info_share" @click="showTelegramShareModalUser = true">{{ $t('games.codenames.add_players') }}</button>
+            <button class="btn-grad" v-if="info_share" @click="showTelegramShareModalCaptain = true">{{ $t('games.codenames.add_captain') }}</button>
           </div>
-          <button class="btn-grad" v-if="!gameStarted" @click="refreshWords">Оновити слова</button>
+          <button class="btn-grad" v-if="!gameStarted" @click="refreshWords">{{ $t('games.codenames.update_words') }}</button>
         </div>
       </div>
     </div>
@@ -55,41 +55,47 @@
     <!-- Модальное окно для отображения победителя -->
     <div v-if="showModal" class="modal-unique">
       <div class="modal-content-unique">
-        <p v-if="bombSelected">Перемогла команда {{ winner }}</p>
-        <p v-else>Команда {{ winner }} виграла!</p>
+        <p v-if="bombSelected">{{ $t('games.codenames.winner_message', { team: winner }) }}</p>
+        <p v-else>{{ $t('games.codenames.winner_message', { team: winner }) }}</p>
         <div>
-          <button class="button_finish" @click="restartGame">Почати нову гру</button>
-          <button class="button_finish" @click="changeWordsCount">Змінити кількість слів</button>
+          <button class="button_finish" @click="restartGame">{{ $t('games.codenames.start_game') }}</button>
+          <button class="button_finish" @click="changeWordsCount">{{ $t('games.codenames.update_words') }}</button>
         </div>
       </div>
     </div>
     <div v-if="showTelegramShareModalCaptain" class="modal-unique">
       <div class="modal-content-unique">
-        <TelegramShareButton :url="url_captan_share" text="Ти капітан, давай грати" />
-        <button class="button_finish" @click="showTelegramShareModalCaptain = false">Закрити</button>
+        <TelegramShareButton :url="url_captan_share" :text="$t('games.codenames.play_codenames')" />
+        <button class="button_finish" @click="showTelegramShareModalCaptain = false">{{ $t('close') }}</button>
       </div>
     </div>
     <div v-if="showTelegramShareModalUser" class="modal-unique">
       <div class="modal-content-unique">
-        <TelegramShareButton :url="url_share" text="Доеднуйся до нас у гру Кодові імена!" />
-        <button class="button_finish" @click="showTelegramShareModalUser = false">Закрити</button>
+        <TelegramShareButton :url="url_share" :text="$t('games.codenames.play_codenames')" />
+        <button class="button_finish" @click="showTelegramShareModalUser = false">{{ $t('close') }}</button>
       </div>
     </div>
   </GameLayout>
 </template>
 
 <script setup>
-// eslint-disable-next-line
+import { useI18n } from 'vue-i18n';
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import GameLayout from '../GameLayout.vue';
 import ShareButton from '@/components/ShareButton.vue';
-import TelegramShareButton from '@/components/TelegramShareButton.vue';  // Предполагая, что этот компонент существует
+import TelegramShareButton from '@/components/TelegramShareButton.vue';  
 import { v4 as uuidv4 } from 'uuid';
 
+const { locale } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const gameId = ref(route.params.gameId);
+
+if (route.params.locale) {
+  locale.value = route.params.locale;
+}
+
 const words = ref([]);
 const revealedWords = ref({});
 const board = ref({});
@@ -104,7 +110,7 @@ const showTelegramShareModalCaptain = ref(false);
 const winner = ref(null);
 const bombSelected = ref(false);
 const url_captan_share = window.location.href;
-const wordsLoaded = ref(false);  // Состояние для отслеживания загрузки слов
+const wordsLoaded = ref(false);  
 
 let socket;
 const url_share = `https://fizigames-799b6804c93a.herokuapp.com/codenames/player-view/${gameId.value}`;
@@ -115,72 +121,61 @@ const blueRevealedCount = computed(() => Object.values(revealedWords.value).filt
 const redTotal = ref(0);
 const blueTotal = ref(0);
 
-// Количество игроков в командах
 const redPlayersCount = ref(0);
 const bluePlayersCount = ref(0);
 
-// Уникальный идентификатор игрока
 const playerId = ref(localStorage.getItem('playerId') || uuidv4());
 localStorage.setItem('playerId', playerId.value);
 
-// Состояние капитана
 const isCaptain = ref(false);
 
-// Состояние команды пользователя
 const userTeam = ref(localStorage.getItem('userTeam') || '');
 
 const checkForWinner = (revealingPlayerTeam, word) => {
   if (revealedWords.value[word] === 'bomb') {
-    winner.value = revealingPlayerTeam === 'червоні' ? 'сині' : 'червоні';
+    winner.value = revealingPlayerTeam === 'red' ? 'blue' : 'red';
     bombSelected.value = true;
     showModal.value = true;
   } else if (redRevealedCount.value === redTotal.value) {
-    winner.value = 'червоні';
+    winner.value = 'red';
     showModal.value = true;
   } else if (blueRevealedCount.value === blueTotal.value) {
-    winner.value = 'сині';
+    winner.value = 'blue';
     showModal.value = true;
   }
 };
 
 const connectWebSocket = () => {
   const wsUrl = `wss://codenames-72ce2135032c.herokuapp.com/ws/${gameId.value}`;
-  console.log(`Connecting to WebSocket at ${wsUrl}`);
   try {
     socket = new WebSocket(wsUrl);
 
     socket.onopen = () => {
-      console.log('WebSocket connection established');
       socket.send(JSON.stringify({ type: "playerJoin", playerId: playerId.value, isCaptain: isCaptain.value }));
     };
 
     socket.onmessage = (event) => {
-      console.log('Received message:', event.data);
       const message = JSON.parse(event.data);
       if (message.type === "reveal") {
         revealedWords.value[message.word] = message.role;
         checkForWinner(message.revealingPlayerTeam, message.word);
-        console.log(`Revealed word: ${message.word}, role: ${message.role}`);
       } else if (message.type === "initialize") {
         words.value = message.words;
         board.value = message.board;
         gameStarted.value = message.gameStarted;
         showColors.value = gameStarted.value;
         revealedWords.value = message.revealedWords;
-        console.log("Initialized game state:", message);
 
         redTotal.value = Object.values(message.board).filter(role => role === 'red').length;
         blueTotal.value = Object.values(message.board).filter(role => role === 'blue').length;
 
-        // Обновляем количество игроков в командах
         redPlayersCount.value = message.redPlayersCount;
         bluePlayersCount.value = message.bluePlayersCount;
 
-        wordsLoaded.value = true;  // Устанавливаем состояние загрузки слов
+        wordsLoaded.value = true;  
       } else if (message.type === "startGame") {
         gameStarted.value = true;
         showColors.value = true;
-        console.log("Game started");
       } else if (message.type === "updateTeams") {
         redPlayersCount.value = message.redPlayersCount;
         bluePlayersCount.value = message.bluePlayersCount;
@@ -202,7 +197,6 @@ const connectWebSocket = () => {
 const revealWord = (word) => {
   if (revealedWords.value[word] || winner.value) return;
 
-  console.log(`Revealing word: ${word}`);
   socket.send(JSON.stringify({ type: "reveal", word, playerId: playerId.value, playerTeam: userTeam.value }));
 };
 
@@ -240,7 +234,6 @@ const refreshWords = () => {
   revealedWords.value = {};
   winner.value = null;
   bombSelected.value = false;
-  console.log("Requested words refresh");
 };
 
 const restartGame = () => {
@@ -263,13 +256,6 @@ onMounted(() => {
   if (gameId.value) {
     isCaptain.value = !!route.query.isCaptain;
     connectWebSocket();
-
-    // Запускаем таймер на 3 секунды для проверки загрузки слов
-    setTimeout(() => {
-      if (!wordsLoaded.value) {
-        location.reload(); // Обновляем страницу, если слова не загружены
-      }
-    }, 1000); // Изменил таймер на 3000 мс
   } else {
     console.error("Missing gameId");
   }
@@ -284,7 +270,7 @@ onMounted(() => {
 }
 
 .containerCodenames {
-  padding-bottom: 100px; /* Нижний отступ для избегания перекрытия с футером */
+  padding-bottom: 100px;
 }
 
 .button_finish {
@@ -322,7 +308,7 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Высота экрана */
+  height: 100vh;
 }
 
 .spinner {

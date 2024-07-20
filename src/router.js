@@ -116,19 +116,22 @@ const routes = [
         path: '/codenames',
         name: 'codenames-create',
         component: CodenamesCreate,
+        props: route => ({ locale: route.query.locale })
     }
     ,
     {
         path: '/codenames/game-board/:gameId/:playerId', 
         name: 'codenames-gameboard', 
         component: CodenamesGameBoard, 
-        props: route => ({ gameId: route.params.gameId, playerId: route.params.playerId }),    }
+        props: route => ({ gameId: route.params.gameId, playerId: route.params.playerId, locale: route.query.locale })
+    }
     ,
-  {
-    path: '/codenames/player-view/:gameId',
-    name: 'codenames-player-view',
-    component: CodenamesPlayerView,
-    props: route => ({ gameId: route.params.gameId, playerId: route.params.playerId }),  }
+    {
+        path: '/codenames/player-view/:gameId',
+        name: 'codenames-player-view',
+        component: CodenamesPlayerView,
+        props: route => ({ gameId: route.params.gameId, playerId: route.params.playerId, locale: route.query.locale })
+    }
 ]
 
 export const router = createRouter({
