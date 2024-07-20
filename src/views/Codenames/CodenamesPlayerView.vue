@@ -7,62 +7,48 @@
       </div>
 
       <!-- Основное содержимое -->
-      <div v-else class="content">
+      <div v-else>
         <div class="progress">
           <div class="team">
             <span class="team-name">Сині ({{ bluePlayersCount }}): </span>
-            <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }} </span>
-           
+            <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }}</span>
           </div>
           <div class="team">
             <span class="team-name">Червоні ({{ redPlayersCount }}): </span>
             <span class="team-progress">{{ redRevealedCount }} / {{ redTotal }}</span>
-            
           </div>
           <br>
           <div class="current-team">
-            <span>Ваша команда: {{ userTeam }} </span>
+            <span>Ваша команда: {{ userTeam }}</span>
             <button class="my_button" @click="changeTeam">Змінити команду</button>
           </div>
         </div>
-        <div class="grid">
+        <div :class="`grid grid-${words.length}`">
           <div
             v-for="word in words"
             :key="word"
             class="word"
-            :class="{
-              revealed: !!revealedWords[word],
-              red: revealedWords[word] === 'red',
-              blue: revealedWords[word] === 'blue',
-              neutral: revealedWords[word] === 'neutral',
-              bomb: revealedWords[word] === 'bomb',
-              'red-border': showColors && board[word] === 'red',
-              'blue-border': showColors && board[word] === 'blue',
-              'neutral-border': showColors && board[word] === 'neutral',
-              'bomb-border': showColors && board[word] === 'bomb'
+            :class="{ 
+              revealed: !!revealedWords[word], 
+              red: revealedWords[word] === 'red', 
+              blue: revealedWords[word] === 'blue', 
+              neutral: revealedWords[word] === 'neutral', 
+              bomb: revealedWords[word] === 'bomb' 
             }"
             @click="confirmRevealWord(word)"
           >
             {{ word }}
           </div>
         </div>
-        <div class="buttonsCode">
-          <button class="btn-grad" v-if="info_share" @click="confirmStartGame">Почати гру</button>
-          <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">{{ showColors ? 'скрити' : 'показати' }}</button>
-          <div class="groupShare">
-            <button class="btn-grad" v-if="info_share" @click="showTelegramShareModalUser = true">Додати гравців</button>
-            <button class="btn-grad" v-if="info_share" @click="showTelegramShareModalCaptain = true">Додати капітана</button>
-          </div>
-          <button class="btn-grad" v-if="!gameStarted" @click="refreshWords">Оновити слова</button>
-        </div>
       </div>
     </div>
+    <ShareButton :url="url_share" text='Давай грати в "Кодові імена"'></ShareButton>
     
     <!-- Модальное окно для отображения победителя -->
     <div v-if="showWinnerModal" class="modal-unique">
       <div class="modal-content-unique">
         <p>{{ winnerMessage }}</p>
-        <button class="button_finish" @click="closeWinnerModal">OK</button>
+        <button @click="closeWinnerModal">OK</button>
       </div>
     </div>
 
@@ -70,8 +56,8 @@
     <div v-if="showTeamSelectionModal" class="modal-unique">
       <div class="modal-content-unique">
         <p>За яку команду гратимеш?</p>
-        <button class="button_finish" @click="selectTeam('червоні')">Червоні</button>
-        <button class="button_finish" @click="selectTeam('сині')">Сині</button>
+        <button class="my_button" @click="selectTeam('червоні')">Червоні</button>
+        <button class="my_button" @click="selectTeam('сині')">Сині</button>
       </div>
     </div>
 
@@ -79,32 +65,19 @@
     <div v-if="showConfirmRevealModal" class="modal-unique">
       <div class="modal-content-unique">
         <p>Точно?</p>
-        <button class="button_finish" @click="revealWord(selectedWord)">Так</button>
-        <button class="button_finish" @click="closeConfirmRevealModal">Ні</button>
-      </div>
-    </div>
-
-    <div v-if="showTelegramShareModalCaptain" class="modal-unique">
-      <div class="modal-content-unique">
-        <TelegramShareButton :url="url_captan_share" text="Ти капітан, давай грати" />
-        <button class="button_finish" @click="showTelegramShareModalCaptain = false">Закрити</button>
-      </div>
-    </div>
-    <div v-if="showTelegramShareModalUser" class="modal-unique">
-      <div class="modal-content-unique">
-        <TelegramShareButton :url="url_share" text="Доеднуйся до нас у гру Кодові імена!" />
-        <button class="button_finish" @click="showTelegramShareModalUser = false">Закрити</button>
+        <button class="my_button" @click="revealWord(selectedWord)">Так</button>
+        <button class="my_button" @click="closeConfirmRevealModal">Ні</button>
       </div>
     </div>
   </GameLayout>
 </template>
 
 <script setup>
+// eslint-disable-next-line
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import GameLayout from '../GameLayout.vue';
 import ShareButton from '@/components/ShareButton.vue';
-import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import { v4 as uuidv4 } from 'uuid';
 
 const route = useRoute();
@@ -116,27 +89,36 @@ const board = ref({});
 let socket;
 const url_share = `https://fizigames-799b6804c93a.herokuapp.com/codenames/player-view/${gameId.value}`;
 
+// Вычисляемое свойство для подсчета угаданных слов
 const redRevealedCount = computed(() => Object.values(revealedWords.value).filter(role => role === 'red').length);
 const blueRevealedCount = computed(() => Object.values(revealedWords.value).filter(role => role === 'blue').length);
 
+// Общее количество слов для каждой команды
 const redTotal = ref(0);
 const blueTotal = ref(0);
 
+// Количество игроков в каждой команде
 const redPlayersCount = ref(0);
 const bluePlayersCount = ref(0);
 
+// Состояние модального окна победителя
 const showWinnerModal = ref(false);
 const winnerMessage = ref('');
 
+// Состояние для отслеживания загрузки слов
 const wordsLoaded = ref(false);
 
+// Состояние для выбора команды
 const showTeamSelectionModal = ref(!localStorage.getItem('userTeam'));
 
+// Состояние для подтверждения выбора слова
 const showConfirmRevealModal = ref(false);
 const selectedWord = ref('');
 
+// Состояние команды пользователя
 const userTeam = ref(localStorage.getItem('userTeam') || '');
 
+// Уникальный идентификатор игрока
 const playerId = ref(localStorage.getItem('playerId') || uuidv4());
 localStorage.setItem('playerId', playerId.value);
 
@@ -148,6 +130,7 @@ const connectWebSocket = () => {
 
     socket.onopen = () => {
       console.log('WebSocket connection established');
+      socket.send(JSON.stringify({ type: "joinGame", playerId: playerId.value }));
     };
 
     socket.onmessage = (event) => {
@@ -161,13 +144,15 @@ const connectWebSocket = () => {
         revealedWords.value = message.revealedWords;
         board.value = message.board;
 
+        // Подсчитываем общее количество слов для каждой команды
         redTotal.value = Object.values(message.board).filter(role => role === 'red').length;
         blueTotal.value = Object.values(message.board).filter(role => role === 'blue').length;
 
+        // Подсчитываем количество игроков в каждой команде
         redPlayersCount.value = message.redPlayersCount;
         bluePlayersCount.value = message.bluePlayersCount;
 
-        wordsLoaded.value = true;
+        wordsLoaded.value = true; // Устанавливаем состояние загрузки слов
       } else if (message.type === "updateTeams") {
         redPlayersCount.value = message.redPlayersCount;
         bluePlayersCount.value = message.bluePlayersCount;
@@ -216,7 +201,7 @@ const revealWord = (word) => {
   if (revealedWords.value[word] || winnerMessage.value) return;
 
   console.log(`Revealing word: ${word}`);
-  socket.send(JSON.stringify({ type: "reveal", word }));
+  socket.send(JSON.stringify({ type: "reveal", word, playerId: playerId.value }));
   showConfirmRevealModal.value = false;
 };
 
@@ -225,10 +210,12 @@ const closeConfirmRevealModal = () => {
 };
 
 const selectTeam = (team) => {
+  // Сохраняем выбор команды в localStorage
   localStorage.setItem('userTeam', team);
   userTeam.value = team;
   showTeamSelectionModal.value = false;
 
+  // Сообщаем серверу о выборе команды
   socket.send(JSON.stringify({ type: "selectTeam", team, playerId: playerId.value }));
 };
 
@@ -240,9 +227,14 @@ onMounted(() => {
   if (gameId.value) {
     connectWebSocket();
 
+    if (userTeam.value) {
+      showTeamSelectionModal.value = false;
+    }
+
+    // Запускаем таймер на 3 секунды для проверки загрузки слов
     setTimeout(() => {
       if (!wordsLoaded.value) {
-        location.reload();
+        location.reload(); // Обновляем страницу, если слова не загружены
       }
     }, 3000);
   } else {
@@ -252,33 +244,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.my_button {
-  border: 1px solid;
-  padding: 7px;
-  border-radius: 12px;
-  margin-left: 10px;
-}
-
-.groupShare {
-  width: 100%;
-  display: flex;
-  padding: 10px;
-}
-
-.containerCodenames {
-  padding-bottom: 100px;
-}
-
-.button_finish {
-  width: 150px;
-  margin: 25px;
-  padding: 20px;
-  border-radius: 12px;
-  color: white !important; 
-  background: linear-gradient(to right, #DA22FF 0%, #9733EE 100%);
-  box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
-}
-
 .modal-unique {
   position: fixed;
   top: 0;
@@ -289,7 +254,17 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  color: #000 !important;
+}
+
+.my_button {
+  width: 100px;
+  margin: 20px;
+  padding: 15px;
+  border-radius: 12px;
+  color: white !important;
+  background: linear-gradient(to right, #DA22FF 0%, #9733EE 100%);
+  box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
 }
 
 .modal-content-unique {
@@ -299,11 +274,12 @@ onMounted(() => {
   text-align: center;
 }
 
+/* Анимация загрузки */
 .loading-spinner {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100vh; /* Высота экрана */
 }
 
 .spinner {
