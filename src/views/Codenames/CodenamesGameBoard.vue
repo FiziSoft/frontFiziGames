@@ -93,6 +93,7 @@ const router = useRouter();
 const gameId = ref(route.params.gameId);
 
 if (route.params.locale) {
+  alert(locale.value)
   locale.value = route.params.locale;
 }
 
