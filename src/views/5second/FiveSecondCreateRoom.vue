@@ -1,10 +1,10 @@
 <template>
-  <GameLayout nameGame="5 секунд">
+  <GameLayout :nameGame="$t('games.five_second.name')">
     <br>
     <div class="containerFormCreate">
       <form @submit.prevent="addNewPlayer" class="formCreate">
         <div v-if="hasSavedData" class="div_continue">
-          <button @click="continueGame" class="btn-grad">Продовжити стару гру</button>
+          <button @click="continueGame" class="btn-grad">{{ $t('games.five_second.continue_game') }}</button>
         </div>
 
         <div class="containerFormCreate_5sec" v-for="(user, i) in five_second_users" :key="i">
@@ -18,38 +18,33 @@
           </div>
         </div>
 
-        <div class="formElement_5sec">
-          <label for="gameType">Виберіть тип гри:</label>
-          <select id="gameType" v-model="gameType" class="input_5sec">
-            <option value="3">Три слова</option>
-            <option value="5">П'ять слів</option>
-          </select>
-        </div>
-        
-        <button @click="addUser" class="btn-grad">Додати гравця</button>
-        <button type="submit" class="btn-grad" v-on:click="startGame">Почати гру</button>
+        <button @click="addUser" class="btn-grad">{{ $t('games.five_second.add_player') }}</button>
+        <button  @click="startGame" type="submit" class="btn-grad">{{ $t('games.five_second.start_game') }}</button>
       </form>
     </div>
-
-    <!-- <ShareButton @share="handleShare" /> -->
-
-   
   </GameLayout>
 </template>
 
 <script setup>
 import GameLayout from '../GameLayout.vue';
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 const router = useRouter();
+const route = useRoute();
+const { t, locale } = useI18n();
 
 const five_second_users = ref([]);
 const hasSavedData = ref(false);
-const gameType = ref('3'); // Добавляем переменную для хранения выбранного типа игры
+const gameType = ref('3');
 
 onMounted(() => {
-  // Проверяем наличие сохраненных данных
+  // Устанавливаем язык из маршрута
+  if (route.query.locale) {
+    locale.value = route.query.locale;
+  }
+
   const savedData = JSON.parse(localStorage.getItem('five_second_game_state'));
   if (savedData) {
     hasSavedData.value = true;
@@ -59,13 +54,13 @@ onMounted(() => {
     if (savedUsers) {
       five_second_users.value = savedUsers.map(user => ({ ...user, score: user.score || 0 }));
     } else {
-      five_second_users.value = [{ name: "Ваше ім'я", score: 0 }];
+      five_second_users.value = [{ name: t('games.five_second.default_name'), score: 0 }];
     }
   }
 });
 
 const addUser = () => {
-  five_second_users.value.push({ name: "І'мя", score: 0 });
+  five_second_users.value.push({ name: t('games.five_second.default_name'), score: 0 });
   saveUsers();
 };
 
@@ -81,23 +76,18 @@ const saveUsers = () => {
 };
 
 const startGame = () => {
-  // Генерация уникального ID комнаты
   const roomId = Math.random().toString(36).substr(2, 9);
-  // Обнуление очков всех игроков
   five_second_users.value = five_second_users.value.map(user => ({ ...user, score: 0 }));
-  // Сохранение типа игры
   localStorage.setItem('five_second_game_type', gameType.value);
-  // Очищаем старые данные игры
   localStorage.removeItem('five_second_game_state');
   saveUsers();
-  // Передаем выбранный тип игры в параметрах маршрута
-  router.push({ name: 'five-second-room', params: { roomId } });
+  router.push({ name: 'five-second-room', params: { roomId }, query: { locale: locale.value } });
 };
 
 const continueGame = () => {
   const savedData = JSON.parse(localStorage.getItem('five_second_game_state'));
   if (savedData) {
-    router.push({ name: 'five-second-room', params: { roomId: savedData.roomId } });
+    router.push({ name: 'five-second-room', params: { roomId: savedData.roomId }, query: { locale: locale.value } });
   }
 };
 </script>

@@ -105,11 +105,13 @@ const routes = [
         path: '/five-second',
         name: 'five-second',
         component: FiveSecondCreateRoom,
+        props: route => ({ locale: route.query.locale })
     },
     {
         path: '/five-second/:roomId',
         name: 'five-second-room',
         component: FiveSecond,
+        props: route => ({ locale: route.query.locale })
     }
     ,
     {

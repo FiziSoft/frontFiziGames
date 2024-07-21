@@ -1,23 +1,23 @@
 <template>
-  <GameLayout nameGame="5 секунд">
+  <GameLayout :nameGame="$t('games.five_second.name')">
     <div class="game-container">
       <div class="player-list">
         <div v-for="(player, index) in five_second_users" :key="index" :class="{'current-player': index === currentPlayer}">
-          <p>{{ player.name }} - {{ player.score }} очков</p>
+          <p>{{ player.name }} - {{ player.score }} {{ $t('games.five_second.score') }}</p>
         </div>
       </div>
 
       <div class="card" v-if="currentQuestion && !gameOver">
-        <h3 class="gameTypeText">{{ gameTypeText }}</h3>
+        <h3 class="gameTypeText">{{ $t('games.five_second.game_type_3') }}</h3>
         <p><strong>{{ currentQuestion.question }}</strong></p>
       </div>
       <div class="controls" v-if="!gameOver">
-        <button class="btn-grad" @click="startGame">Почати</button>
+        <button class="btn-grad" @click="startGame">{{ $t('games.five_second.start_game') }}</button>
         <p v-if="isRunning" class="timer">{{ timeLeft }}</p>
       </div>
-      <div v-if="gameOver" class="modal">
-        <button class="btn-grad" @click="playerAnswered(true)">+</button>
-        <button class="btn-grad" @click="playerAnswered(false)">-</button>
+      <div v-if="gameOver" class="modal yes_or_not_div">
+        <button class="btn-grad" @click="playerAnswered(true)">{{ $t('games.five_second.answer_correct') }}</button>
+        <button class="btn-grad" @click="playerAnswered(false)">{{ $t('games.five_second.answer_wrong') }}</button>
       </div>
     </div>
   </GameLayout>
@@ -26,15 +26,15 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import questionsThree from './questions3.json'
-import questionsFive from './questions5.json'
+import { useI18n } from 'vue-i18n'
 import GameLayout from '../GameLayout.vue'
 
-// Импорт аудиофайла
+// eslint-disable-next-line
 import alarmSound from '@/assets/sound/tic5sec.mp3'
 
 const alarm = new Audio(alarmSound)
 
+const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 
@@ -50,10 +50,19 @@ const questions = ref([])
 
 let timer = null
 
+const loadQuestions = async () => {
+  try {
+    const questionsModule = await import(`./questions_${gameType.value}_${locale.value}.json`)
+    questions.value = questionsModule.default
+  } catch (error) {
+    console.error("Ошибка загрузки вопросов:", error)
+  }
+}
+
 const startGame = () => {
   if (isRunning.value) return
 
-  alarm.play() // Проигрывание аудио при нажатии на кнопку "Почати"
+  alarm.play()
   
   isRunning.value = true
   gameOver.value = false
@@ -101,7 +110,7 @@ const loadGameState = () => {
     currentPlayer.value = gameState.currentPlayer
     five_second_users.value = gameState.five_second_users.map(user => ({ ...user, score: user.score || 0 }))
     gameType.value = gameState.gameType
-    questions.value = gameType.value === '3' ? questionsThree : questionsFive
+    loadQuestions()
   }
 }
 
@@ -113,17 +122,18 @@ const gameTypeText = computed(() => {
   return gameType.value === '3' ? 'Назви три' : 'Назви п\'ять'
 })
 
-onMounted(() => {
+onMounted(async () => {
   const roomId = route.params.roomId
-  // Load players from localStorage
+  // Загружаем игроков из localStorage
   const savedUsers = JSON.parse(localStorage.getItem('five_second_users')) || []
   five_second_users.value = savedUsers.map(user => ({ ...user, score: user.score || 0 }))
   loadGameState()
   
   // Устанавливаем вопросы в зависимости от типа игры
-  questions.value = gameType.value === '3' ? questionsThree : questionsFive
+  await loadQuestions()
 
-  if (!currentQuestion.value) {
+  // Загружаем первый вопрос
+  if (questions.value.length > 0 && !currentQuestion.value) {
     currentQuestion.value = questions.value[Math.floor(Math.random() * questions.value.length)]
   }
 })
@@ -161,6 +171,15 @@ router.beforeEach((to, from, next) => {
   --btn-bg-color: linear-gradient(to right, #ffdd00, #fbb034);
   --modal-bg-color: rgba(0, 0, 0, 0.8);
 }
+.yes_or_not_div {
+  width: 400px;
+  height: 200px;
+}
+
+.btn-grad {
+  margin: 15px;
+
+}
 
 .gameTypeText {
   color: #000;
@@ -177,7 +196,7 @@ router.beforeEach((to, from, next) => {
 }
 
 .card {
-  background-color: #fff; /* Устанавливаем белый фон для карточки */
+  background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
@@ -199,7 +218,7 @@ router.beforeEach((to, from, next) => {
 }
 
 .card p {
-  font-size: 1.5em; /* Увеличиваем размер текста */
+  font-size: 1.5em;
 }
 
 .controls {
@@ -225,7 +244,7 @@ router.beforeEach((to, from, next) => {
 
 .timer {
   font-weight: 100;
-  font-size: 50px; /* Увеличиваем размер таймера */
+  font-size: 50px;
   color: var(--text-color);
 }
 
@@ -234,47 +253,50 @@ router.beforeEach((to, from, next) => {
 }
 
 .player-list div {
-  margin: 10px 0; /* Увеличиваем отступы между игроками */
-  color: var(--text-color); /* Устанавливаем цвет текста для всех игроков */
-  font-size: 1.2em; /* Увеличиваем размер текста для списка игроков */
+  margin: 10px 0;
+  color: var(--text-color);
+  font-size: 1.2em;
 }
 
 .current-player {
   font-weight: bold;
-  background-color: #d3d3d3;
-  padding: 10px; /* Увеличиваем отступы для текущего игрока */
+  background-color: transparent;
+  padding: 10px;
   border-radius: 5px;
-  color: black !important; /* Устанавливаем черный цвет текста для текущего игрока */
+  color: black !important;
+  border: 1px solid;
+  border-radius: 12px;
+  box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 768px) {
   .card {
     padding: 15px;
-    font-size: 18px; /* Увеличиваем размер текста в карточке на планшетах */
+    font-size: 18px;
   }
   .btn-grad {
-    font-size: 18px; /* Увеличиваем размер текста кнопок на планшетах */
-    padding: 12px 24px; /* Увеличиваем размер кнопок на планшетах */
+    font-size: 18px;
+    padding: 12px 24px;
   }
   .timer {
-    font-size: 40px; /* Увеличиваем размер таймера на планшетах */
+    font-size: 40px;
   }
 }
 
 @media (max-width: 480px) {
   .card {
     padding: 20px;
-    font-size: 16px; /* Увеличиваем размер текста в карточке на мобильных устройствах */
+    font-size: 16px;
   }
   .btn-grad {
-    font-size: 16px; /* Увеличиваем размер текста кнопок на мобильных устройствах */
-    padding: 10px 20px; /* Увеличиваем размер кнопок на мобильных устройствах */
+    font-size: 16px;
+    padding: 10px 20px;
   }
   .timer {
-    font-size: 35px; /* Увеличиваем размер таймера на мобильных устройствах */
+    font-size: 35px;
   }
   .player-list div {
-    font-size: 1.5em; /* Увеличиваем размер текста для списка игроков на мобильных устройствах */
+    font-size: 1.5em;
   }
 }
 </style>
