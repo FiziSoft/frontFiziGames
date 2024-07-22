@@ -128,11 +128,11 @@ const connectToWebSocket = (roomId, playerName, playerHash) => {
     if (eventType === 'GameCanBeStart') {
       gameState.value = 'GameCanBeStart';
       cur_world.value = message.world_spy;
-      time_game.value = parseInt(message.room.time_game)*60;
+      time_game.value = parseInt(message.room.time_game);
       isSpy.value = false; // Обнуляем значение
     } else if (eventType === 'YouAreSpy') {
       gameState.value = 'GameCanBeStart';
-      time_game.value = parseInt(message.room.time_game)*60;
+      time_game.value = parseInt(message.room.time_game);
       isSpy.value = true;
       cur_world.value = ''; // Очистим текущее слово
     } else if (eventType === 'VotingStarted') {

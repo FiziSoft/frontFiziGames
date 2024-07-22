@@ -13,6 +13,7 @@
   import FooterComponent from '@/components/FooterComponent.vue';
   import ThemeProvider from '@/components/ThemeProvider.vue';
 
+  
   const currentTheme = ref('default');
   
   const handleThemeChange = (theme) => {
