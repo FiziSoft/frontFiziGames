@@ -1,81 +1,76 @@
 <template>
   <GameLayout nameGame="Шпіон">
-    <div v-if="loading">
-      <div class="loading-container">
-        <div class="spinner"></div>
-        <p>Loading...</p>
-      </div>
+    <div v-if="showSpinner" class="spinner"></div>
+    <div v-else >
+      <h2>Доедналися до гри:</h2>
+      <ul v-if="room.players.length">
+        <li v-for="(player, key) in room.players" :key="key">{{ player.name }}</li>
+      </ul>
     </div>
-    <div v-else>
-      <div>
-        <h2>Доедналися до гри:</h2>
-        <ul v-if="room.players.length">
-          <li v-for="(player, key) in room.players" :key="key">{{ player.name }}</li> 
-        </ul>
+
+    <div v-if="loading">Loading...</div>
+    <div v-else class="containerFormCreate">
+      <div v-if="gameState === 'WaitPlayers'">
+        <div class="waiting">Очікуємо на гравців</div>
+        <TelegramShareButton :url="qrCodeValue" text="Давай грати в Шпіона" />
       </div>
-      <div class="containerFormCreate">
-        <div v-if="gameState === 'WaitPlayers'">
-          <div class="waiting">Очікуємо на гравців</div>
-          <TelegramShareButton :url="qrCodeValue" text="Давай грати в Шпіона" />
+      <div v-else-if="gameState === 'GameCanBeStart'">
+        <h1 v-if="isSpy" class="spy-notice">Ви шпіон!</h1>
+        <div class="cur_word">
+          <h2 v-if="!isSpy">{{ cur_world }}</h2>
         </div>
-        <div v-else-if="gameState === 'GameCanBeStart'">
-          <h1 v-if="isSpy" class="spy-notice">Ви шпіон!</h1>
-          <div class="cur_word">
-            <h2 v-if="!isSpy">{{ cur_world }}</h2>
-          </div>
-          <table class="formCreate">
-            <thead>
-              <tr>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="i in filteredPlayers" :key="i.id" class="formElement">
-                <td class="tableElement">{{ i.name }}</td>
-              </tr>
-              <TimerFizi :timeInSeconds="time_game" :autoStart="true" 
-                timerTimeLeftKey="spyTimerTimeLeft"
-                timerIsRunningKey="spyIsRunning"
-                lastUpdateTimeKey="spylastUpdateTime"/>
-            </tbody>
-          </table>
-          <div class="spyDiv" v-if="isSpy">
-            <div>
-              <ul>
-                <li v-for="word in room.theme" :key="word">{{ word }}</li>
-              </ul>
-            </div>
+        <table class="formCreate">
+          <thead>
+            <tr>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="i in filteredPlayers" :key="i.id" class="formElement">
+              <td class="tableElement">{{ i.name }}</td>
+            </tr>
+            <TimerFizi :timeInSeconds="time_game" :autoStart="true" 
+              timerTimeLeftKey="spyTimerTimeLeft"
+              timerIsRunningKey="spyIsRunning"
+              lastUpdateTimeKey="spylastUpdateTime"/>
+          </tbody>
+        </table>
+        <div class="spyDiv" v-if="isSpy">
+          <div>
+            <ul>
+              <li v-for="word in room.theme" :key="word">{{ word }}</li>
+            </ul>
           </div>
         </div>
-        <div v-if="showVotingModal" class="modal">
-          <div class="modal-content">
-            <span class="close" @click="showVotingModal = false">&times;</span>
-            <h2>Выберите шпиона</h2>
-            <button v-for="player in filteredPlayers" :key="player.id" @click="voteForPlayer(player.id)">
-              {{ player.name }}
-            </button>
-          </div>
+      </div>
+      <div v-if="showVotingModal" class="modal">
+        <div class="modal-content">
+          <span class="close" @click="showVotingModal = false">&times;</span>
+          <h2>Выберите шпиона</h2>
+          <button v-for="player in filteredPlayers" :key="player.id" @click="voteForPlayer(player.id)">
+            {{ player.name }}
+          </button>
         </div>
-        <div v-if="showGuessingModal" class="modal">
-          <div class="modal-content">
-            <span class="close" @click="showGuessingModal = false">&times;</span>
-            <h2>Выберите загаданное слово</h2>
-            <button v-for="word in room.theme" :key="word" @click="guessWord(word)">
-              {{ word }}
-            </button>
-          </div>
+      </div>
+      <div v-if="showGuessingModal" class="modal">
+        <div class="modal-content">
+          <span class="close" @click="showGuessingModal = false">&times;</span>
+          <h2>Выберите загаданное слово</h2>
+          <button v-for="word in room.theme" :key="word" @click="guessWord(word)">
+            {{ word }}
+          </button>
         </div>
-        <div v-if="showResultModal" class="modal">
-          <div class="modal-content">
-            <span class="close" @click="showResultModal = false">&times;</span>
-            <h2>Результат игры</h2>
-            <p>{{ gameResult }}</p>
-            <ButtonHome></ButtonHome>
-          </div>
+      </div>
+      <div v-if="showResultModal" class="modal">
+        <div class="modal-content">
+          <span class="close" @click="showResultModal = false">&times;</span>
+          <h2>Результат игры</h2>
+          <p>{{ gameResult }}</p>
+          <ButtonHome></ButtonHome>
         </div>
-        <div v-if="errorMessage" class="error-message">
-          {{ errorMessage }}
-        </div>
+      </div>
+      <div v-if="errorMessage" class="error-message">
+        {{ errorMessage }}
       </div>
     </div>
   </GameLayout>
@@ -108,6 +103,7 @@ const route = useRoute();
 const router = useRouter();
 const room = reactive({ name: '', players: [], theme: [] });
 const qrCodeValue = ref('');
+const showSpinner = ref(true);
 
 const connectToWebSocket = (roomId, playerName, playerHash) => {
   console.log(`Connecting to WebSocket for room ${roomId} as player ${playerName} with hash ${playerHash}`);
@@ -116,6 +112,9 @@ const connectToWebSocket = (roomId, playerName, playerHash) => {
   websocket.onopen = () => {
     console.log('WebSocket connected');
     loading.value = false;
+    setTimeout(() => {
+      showSpinner.value = false;
+    }, 2000); // Устанавливаем спиннер на 2 секунды
   };
 
   websocket.onmessage = (event) => {
@@ -129,11 +128,11 @@ const connectToWebSocket = (roomId, playerName, playerHash) => {
     if (eventType === 'GameCanBeStart') {
       gameState.value = 'GameCanBeStart';
       cur_world.value = message.world_spy;
-      time_game.value = parseInt(message.room.time_game)*60;
+      time_game.value = parseInt(message.room.time_game);
       isSpy.value = false; // Обнуляем значение
     } else if (eventType === 'YouAreSpy') {
       gameState.value = 'GameCanBeStart';
-      time_game.value = parseInt(message.room.time_game)*60;
+      time_game.value = parseInt(message.room.time_game);
       isSpy.value = true;
       cur_world.value = ''; // Очистим текущее слово
     } else if (eventType === 'VotingStarted') {
@@ -214,26 +213,23 @@ const filteredPlayers = computed(() => {
 });
 
 onMounted(async () => {
-  setTimeout(async () => {
-    const playerNameFromStorage = localStorage.getItem('spyPlayerName');
-    const roomId = route.params.id;
-    const playerHash = localStorage.getItem('spyPlayerHash');
+  const playerNameFromStorage = localStorage.getItem('spyPlayerName');
+  const roomId = route.params.id;
+  const playerHash = localStorage.getItem('spyPlayerHash');
 
-    if (!playerNameFromStorage || !roomId) {
-      router.push('/');
-      return;
-    }
+  if (!playerNameFromStorage || !roomId) {
+    router.push('/');
+    return;
+  }
 
-    const exists = await checkRoomExists(roomId);
-    if (exists) {
-      playerName.value = playerNameFromStorage;
-      qrCodeValue.value = `https://fizigames-799b6804c93a.herokuapp.com/spy/connect/${roomId}`;
-      connectToWebSocket(roomId, playerNameFromStorage, playerHash);
-    } else {
-      router.push('/');
-    }
-    loading.value = false;
-  }, 1000);
+  const exists = await checkRoomExists(roomId);
+  if (exists) {
+    playerName.value = playerNameFromStorage;
+    qrCodeValue.value = `https://fizigames-799b6804c93a.herokuapp.com/spy/connect/${roomId}`;
+    connectToWebSocket(roomId, playerNameFromStorage, playerHash);
+  } else {
+    router.push('/');
+  }
 });
 
 const connectedPlayers = ref([]);
@@ -246,37 +242,11 @@ watch(() => room.players, (newPlayers) => {
 </script>
 
 <style scoped>
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
-.spinner {
-  border: 16px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 16px solid #3498db;
-  width: 120px;
-  height: 120px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
-  animation: spin 2s linear infinite;
-}
-
-/* Safari */
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 .cur_word {
-  font-size: large;
+  font-size: 1.7em;
+  text-align: center;
+  margin: 20px;
+  font-weight: 500;
 }
 
 .error-message {
@@ -338,5 +308,21 @@ button {
 
 button:hover {
   background-color: #ddd;
+}
+
+.spinner {
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+  margin: auto;
+  display: block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
