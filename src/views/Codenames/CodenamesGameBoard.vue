@@ -1,8 +1,6 @@
 <template>
   <GameLayout :nameGame="$t('games.codenames.name')">
     <div class="containerCodenames">
-      <!-- Кнопка для запуска тура -->
-      <button @click="startTour" class="btn-grad">{{ $t('tour.start') }}</button>
       
       <!-- Анимация загрузки -->
       <div v-if="!wordsLoaded" class="loading-spinner">
@@ -89,10 +87,8 @@ import GameLayout from '../GameLayout.vue';
 import ShareButton from '@/components/ShareButton.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';  
 import { v4 as uuidv4 } from 'uuid';
-import { driver } from 'driver.js';
-// import 'driver.js/dist/driver.min.css';
 
-const { locale, t } = useI18n();
+const { locale } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const gameId = ref(route.params.gameId);
@@ -275,49 +271,6 @@ onMounted(() => {
     console.error("Missing gameId");
   }
 });
-
-const startTour = () => {
-  const driverrr = new driver({
-    animate: true,
-    opacity: 0.75,
-    doneBtnText: t('tour.finish'),
-    closeBtnText: t('tour.finish'),
-    nextBtnText: t('tour.next'),
-    prevBtnText: t('tour.back'),
-    showProgress: true,
-    keyboardControl: true,
-    progressBar: true
-  });
-
-  driverrr.defineSteps([
-    {
-      element: '.team-name',
-      popover: {
-        title: t('tour.teamNameTitle'),
-        description: t('tour.teamName'),
-        position: 'bottom'
-      }
-    },
-    {
-      element: '.grid',
-      popover: {
-        title: t('tour.gridTitle'),
-        description: t('tour.grid'),
-        position: 'top'
-      }
-    },
-    {
-      element: '.btn-grad',
-      popover: {
-        title: t('tour.btnGradTitle'),
-        description: t('tour.btnGrad'),
-        position: 'bottom'
-      }
-    }
-  ]);
-
-  driverrr.start();
-};
 </script>
 
 <style scoped>
