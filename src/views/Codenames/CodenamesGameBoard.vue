@@ -337,6 +337,8 @@ const startTour = () => {
 .tourDiv {
   background-color: transparent;
   font-size: 30px;
+  position: relative;
+  bottom: 80px;
 }
 
 .containerCodenames {
