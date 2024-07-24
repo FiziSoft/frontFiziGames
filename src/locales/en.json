@@ -1,6 +1,6 @@
 {
   "welcome": "Fizi Games",
-  "best_online_games": "Best Online Board Games",
+  "best_online_games": "The Best Online Board Games",
   "themes": {
     "default": "Dark",
     "theme1": "Sunset",
@@ -11,19 +11,19 @@
   "games": {
     "rsp": {
       "name": "Rock Paper Scissors",
-      "description": "Rock Paper Scissors is a classic game of luck and strategy. Two players simultaneously choose one of three shapes: rock, paper, or scissors. Rock beats scissors, scissors beat paper, and paper beats rock."
+      "description": "Rock Paper Scissors is a classic game of luck and strategy. Two players simultaneously choose one of three figures: rock, scissors, or paper. Rock beats scissors, scissors beat paper, and paper beats rock."
     },
     "spy": {
       "name": "Spy",
-      "description": "Spy is a game where players try to figure out who the spy is by asking each other questions. One player takes on the role of the spy and tries to guess the secret word without revealing their identity."
+      "description": "Spy is a game where players try to figure out who the spy is by asking each other questions. One player gets the role of a spy and tries to guess the secret word without revealing their identity."
     },
     "tod": {
       "name": "Truth or Dare",
-      "description": "Truth or Dare is a classic party game where players take turns choosing between truth and dare. Choosing truth means the player must honestly answer a question, while a dare requires them to complete a task."
+      "description": "Truth or Dare is a classic party game where players take turns choosing between truth and dare. Choosing truth means the player must honestly answer a question, while dare requires them to complete a task."
     },
     "five_second": {
       "name": "5 Seconds",
-      "description": "5 Seconds is a fast and fun game where players must name three things in five seconds. For example, three types of fruit or three famous movies. If a player doesn't make it in time, the turn passes to the next player.",
+      "description": "5 Seconds is a fast and fun game where players must name three things in five seconds. For example, three types of fruit or three famous movies. If the player doesn't make it in time, the turn goes to the next player.",
       "continue_game": "Continue Previous Game",
       "add_player": "Add Player",
       "delete_player": "Delete",
@@ -39,7 +39,7 @@
     },
     "codenames": {
       "name": "Codenames",
-      "description": "Codenames is a team game where players try to guess words using clues. Two teams compete to be the first to find all their code words on the board. A clue consists of one word and a number indicating the number of related words.",
+      "description": "Codenames is a team game where players try to guess words using clues. Two teams compete to be the first to find all their codenames on the board. A clue consists of one word and a number indicating how many related words there are.",
       "title": "Codenames",
       "create_game": "Create a game with {count} words",
       "teams": {
@@ -52,17 +52,36 @@
       "show_colors": "Show Colors",
       "hide_colors": "Hide Colors",
       "update_words": "Update Words",
-      "winner_message": "{team} Team Wins!",
+      "winner_message": "Team {team} wins!",
       "choose_team": "Choose Your Team",
       "confirm_reveal": "Are you sure?",
       "yes": "Yes",
       "no": "No",
       "add_players": "Add Players",
       "add_captain": "Add Captain",
-      "play_codenames": "Let's Play Codenames"
+      "play_codenames": "Let's Play Codenames",
+      "tour": {
+        "teamNameTitle": "Teams",
+        "teamName": "There are two teams, Blue and Red <br/>(in parentheses, the number of players in the team)",
+        "team-progressTitle": "Points",
+        "team-progress": "The number of points needed to win <strong>(Blue starts, so they always have 1 more point)</strong> ",
+        "gridTitle": "Guessing Words",
+        "grid": "Here are the words that captains need to encode and players need to guess",
+        "usersTitle": "Add players to whom you will give words",
+        "users": "Using qr code or sending a ready link through social networks",
+        "captainTitle": "Add the captain of the second team",
+        "captain": "Using qr code or sending a ready link through social networks",
+        "startTitle": "After pressing, you will see the color map of words",
+        "start": "1. Only captains see this map <br/> 2. They try to combine words by different meanings <br/> 3. The Blue team starts first (they have 1 more guessed word) <br/> 4. Whoever guesses all the words first wins <br/> 5. Players will mark words on their phones (but the captain can also do it) <br/> 6. Black word is a bomb<br/>(choose = lose)"
+      }
     }
   },
   "select_theme": "Select Theme",
   "select_language": "Select Language",
-  "close": "Close"
+  "close": "Close",
+  "tour" : {
+      "back":"Back",
+      "next":"Next",
+      "finish":"Finish"
+  }
 }

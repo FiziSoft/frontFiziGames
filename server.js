@@ -7,11 +7,17 @@ app.use((req, res, next) => {
   const host = req.headers.host;
   const protocol = req.headers['x-forwarded-proto'];
 
-  // Redirect from www to non-www and from HTTP to HTTPS
-  if (protocol !== 'https' || host.startsWith('www.')) {
-    const newHost = host.startsWith('www.') ? host.slice(4) : host;
+  if (protocol !== 'https') {
+    // Redirect HTTP to HTTPS
+    return res.redirect(301, `https://${host}${req.url}`);
+  }
+
+  if (host.startsWith('www.')) {
+    // Redirect www to non-www
+    const newHost = host.slice(4);
     return res.redirect(301, `https://${newHost}${req.url}`);
   }
+
   next();
 });
 

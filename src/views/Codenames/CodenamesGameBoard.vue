@@ -1,6 +1,7 @@
 <template>
   <GameLayout :nameGame="$t('games.codenames.name')">
     <div class="containerCodenames">
+     
       
       <!-- Анимация загрузки -->
       <div v-if="!wordsLoaded" class="loading-spinner">
@@ -12,11 +13,11 @@
         <div class="progress">
           <div class="team">
             <span class="team-name">{{ $t('games.codenames.teams.blue') }} ({{ bluePlayersCount }}): </span>
-            <span class="team-progress">{{ blueRevealedCount }} / {{ blueTotal }}</span>
+            <span class="team-progress">{{ blueTotal }} / {{ blueRevealedCount }}</span>
           </div>
           <div class="team">
             <span class="team-name">{{ $t('games.codenames.teams.red') }} ({{ redPlayersCount }}): </span>
-            <span class="team-progress">{{ redRevealedCount }} / {{ redTotal }}</span>
+            <span class="team-progress"> {{ redTotal }} / {{ redRevealedCount }}</span>
           </div>
           <br>
         </div>
@@ -42,11 +43,11 @@
           </div>
         </div>
         <div class="buttonsCode">
-          <button class="btn-grad" v-if="info_share" @click="confirmStartGame">{{ $t('games.codenames.start_game') }}</button>
-          <button class="btn-grad" v-if="gameStarted" @click="toggleShowColors">{{ showColors ? $t('games.codenames.hide_colors') : $t('games.codenames.show_colors') }}</button>
+          <button class="btn-grad"  id="btnStart" v-if="info_share" @click="confirmStartGame">{{ $t('games.codenames.start_game') }}</button>
+          <button  class="btn-grad" v-if="gameStarted" @click="toggleShowColors">{{ showColors ? $t('games.codenames.hide_colors') : $t('games.codenames.show_colors') }}</button>
           <div class="groupShare">
-            <button class="btn-grad" v-if="info_share" @click="showTelegramShareModalUser = true">{{ $t('games.codenames.add_players') }}</button>
-            <button class="btn-grad" v-if="info_share" @click="showTelegramShareModalCaptain = true">{{ $t('games.codenames.add_captain') }}</button>
+            <button class="btn-grad" id="btnUsers" v-if="info_share" @click="showTelegramShareModalUser = true">{{ $t('games.codenames.add_players') }}</button>
+            <button class="btn-grad" id="btnCaptain" v-if="info_share" @click="showTelegramShareModalCaptain = true">{{ $t('games.codenames.add_captain') }}</button>
           </div>
           <button class="btn-grad" v-if="!gameStarted" @click="refreshWords">{{ $t('games.codenames.update_words') }}</button>
         </div>
@@ -65,9 +66,9 @@
       </div>
     </div>
     <div v-if="showTelegramShareModalCaptain" class="modal-unique">
-      <div class="modal-content-unique">
+      <div  class="modal-content-unique">
         <TelegramShareButton :url="url_captan_share" :text="$t('games.codenames.play_codenames')" />
-        <button class="button_finish" @click="showTelegramShareModalCaptain = false">{{ $t('close') }}</button>
+        <button  class="button_finish btnCaptain" @click="showTelegramShareModalCaptain = false">{{ $t('close') }}</button>
       </div>
     </div>
     <div v-if="showTelegramShareModalUser" class="modal-unique">
@@ -76,6 +77,11 @@
         <button class="button_finish" @click="showTelegramShareModalUser = false">{{ $t('close') }}</button>
       </div>
     </div>
+
+    <!-- Компонент подсказок -->
+    <ToolTripFizi v-if="showTour" :steps="steps" />
+     <!-- Кнопка для запуска тура -->
+     <button @click="startTour" class="tourDiv"><i class="fa-regular fa-circle-question"></i></button>
   </GameLayout>
 </template>
 
@@ -87,8 +93,9 @@ import GameLayout from '../GameLayout.vue';
 import ShareButton from '@/components/ShareButton.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';  
 import { v4 as uuidv4 } from 'uuid';
+import ToolTripFizi from '@/components/ToolTripFizi.vue';
 
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const gameId = ref(route.params.gameId);
@@ -266,11 +273,58 @@ onMounted(() => {
       if (!wordsLoaded.value) {
         location.reload(); // Обновляем страницу, если слова не загружены
       }
-    }, 2000);
+    }, 1000);
   } else {
     console.error("Missing gameId");
   }
 });
+
+const steps = [
+  {
+    element: '.team-name',
+    title: t('games.codenames.tour.teamNameTitle'),
+    description: t('games.codenames.tour.teamName'),
+    position: 'bottom'
+  },
+  {
+    element: '.team-progress',
+    title: t('games.codenames.tour.team-progressTitle'),
+    description: t('games.codenames.tour.team-progress'),
+    position: 'bottom'
+  },
+  {
+    element: '.grid',
+    title: t('games.codenames.tour.gridTitle'),
+    description: t('games.codenames.tour.grid'),
+    position: 'bottom'
+  },
+  {
+    element: '#btnUsers',
+    title: t('games.codenames.tour.usersTitle'),
+    description: t('games.codenames.tour.users'),
+    position: 'top'
+  }
+  ,
+  {
+    element: '#btnCaptain',
+    title: t('games.codenames.tour.captainTitle'),
+    description: t('games.codenames.tour.captain'),
+    position: 'top'
+  }
+  ,
+  {
+    element: '#btnStart',
+    title: t('games.codenames.tour.startTitle'),
+    description: t('games.codenames.tour.start'),
+    position: 'top'
+  }
+];
+
+const showTour = ref(false);
+
+const startTour = () => {
+  showTour.value = true;
+};
 </script>
 
 <style scoped>
@@ -278,6 +332,11 @@ onMounted(() => {
   width: 100%;
   display: flex;
   padding: 10px;
+}
+
+.tourDiv {
+  background-color: transparent;
+  font-size: 30px;
 }
 
 .containerCodenames {
