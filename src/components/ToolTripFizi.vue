@@ -74,6 +74,7 @@ const updateTooltip = () => {
   const element = document.querySelector(step.element);
   if (element) {
     const rect = element.getBoundingClientRect();
+    tooltipStyle.value = calculatePosition(rect, position.value);
     highlightStyle.value = {
       top: `${rect.top + window.scrollY - rect.height * 0.025}px`,
       left: `${rect.left + window.scrollX - rect.width * 0.025}px`,
@@ -82,8 +83,8 @@ const updateTooltip = () => {
       boxShadow: `0 0 0 2000px rgba(0, 0, 0, 0.5), 0 0 10px 5px rgba(0, 0, 0, 0.3)`,
       borderRadius: '10px', // добавляем скругленные углы
     };
-    tooltipStyle.value = calculatePosition(rect, position.value);
     highlightElement(element);
+    scrollToElement(element);
   }
 };
 
@@ -111,6 +112,12 @@ const highlightElement = (element) => {
   element.classList.add('highlight');
   showTooltip.value = true;
   showOverlay.value = true;
+};
+
+const scrollToElement = (element) => {
+  const rect = element.getBoundingClientRect();
+  const elementTop = rect.top + window.scrollY;
+  window.scrollTo({ top: elementTop - 50, behavior: 'smooth' });
 };
 
 const removeHighlight = () => {
@@ -145,6 +152,9 @@ watch(currentStep, () => {
 .tooltip-wrapper {
   position: fixed;
   z-index: 1003;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   transition: opacity 0.3s ease, transform 0.3s ease;
   opacity: 1;
   transform: translateY(0);
@@ -156,7 +166,10 @@ watch(currentStep, () => {
   padding: 15px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  max-width: 400px;
+  max-width: 90%;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .tooltip-title {
@@ -205,5 +218,45 @@ watch(currentStep, () => {
 
 .tooltip-buttons button:hover {
   background-color: #2980b9;
+}
+
+.arrow {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  position: absolute;
+  z-index: 1003;
+}
+
+.arrow.top {
+  border-width: 10px 10px 0 10px;
+  border-color: white transparent transparent transparent;
+  top: 100%; /* смещаем стрелку вниз */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.arrow.bottom {
+  border-width: 0 10px 10px 10px;
+  border-color: transparent transparent white transparent;
+  bottom: 100%; /* смещаем стрелку вверх */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.arrow.left {
+  border-width: 10px 10px 10px 0;
+  border-color: transparent white transparent transparent;
+  left: 100%; /* смещаем стрелку влево */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.arrow.right {
+  border-width: 10px 0 10px 10px;
+  border-color: transparent transparent transparent white;
+  right: 100%; /* смещаем стрелку вправо */
+  top: 50%;
+  transform: translateY(-50%);
 }
 </style>
