@@ -90,7 +90,7 @@ const words = ref([]);
 const revealedWords = ref({});
 const board = ref({});
 let socket;
-const url_share = `https://fizigames-799b6804c93a.herokuapp.com/codenames/player-view/${gameId.value}`;
+const url_share = `https://fizi.cc/codenames/player-view/${gameId.value}`;
 
 // Вычисляемое свойство для подсчета угаданных слов
 const redRevealedCount = computed(() => Object.values(revealedWords.value).filter(role => role === 'red').length);

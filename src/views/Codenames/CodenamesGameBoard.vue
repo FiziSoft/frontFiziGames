@@ -121,7 +121,7 @@ const url_captan_share = window.location.href;
 const wordsLoaded = ref(false);  
 
 let socket;
-const url_share = `https://fizigames-799b6804c93a.herokuapp.com/codenames/player-view/${gameId.value}`;
+const url_share = `https://fizi.cc/codenames/player-view/${gameId.value}`;
 
 const redRevealedCount = computed(() => Object.values(revealedWords.value).filter(role => role === 'red').length);
 const blueRevealedCount = computed(() => Object.values(revealedWords.value).filter(role => role === 'blue').length);
