@@ -114,7 +114,7 @@ const connectToWebSocket = (roomId, playerName, playerHash) => {
     loading.value = false;
     setTimeout(() => {
       showSpinner.value = false;
-    }, 2000); // Устанавливаем спиннер на 2 секунды
+    }, 1000); // Устанавливаем спиннер на 2 секунды
   };
 
   websocket.onmessage = (event) => {
@@ -225,7 +225,7 @@ onMounted(async () => {
   const exists = await checkRoomExists(roomId);
   if (exists) {
     playerName.value = playerNameFromStorage;
-    qrCodeValue.value = `https://fizigames-799b6804c93a.herokuapp.com/spy/connect/${roomId}`;
+    qrCodeValue.value = `https://fizi.cc/spy/connect/${roomId}`;
     connectToWebSocket(roomId, playerNameFromStorage, playerHash);
   } else {
     router.push('/');
