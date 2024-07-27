@@ -2,22 +2,21 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
-// Middleware to handle redirects
+// Middleware to redirect HTTP to HTTPS
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] !== 'https') {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
+
+// Middleware to redirect www to non-www
 app.use((req, res, next) => {
   const host = req.headers.host;
-  const protocol = req.headers['x-forwarded-proto'];
-
-  if (protocol !== 'https') {
-    // Redirect HTTP to HTTPS
-    return res.redirect(301, `https://${host}${req.url}`);
-  }
-
   if (host.startsWith('www.')) {
-    // Redirect www to non-www
     const newHost = host.slice(4);
     return res.redirect(301, `https://${newHost}${req.url}`);
   }
-
   next();
 });
 
