@@ -30,6 +30,7 @@
               <option value="en">English</option>
             </select>
           </div>
+          <ShareButton url="https://fizi.cc" text="Запрошую пограти на Fizi.cc (Найкращі настільні ігри Он-лайн)"></ShareButton>
           <button class="close-button" @click="toggleModal">{{ $t('close') }}</button>
         </div>
       </div>
@@ -41,6 +42,8 @@
 import { inject, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import ShareButton from './ShareButton.vue';
+
 
 const router = useRouter();
 const { locale } = useI18n();

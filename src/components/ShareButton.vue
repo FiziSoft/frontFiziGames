@@ -40,13 +40,13 @@ const closeModal = () => {
 
 <style scoped>
 .share-button {
-  position: fixed;
-  bottom: 60px;
+  position: relative;
+  bottom: 0px;
   left: 0;
-  width: 90px;
-  height: 90px;
+  width: 70px;
+  height: 70px;
   background-color: #007bff;
-  border-top-right-radius: 100px;
+  border-radius: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,8 +57,8 @@ const closeModal = () => {
 
 .share-button i {
   pointer-events: none;
-  margin-left: -25px;
-  margin-top: 20px;
+  margin-left: -6px;
+  /* margin-top: 20px; */
 }
 
 .modal {
