@@ -38,10 +38,11 @@
             <tr v-for="i in filteredPlayers" :key="i.id" class="formElement">
               <td class="tableElement">{{ i.name }}</td>
             </tr>
-            <TimerFizi :timeInSeconds="time_game" :autoStart="true" 
-              timerTimeLeftKey="spyTimerTimeLeft"
-              timerIsRunningKey="spyIsRunning"
-              lastUpdateTimeKey="spylastUpdateTime"/>
+            <TimerFizi
+              ref="timer"
+              :timeInSeconds="time_game"
+              :autoStart="true"
+            />
           </tbody>
         </table>
         <button @click="toggleHide" class="btn-grad">{{ isHidden ? 'Показать' : 'Скрыть' }}</button>
@@ -110,6 +111,7 @@ const room = reactive({ name: '', players: [], theme: [] });
 const qrCodeValue = ref('');
 const showSpinner = ref(true);
 const isHidden = ref(false);
+const timerRef = ref(null);
 
 const toggleHide = () => {
   isHidden.value = !isHidden.value;
@@ -139,13 +141,25 @@ const connectToWebSocket = (roomId, playerName, playerHash) => {
     if (eventType === 'GameCanBeStart') {
       gameState.value = 'GameCanBeStart';
       cur_world.value = message.word_game;
-      time_game.value = parseInt(message.room.time_game);
+      time_game.value = message.room?.time_game ? parseInt(message.room.time_game) : 0;
       isSpy.value = false; // Обнуляем значение
+      if (message.time_left !== undefined) {
+        time_game.value = message.time_left;
+        if (timerRef.value && timerRef.value.setTimeLeft) {
+          timerRef.value.setTimeLeft(time_game.value);
+        }
+      }
     } else if (eventType === 'YouAreSpy') {
       gameState.value = 'GameCanBeStart';
-      time_game.value = parseInt(message.room.time_game);
+      time_game.value = message.room?.time_game ? parseInt(message.room.time_game) : 0;
       isSpy.value = true;
-      cur_world.value = ''; // Очистим текущее слово
+      cur_world.value = '';
+      if (message.time_left !== undefined) {
+        time_game.value = message.time_left;
+        if (timerRef.value && timerRef.value.setTimeLeft) {
+          timerRef.value.setTimeLeft(time_game.value);
+        }
+      } // Очистим текущее слово
     } else if (eventType === 'VotingStarted') {
       if (isSpy.value) {
         showGuessingModal.value = true;
