@@ -106,7 +106,7 @@ const showSpinner = ref(true);
 
 const connectToWebSocket = (roomId, playerName, playerHash) => {
   console.log(`Connecting to WebSocket for room ${roomId} as player ${playerName} with hash ${playerHash}`);
-  const websocket = new WebSocket(`wss://${url_serv}/ws/${roomId}/${playerName}/${playerHash}`);
+  const websocket = new WebSocket(`ws://${url_serv}/ws/${roomId}/${playerName}/${playerHash}`);
 
   websocket.onopen = () => {
     console.log('WebSocket connected');

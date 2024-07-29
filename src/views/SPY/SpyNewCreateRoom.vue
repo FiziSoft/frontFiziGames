@@ -75,7 +75,7 @@ const sendCreateRoomRequest = async () => {
 
     console.log('Отправка данных на сервер:', roomData);
 
-    const response = await axios.post(`https://${url_serv}/create_room`, roomData);
+    const response = await axios.post(`http://${url_serv}/create_room`, roomData);
 
     const roomId = response.data.id;
     localStorage.setItem('spyPlayerName', playerName.value);
