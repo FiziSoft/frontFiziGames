@@ -38,7 +38,7 @@ import themeData from './theme.json'; // Убедитесь, что путь п�
 import axios from "axios";
 
 const router = useRouter();
-const playerName = ref(localStorage.getItem('PlayerName') || '');
+const playerName = ref(localStorage.getItem('playerName') || '');
 const numPlayers = ref(null);
 const time_game = ref(null);
 const selectedTheme = ref(null);
@@ -78,7 +78,7 @@ const sendCreateRoomRequest = async () => {
     const response = await axios.post(`${url_serv}/create_room`, roomData);
 
     const roomId = response.data.id;
-    localStorage.setItem('PlayerName', playerName.value);
+    localStorage.setItem('playerName', playerName.value);
     localStorage.setItem('spyRoomId', roomId);
     localStorage.setItem('spyPlayerHash', uuidv4());
 
