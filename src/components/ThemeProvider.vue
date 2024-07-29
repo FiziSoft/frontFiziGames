@@ -19,10 +19,10 @@
       '--burger-color': '#fff'
     },
     theme1: {
-      '--bg-color': '#ff7e5f',
+      '--bg-color': 'radial-gradient( circle farthest-corner at 10% 20%,  rgba(253,193,104,1) 0%, rgba(251,128,128,1) 90% )',
       '--text-color': '#000',
       '--gradient-color': 'linear-gradient(to right, #ff7e5f, #ffb27d)',
-      '--btn-gradient-color': 'linear-gradient(to right, #ff4e50, #f9d423)',
+      '--btn-gradient-color': 'linear-gradient(to right, #fa709a 0%, #fee140 100%)',
       '--btn-delete-color': '#000',
       '--fizi-gradient': 'linear-gradient(to right, #6A82FB, #FC5C7D)',
       '--border-color': '#000',
@@ -39,7 +39,7 @@
       '--burger-color': '#000'  
     },
     theme3: {
-      '--bg-color': '#f9f9a1',
+      '--bg-color': 'linear-gradient( 184.1deg,  rgba(249,255,182,1) 44.7%, rgba(226,255,172,1) 67.2% )',
       '--text-color': '#000',
       '--gradient-color': 'linear-gradient(to right, #f9f9a1, #fce16b)',
       '--btn-gradient-color': 'linear-gradient(to right, #ffdd00, #fbb034)',
