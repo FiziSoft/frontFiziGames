@@ -187,7 +187,7 @@ const checkRoomExists = async (roomId) => {
   }
 };
 
-const playerName = ref(localStorage.getItem('spyPlayerName') || '');
+const playerName = ref(localStorage.getItem('PlayerName') || '');
 
 const isButtonActive = computed(() => {
   return playerName.value.trim().length > 0;
@@ -224,7 +224,7 @@ const filteredPlayers = computed(() => {
 });
 
 onMounted(async () => {
-  const playerNameFromStorage = localStorage.getItem('spyPlayerName');
+  const playerNameFromStorage = localStorage.getItem('PlayerName');
   const roomId = route.params.id;
   const playerHash = localStorage.getItem('spyPlayerHash');
 
@@ -249,7 +249,7 @@ watch(() => room.players, (newPlayers) => {
   connectedPlayers.value = newPlayers;
   console.log('Players updated:', newPlayers);
   console.log('Connected players:', connectedPlayers.value.length);
-  const playerNameFromStorage = localStorage.getItem('spyPlayerName');
+  const playerNameFromStorage = localStorage.getItem('PlayerName');
   if (!connectedPlayers.value.some(player => player.name === playerNameFromStorage)) {
     window.location.reload();
   }
