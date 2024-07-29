@@ -29,7 +29,7 @@
       '--burger-color': '#000'  
     },
     theme2: {
-      '--bg-color': 'linear-gradient(to top, #a8edea 0%, #fed6e3 100%)',
+      '--bg-color': 'linear-gradient(to left, #a8edea 0%, #fed6e3 100%)',
       '--text-color': '#000',
       '--gradient-color': 'linear-gradient(to right, #9733ee, #da22ff)',
       '--btn-gradient-color': 'linear-gradient( 68.4deg,  rgba(248,182,204,1) 0.5%, rgba(192,198,230,1) 49%, rgba(225,246,240,1) 99.8% )',
