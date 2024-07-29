@@ -27,6 +27,8 @@ import { v4 as uuidv4 } from 'uuid';
 // const url_serv = "127.0.0.1:7000";
 const url_serv = "spy-02051e1fd8ed.herokuapp.com";
 
+
+
 const router = useRouter();
 const route = useRoute();
 const playerName = ref(localStorage.getItem('playerName') || '');

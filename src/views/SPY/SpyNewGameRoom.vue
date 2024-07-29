@@ -15,9 +15,18 @@
         <TelegramShareButton :url="qrCodeValue" text="Давай грати в Шпіона" />
       </div>
       <div v-else-if="gameState === 'GameCanBeStart'">
-        <h1 v-if="isSpy" class="spy-notice">Ви шпіон!</h1>
-        <div class="cur_word">
-          <h2 v-if="!isSpy">{{ room.word_game }}</h2>
+        <div v-if="!isHidden">
+          <h1 v-if="isSpy" class="spy-notice">Ви шпіон!</h1>
+          <div class="cur_word">
+            <h2 v-if="!isSpy">{{ room.word_game }}</h2>
+          </div>
+          <div class="spyDiv" v-if="isSpy">
+            <div>
+              <ul>
+                <li v-for="word in room.theme_words" :key="word">{{ word }}</li>
+              </ul>
+            </div>
+          </div>
         </div>
         <table class="formCreate">
           <thead>
@@ -35,13 +44,7 @@
               lastUpdateTimeKey="spylastUpdateTime"/>
           </tbody>
         </table>
-        <div class="spyDiv" v-if="isSpy">
-          <div>
-            <ul>
-              <li v-for="word in room.theme_words" :key="word">{{ word }}</li>
-            </ul>
-          </div>
-        </div>
+        <button @click="toggleHide" class="btn-grad">{{ isHidden ? 'Показать' : 'Скрыть' }}</button>
       </div>
       <div v-if="showVotingModal" class="modal">
         <div class="modal-content">
@@ -85,10 +88,11 @@ import TimerFizi from '@/components/TimerFizi.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import ButtonHome from '@/components/ButtonHome.vue';
 
-// const url_serv = "127.0.0.1:7000";
-const url_serv = "spy-02051e1fd8ed.herokuapp.com";
+// const url_serv = "http://127.0.0.1:7000";
+const url_serv = "https://spy-02051e1fd8ed.herokuapp.com";
 
-
+// const url_wss = "ws://127.0.0.1:7000";
+const url_wss = "wss://spy-02051e1fd8ed.herokuapp.com";
 
 const loading = ref(true);
 const gameState = ref('WaitPlayers');
@@ -105,20 +109,22 @@ const router = useRouter();
 const room = reactive({ name: '', players: [], theme: [] });
 const qrCodeValue = ref('');
 const showSpinner = ref(true);
+const isHidden = ref(false);
 
-
-
+const toggleHide = () => {
+  isHidden.value = !isHidden.value;
+};
 
 const connectToWebSocket = (roomId, playerName, playerHash) => {
   console.log(`Connecting to WebSocket for room ${roomId} as player ${playerName} with hash ${playerHash}`);
-  const websocket = new WebSocket(`wss://${url_serv}/ws/${roomId}/${playerName}/${playerHash}`);
+  const websocket = new WebSocket(`${url_wss}/ws/${roomId}/${playerName}/${playerHash}`);
 
   websocket.onopen = () => {
     console.log('WebSocket connected');
     loading.value = false;
     setTimeout(() => {
       showSpinner.value = false;
-    }, 1000); // Устанавливаем спиннер на 1 секунду
+    }, 200); // Устанавливаем спиннер на 1 секунду
   };
 
   websocket.onmessage = (event) => {
@@ -132,7 +138,7 @@ const connectToWebSocket = (roomId, playerName, playerHash) => {
     const eventType = message.event;
     if (eventType === 'GameCanBeStart') {
       gameState.value = 'GameCanBeStart';
-      cur_world.value = message.world_spy;
+      cur_world.value = message.word_game;
       time_game.value = parseInt(message.room.time_game);
       isSpy.value = false; // Обнуляем значение
     } else if (eventType === 'YouAreSpy') {
@@ -168,7 +174,7 @@ const connectToWebSocket = (roomId, playerName, playerHash) => {
 
 const checkRoomExists = async (roomId) => {
   try {
-    const response = await axios.get(`https://${url_serv}/rooms/${roomId}`);
+    const response = await axios.get(`${url_serv}/rooms/${roomId}`);
     return response.status === 200 && response.data;
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -190,7 +196,7 @@ const isButtonActive = computed(() => {
 const voteForPlayer = async (playerId) => {
   const roomId = route.params.id;
   try {
-    await axios.post(`https://${url_serv}/vote`, null, {
+    await axios.post(`${url_serv}/vote`, null, {
       params: { room_id: roomId, player_id: playerId }
     });
   } catch (error) {
@@ -203,7 +209,7 @@ const voteForPlayer = async (playerId) => {
 const guessWord = async (word) => {
   const roomId = route.params.id;
   try {
-    await axios.post(`https://${url_serv}/guess`, null, {
+    await axios.post(`${url_serv}/guess`, null, {
       params: { room_id: roomId, word: word }
     });
   } catch (error) {
@@ -243,6 +249,10 @@ watch(() => room.players, (newPlayers) => {
   connectedPlayers.value = newPlayers;
   console.log('Players updated:', newPlayers);
   console.log('Connected players:', connectedPlayers.value.length);
+  const playerNameFromStorage = localStorage.getItem('spyPlayerName');
+  if (!connectedPlayers.value.some(player => player.name === playerNameFromStorage)) {
+    window.location.reload();
+  }
 });
 </script>
 
@@ -258,10 +268,12 @@ watch(() => room.players, (newPlayers) => {
   color: red;
   margin-top: 10px;
 }
+
 .spy-notice {
   color: red;
   font-size: 2em;
 }
+
 .modal {
   display: block;
   position: fixed;
@@ -332,5 +344,26 @@ button:hover {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.toggle-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 20px auto;
+  font-size: 1.2em;
+  color: #fff;
+  background-color: #3498db;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.toggle-button:hover {
+  background-color: #2980b9;
+}
+
+.containerFormCreate {
+  text-align: center;
 }
 </style>
