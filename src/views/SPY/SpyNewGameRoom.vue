@@ -88,6 +88,8 @@ import ButtonHome from '@/components/ButtonHome.vue';
 // const url_serv = "127.0.0.1:7000";
 const url_serv = "spy-02051e1fd8ed.herokuapp.com";
 
+
+
 const loading = ref(true);
 const gameState = ref('WaitPlayers');
 const isSpy = ref(false);
@@ -104,9 +106,12 @@ const room = reactive({ name: '', players: [], theme: [] });
 const qrCodeValue = ref('');
 const showSpinner = ref(true);
 
+
+
+
 const connectToWebSocket = (roomId, playerName, playerHash) => {
   console.log(`Connecting to WebSocket for room ${roomId} as player ${playerName} with hash ${playerHash}`);
-  const websocket = new WebSocket(`ws://${url_serv}/ws/${roomId}/${playerName}/${playerHash}`);
+  const websocket = new WebSocket(`wss://${url_serv}/ws/${roomId}/${playerName}/${playerHash}`);
 
   websocket.onopen = () => {
     console.log('WebSocket connected');

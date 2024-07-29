@@ -50,8 +50,8 @@ const isButtonActive = computed(() => {
   return playerName.value.trim().length > 0 && numPlayers.value && time_game.value && selectedTheme.value;
 });
 
-// const url_serv = "localhost:7000"
-const url_serv = "spy-02051e1fd8ed.herokuapp.com";
+// const url_serv = "http://localhost:7000"
+const url_serv = "https://spy-02051e1fd8ed.herokuapp.com";
 
 
 
@@ -75,7 +75,7 @@ const sendCreateRoomRequest = async () => {
 
     console.log('Отправка данных на сервер:', roomData);
 
-    const response = await axios.post(`https://${url_serv}/create_room`, roomData);
+    const response = await axios.post(`${url_serv}/create_room`, roomData);
 
     const roomId = response.data.id;
     localStorage.setItem('spyPlayerName', playerName.value);
