@@ -26,17 +26,17 @@
       '--btn-delete-color': '#000',
       '--fizi-gradient': 'linear-gradient(to right, #6A82FB, #FC5C7D)',
       '--border-color': '#000',
-      '--burger-color': '#000'
+      '--burger-color': '#000'  
     },
     theme2: {
-      '--bg-color': '#9733ee',
-      '--text-color': '#fff',
+      '--bg-color': 'linear-gradient(to top, #a8edea 0%, #fed6e3 100%)',
+      '--text-color': '#000',
       '--gradient-color': 'linear-gradient(to right, #9733ee, #da22ff)',
-      '--btn-gradient-color': 'linear-gradient(to right, #6a11cb, #2575fc)',
-      '--btn-delete-color': '#fff',
+      '--btn-gradient-color': 'linear-gradient( 68.4deg,  rgba(248,182,204,1) 0.5%, rgba(192,198,230,1) 49%, rgba(225,246,240,1) 99.8% )',
+      '--btn-delete-color': '#000',
       '--fizi-gradient': 'linear-gradient(to right, #FF5F6D, #FFC371)',
-      '--border-color': '#fff',
-      '--burger-color': '#fff'
+      '--border-color': '#000',
+      '--burger-color': '#000'  
     },
     theme3: {
       '--bg-color': '#f9f9a1',

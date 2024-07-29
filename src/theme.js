@@ -13,7 +13,7 @@ export const themes = {
     '--burger-color': '#fff'
   },
   theme1: {
-    '--bg-color': '#ff7e5f',
+    '--bg-color': 'linear-gradient(90deg, rgba(65,41,90,1) 0%, rgba(47,7,67,1) 100%)',
     '--text-color': '#000',
     '--gradient-color': 'linear-gradient(to right, #ff7e5f, #ffb27d)',
     '--btn-gradient-color': 'linear-gradient(to right, #ff4e50, #f9d423)',
@@ -22,10 +22,10 @@ export const themes = {
     '--border-color': '#000',
     '--burger-color': '#000'
   },
-  theme2: {
-    '--bg-color': '#9733ee',
+  theme2: {                            
+    '--bg-color': 'linear-gradient( 109.6deg, rgba(112,246,255,0.33) 11.2%, rgba(221,108,241,0.26) 42%, rgba(229,106,253,0.71) 71.5%, rgba(123,183,253,1) 100.2% )',
     '--text-color': '#fff',
-    '--gradient-color': 'linear-gradient(to right, #9733ee, #da22ff)',
+    '--gradient-color': 'linear-gradient( 109.6deg,  rgba(112,246,255,0.33) 11.2%, rgba(221,108,241,0.26) 42%, rgba(229,106,253,0.71) 71.5%, rgba(123,183,253,1) 100.2% )',
     '--btn-gradient-color': 'linear-gradient(to right, #6a11cb, #2575fc)',
     '--btn-delete-color': '#fff',
     '--fizi-gradient': 'linear-gradient(to right, #FF5F6D, #FFC371)',
