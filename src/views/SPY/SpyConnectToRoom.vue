@@ -29,7 +29,7 @@ const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com";
 
 const router = useRouter();
 const route = useRoute();
-const playerName = ref(localStorage.getItem('spyPlayerName') || '');
+const playerName = ref(localStorage.getItem('playerName') || '');
 const errorMessage = ref('');
 const isButtonActive = computed(() => {
   return playerName.value.trim().length > 0;
@@ -43,7 +43,7 @@ const redirectToRoomPage = async () => {
   try {
     const roomId = route.params.id;
     const encodedName = encodeURIComponent(playerName.value);
-    localStorage.setItem('spyPlayerName', playerName.value);
+    localStorage.setItem('playerName', playerName.value);
 
     if (!localStorage.getItem('spyPlayerHash')) {
       localStorage.setItem('spyPlayerHash', uuidv4());

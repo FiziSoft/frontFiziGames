@@ -18,6 +18,8 @@ import FiveSecondCreateRoom from './views/5second/FiveSecondCreateRoom.vue'
 import CodenamesCreate from './views/Codenames/CodenamesCreate.vue'
 import CodenamesGameBoard from './views/Codenames/CodenamesGameBoard.vue'
 import CodenamesPlayerView from './views/Codenames/CodenamesPlayerView.vue'
+import SpyNewCreateRoom from './views/SPY/SpyNewCreateRoom.vue'
+import SpyNewGameRoom from './views/SPY/SpyNewGameRoom.vue'
 
 
 const routes = [
@@ -36,8 +38,9 @@ const routes = [
     {
         path: '/spy/createRoom',
         name: "spyCreateRoom",
-        component: spyCreateRoom
+        component: SpyNewCreateRoom
     },
+    
 
     {
         path: '/rsp-room/:id',
@@ -48,7 +51,7 @@ const routes = [
     {
         path: '/spy/room/:id',
         name: 'spyGameRoom',
-        component: spyGameRoom,
+        component: SpyNewGameRoom,
         props: true // Разрешить передачу параметров как свойства компонента
     },
 

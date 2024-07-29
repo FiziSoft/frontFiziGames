@@ -1,7 +1,7 @@
 <template>
   <GameLayout nameGame="Шпіон">
     <div v-if="showSpinner" class="spinner"></div>
-    <div v-else >
+    <div v-else>
       <h2>Доедналися до гри:</h2>
       <ul v-if="room.players.length">
         <li v-for="(player, key) in room.players" :key="key">{{ player.name }}</li>
@@ -17,7 +17,7 @@
       <div v-else-if="gameState === 'GameCanBeStart'">
         <h1 v-if="isSpy" class="spy-notice">Ви шпіон!</h1>
         <div class="cur_word">
-          <h2 v-if="!isSpy">{{ cur_world }}</h2>
+          <h2 v-if="!isSpy">{{ room.word_game }}</h2>
         </div>
         <table class="formCreate">
           <thead>
@@ -38,7 +38,7 @@
         <div class="spyDiv" v-if="isSpy">
           <div>
             <ul>
-              <li v-for="word in room.theme" :key="word">{{ word }}</li>
+              <li v-for="word in room.theme_words" :key="word">{{ word }}</li>
             </ul>
           </div>
         </div>
@@ -56,7 +56,7 @@
         <div class="modal-content">
           <span class="close" @click="showGuessingModal = false">&times;</span>
           <h2>Выберите загаданное слово</h2>
-          <button v-for="word in room.theme" :key="word" @click="guessWord(word)">
+          <button v-for="word in room.theme_words" :key="word" @click="guessWord(word)">
             {{ word }}
           </button>
         </div>
@@ -85,9 +85,8 @@ import TimerFizi from '@/components/TimerFizi.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import ButtonHome from '@/components/ButtonHome.vue';
 
-// const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com";
-
-const url_serv = "127.0.0.1:7000";
+// const url_serv = "127.0.0.1:7000";
+const url_serv = "spy-02051e1fd8ed.herokuapp.com";
 
 const loading = ref(true);
 const gameState = ref('WaitPlayers');
@@ -107,18 +106,19 @@ const showSpinner = ref(true);
 
 const connectToWebSocket = (roomId, playerName, playerHash) => {
   console.log(`Connecting to WebSocket for room ${roomId} as player ${playerName} with hash ${playerHash}`);
-  const websocket = new WebSocket(`ws://${url_serv}/start/${roomId}?name=${encodeURIComponent(playerName)}&player_hash=${playerHash || ''}`);
+  const websocket = new WebSocket(`wss://${url_serv}/ws/${roomId}/${playerName}/${playerHash}`);
 
   websocket.onopen = () => {
     console.log('WebSocket connected');
     loading.value = false;
     setTimeout(() => {
       showSpinner.value = false;
-    }, 1000); // Устанавливаем спиннер на 2 секунды
+    }, 1000); // Устанавливаем спиннер на 1 секунду
   };
 
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);
+    console.log("Received message:", message);
 
     if (message.hash) {
       localStorage.setItem('spyPlayerHash', message.hash);
@@ -163,7 +163,7 @@ const connectToWebSocket = (roomId, playerName, playerHash) => {
 
 const checkRoomExists = async (roomId) => {
   try {
-    const response = await axios.get(`http://${url_serv}/rooms/${roomId}`);
+    const response = await axios.get(`https://${url_serv}/rooms/${roomId}`);
     return response.status === 200 && response.data;
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -185,7 +185,7 @@ const isButtonActive = computed(() => {
 const voteForPlayer = async (playerId) => {
   const roomId = route.params.id;
   try {
-    await axios.post(`http://${url_serv}/vote`, null, {
+    await axios.post(`https://${url_serv}/vote`, null, {
       params: { room_id: roomId, player_id: playerId }
     });
   } catch (error) {
@@ -198,7 +198,7 @@ const voteForPlayer = async (playerId) => {
 const guessWord = async (word) => {
   const roomId = route.params.id;
   try {
-    await axios.post(`http://${url_serv}/guess`, null, {
+    await axios.post(`https://${url_serv}/guess`, null, {
       params: { room_id: roomId, word: word }
     });
   } catch (error) {
@@ -318,11 +318,14 @@ button:hover {
   height: 120px;
   animation: spin 2s linear infinite;
   margin: auto;
-  display: block;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

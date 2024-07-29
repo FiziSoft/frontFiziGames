@@ -1,5 +1,5 @@
 <template>
-  <GameLayout nameGame="Шпіон old">
+  <GameLayout nameGame="Шпіон">
     <div class="containerFormCreate">
       <form class="formCreate">
         <div class="formElement">
@@ -7,7 +7,7 @@
           <input v-model="playerName" type="text" id="playerName" class="input-gradient">
         </div>
         <div class="formElement">
-          <label class="">Кількість гравців:</label>
+          <label>Кількість гравців:</label>
           <input v-model="numPlayers" class="input-gradient" placeholder=" " type="number" />
         </div>
         <div class="formElement">
@@ -15,7 +15,7 @@
           <input v-model="time_game" type="number" id="time_game" class="input-gradient">
         </div>
         <div class="formElement">
-          <Dropdown_my :items="themes" v-model="theme_str" label="Тема гри:" />
+          <Dropdown_my :items="themeOptions" v-model="selectedTheme" label="Тема гри:" />
         </div>
         <div class="btnDiv">
           <button :disabled="!isButtonActive" type="button" @click="sendCreateRoomRequest" class="btn-grad">Почати гру</button>
@@ -28,89 +28,65 @@
   </GameLayout>
 </template>
 
-<script setup charset="utf-8">
-import axios from "axios";
-import { ref, reactive, computed, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
+<script setup>
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import { v4 as uuidv4 } from 'uuid';
 import GameLayout from "../GameLayout.vue";
 import Dropdown_my from "/src/components/Dropdown_my.vue";
-import network_url from "@/views/MainPage.vue";
+import themeData from './theme.json'; // Убедитесь, что путь правильный
+import axios from "axios";
 
 const router = useRouter();
-const route = useRoute();
 const playerName = ref(localStorage.getItem('spyPlayerName') || '');
 const numPlayers = ref(null);
 const time_game = ref(null);
-const theme_str = ref(null);
-const themes = ref([]);
+const selectedTheme = ref(null);
+const selectedWord = ref(null);
+const themes = ref(themeData);
+const themeOptions = ref(Object.keys(themeData)); // Получаем все темы из JSON файла
 const errorMessage = ref('');
-const gameState = ref('WaitPlayers');
-const isSpy = ref(false);
-const cur_world = ref('');
-const room = reactive({ name: '', players: [], theme: [] });
-const loading = ref(true);
-const qrCodeValue = ref('');
-// const url_serv = "mysterious-eyrie-00377-cd0134972bbc.herokuapp.com";
-const url_serv = "127.0.0.1:7000";
-
-
-const getThemes = async () => {
-  try {
-    const res = await axios.get(`http://${url_serv}/getThemes`);
-    themes.value = res.data;
-  } catch (error) {
-    console.log('Error fetching themes:', error);
-  }
-};
-
-onMounted(() => {
-  getThemes();
-});
-
 const isButtonActive = computed(() => {
-  return playerName.value.trim().length > 0 && numPlayers.value && time_game.value && theme_str.value;
+  return playerName.value.trim().length > 0 && numPlayers.value && time_game.value && selectedTheme.value;
 });
+
+// const url_serv = "localhost:7000"
+const url_serv = "spy-02051e1fd8ed.herokuapp.com";
+
+
 
 const sendCreateRoomRequest = async () => {
   try {
-    const roomName = playerName.value;
-    const encodedThemeStr = encodeURIComponent(theme_str.value);
+    // Выбираем случайное слово перед отправкой запроса
+    if (selectedTheme.value) {
+      const words = themes.value[selectedTheme.value];
+      const randomIndex = Math.floor(Math.random() * words.length);
+      selectedWord.value = words[randomIndex];
+    }
 
-    console.log('Creating room with params:', {
-      name: roomName,
+    const roomData = {
+      name: playerName.value,
       req_players: numPlayers.value,
       time_game: time_game.value,
-      theme_str: encodedThemeStr
-    });
+      theme_str: selectedTheme.value,
+      word: selectedWord.value,
+      theme_words: themes.value[selectedTheme.value] // Добавляем все слова темы
+    };
 
-    const response = await axios.post(
-      `http://${url_serv}/create_room`,
-      null,
-      {
-        params: {
-          name: roomName,
-          req_players: numPlayers.value,
-          time_game: time_game.value,
-          theme_str: encodedThemeStr
-        },
-      }
-    );
+    console.log('Отправка данных на сервер:', roomData);
+
+    const response = await axios.post(`https://${url_serv}/create_room`, roomData);
 
     const roomId = response.data.id;
-    console.log('Room created with ID:', roomId);
     localStorage.setItem('spyPlayerName', playerName.value);
     localStorage.setItem('spyRoomId', roomId);
-
-    if (!localStorage.getItem('spyPlayerHash')) {
-      localStorage.setItem('spyPlayerHash', uuidv4());
-    }
+    localStorage.setItem('spyPlayerHash', uuidv4());
 
     router.push({ name: 'spyGameRoom', params: { id: roomId } }).then(() => {
       window.location.reload();
     });
   } catch (error) {
-    console.error('Error creating room:', error);
+    console.error('Ошибка при создании комнаты:', error);
     errorMessage.value = "Произошла ошибка при создании комнаты. Пожалуйста, попробуйте снова.";
   }
 };
