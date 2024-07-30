@@ -40,6 +40,11 @@ const network_url = 'https://fizi.cc';
 
 
 const games = ref([
+{
+    key: 'battleSee',
+    url: '/battle-sea',
+    icon: 'fa-solid fa-ship',
+  },
   {
     key: 'rsp',
     url: '/rsp-createRoom',

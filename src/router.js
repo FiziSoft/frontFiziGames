@@ -20,6 +20,7 @@ import CodenamesGameBoard from './views/Codenames/CodenamesGameBoard.vue'
 import CodenamesPlayerView from './views/Codenames/CodenamesPlayerView.vue'
 import SpyNewCreateRoom from './views/SPY/SpyNewCreateRoom.vue'
 import SpyNewGameRoom from './views/SPY/SpyNewGameRoom.vue'
+import BattleSeeConnect from './views/BattleSee/BattleSeeConnect.vue'
 
 
 const routes = [
@@ -87,21 +88,27 @@ const routes = [
     }
     ,
     {
-        path: '/battle-see',
+        path: '/battle-sea',
         name: 'BattleSee',
         component: BattleSeeCreateRoom,
         props: true
     },
     {
-        path: '/battle-see/:roomId/:playerId',
+        path: '/battle-sea/connect/:roomId',
+        name: 'BattleSeeConnect',
+        component: BattleSeeConnect,
+        props: true
+    },
+    {
+        path: '/battle-sea/:roomId/:playerId',
         name: 'BattleSeeGameRoom',
-        component: BattleSee,
+        component: BattleSee
     }
     ,
     {
         path: '/crud',
         name: 'TruthDareCrud',
-        component: TruthDareCrud,
+        component: TruthDareCrud
     }
     ,
     {

@@ -9,6 +9,10 @@
     "theme4": "Pink"
   },
   "games": {
+    "battleSee": {
+      "name": "Sea Battle",
+      "description": ""
+    },
     "rsp": {
       "name": "Rock Paper Scissors",
       "description": "Rock Paper Scissors is a classic game of luck and strategy. Two players simultaneously choose one of three figures: rock, scissors, or paper. Rock beats scissors, scissors beat paper, and paper beats rock."

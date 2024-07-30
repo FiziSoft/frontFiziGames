@@ -1,143 +1,308 @@
 <template>
-  <div class="containerBattle">
-    <h1>Battleship Game</h1>
-    <div v-if="playerBoard.length && opponentBoard.length" class="boards">
-      <div>
-        <h2>Your Board</h2>
+  <GameLayout name-game="Морський Бій">
+    <div class="containerFormCreate">
+      <div class="game-board" :class="currentTurnClass('my')">
+        <h3>Гравець {{ playerName }}</h3>
+        <br>
         <div class="board">
-          <div class="row" v-for="(row, rowIndex) in playerBoard" :key="rowIndex">
+          <div class="label-row">
+            <div :class="['cell', 'label', currentTurnClassLabel('my')]"></div>
+            <div v-for="colIndex in 10" :key="'top-label-' + colIndex" class="cell label">
+              {{ String.fromCharCode(1040 + colIndex - 1) }}
+            </div>
+          </div>
+          <div v-for="(row, rowIndex) in myBoard" :key="'my-row-' + rowIndex" class="row">
+            <div class="cell label">{{ rowIndex + 1 }}</div>
             <div
-              class="cell"
               v-for="(cell, colIndex) in row"
-              :key="colIndex"
-              :class="getCellClass('player', rowIndex, colIndex)"
+              :key="'my-cell-' + colIndex"
+              :class="getCellClass(cell, true)"
+              class="cell"
             ></div>
           </div>
         </div>
       </div>
-      <div>
-        <h2>Opponent Board</h2>
+      <div class="game-board" :class="currentTurnClass('opponent')">
+        <h3>Гравець {{ opponentName }}</h3>
+        <br>
         <div class="board">
-          <div class="row" v-for="(row, rowIndex) in opponentBoard" :key="rowIndex">
+          <div class="label-row">
+            <div :class="['cell', 'label', currentTurnClassLabel('opponent')]"></div>
+            <div v-for="colIndex in 10" :key="'top-label-' + colIndex" class="cell label">
+              {{ String.fromCharCode(1040 + colIndex - 1) }}
+            </div>
+          </div>
+          <div v-for="(row, rowIndex) in opponentBoard" :key="'opponent-row-' + rowIndex" class="row">
+            <div class="cell label">{{ rowIndex + 1 }}</div>
             <div
-              class="cell"
               v-for="(cell, colIndex) in row"
-              :key="colIndex"
-              :class="getCellClass('opponent', rowIndex, colIndex)"
-              @click="handleCellClick(rowIndex, colIndex)"
+              :key="'opponent-cell-' + colIndex"
+              :class="getCellClass(cell, false)"
+              class="cell"
+              @click="makeMove(rowIndex, colIndex)"
             ></div>
           </div>
         </div>
+      </div>
+      <div v-show="!opponentName">
+        <ShareButton :url="url_connect"></ShareButton>
       </div>
     </div>
-    <p v-if="turn === playerId">Your turn!</p>
-    <p v-else>Waiting for opponent's turn...</p>
-  </div>
+    <div v-if="winnerModal" class="modal">
+      <div class="modal-content">
+        <p>{{ winnerMessage }}</p>
+        <button @click="startNewGame">Начать сначала</button>
+        <button @click="exitGame">Выход</button>
+      </div>
+    </div>
+  </GameLayout>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import axios from 'axios';
+import ShareButton from '@/components/ShareButton.vue';
+import GameLayout from '../GameLayout.vue';
 
+const myBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
+const opponentBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
+const currentTurn = ref(null);
+const winner = ref(null);
+const winnerModal = ref(false);
+const winnerMessage = ref('');
 const route = useRoute();
+const router = useRouter();
+const ws = ref(null);
+const opponentName = ref('');
+
+const playerName = ref(localStorage.getItem('playerName') || '');
+
 const roomId = route.params.roomId;
 const playerId = route.params.playerId;
-const ws = ref(null);
 
-const playerBoard = ref([]);
-const opponentBoard = ref([]);
-const turn = ref('');
+const url_connect = `https://fizi.cc/battle-sea/connect/${roomId}`;
 
-const getCellClass = (boardType, row, col) => {
-  let board;
-  if (boardType === 'player') {
-    board = playerBoard.value;
-  } else {
-    board = opponentBoard.value;
+
+// const url_serv = "http://localhost:7001";  // или ваш сервер
+const url_serv = "https://seabattle-acb2eb1faa50.herokuapp.com";
+
+
+
+const getCellClass = (cell, isMyBoard) => {
+  if (cell === 'hit') return 'hit';
+  if (cell === 'miss') return 'miss';
+  if (cell === 'ship' && isMyBoard) return 'ship';
+  return 'empty';
+};
+
+const currentTurnClass = (board) => {
+  if (currentTurn.value === playerId && board === 'opponent') {
+    return 'current-turn';
   }
-  if (board && board[row] && board[row][col]) {
-    return board[row][col] === '1' ? 'ship' : board[row][col];
+  if (currentTurn.value !== playerId && board === 'my') {
+    return 'opponent-turn';
   }
   return '';
 };
 
-const handleCellClick = (row, col) => {
-  if (ws.value && turn.value === playerId) {
-    ws.value.send(JSON.stringify({ type: 'fire', row, col }));
+const currentTurnClassLabel = (board) => {
+  if (currentTurn.value === playerId && board === 'opponent') {
+    return 'label-current-turn';
+  }
+  if (currentTurn.value !== playerId && board === 'my') {
+    return 'label-opponent-turn';
+  }
+  return '';
+};
+
+const makeMove = async (row, col) => {
+  try {
+    console.log(`Making move: row=${row}, col=${col}, playerId=${playerId}`);
+    await axios.post(`${url_serv}/api/move/${roomId}`, {
+      row,
+      col,
+      playerId
+    });
+  } catch (error) {
+    console.error("Error making move:", error);
   }
 };
 
-onMounted(() => {
-  ws.value = new WebSocket(`ws://localhost:8000/ws/${roomId}/${playerId}`);
+const initializeWebSocket = () => {
+  console.log(`Connecting to WebSocket for room: ${roomId}, playerId: ${playerId}`);
+  // ws.value = new WebSocket(`ws://localhost:7001/ws/${roomId}/${playerId}`);
+  ws.value = new WebSocket(`wss://seabattle-acb2eb1faa50.herokuapp.com/ws/${roomId}/${playerId}`);
+
 
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    if (data.type === 'initialState') {
-      playerBoard.value = data.playerBoard;
-      opponentBoard.value = data.opponentBoard;
-      turn.value = data.turn;
-    } else if (data.type === 'updateBoard') {
-      if (data.player === 'player') {
-        playerBoard.value = data.board;
-      } else {
-        opponentBoard.value = data.board;
-      }
-      turn.value = data.turn;
+    currentTurn.value = data.current_turn;
+    myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
+    opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
+    opponentName.value = playerId === data.admin.id ? data.player.name : data.admin.name;
+    if (data.player_joined && playerId === data.admin.id) {
+      window.location.reload();
+    }
+    if (data.winner) {
+      winner.value = data.winner;
+      winnerModal.value = true;
+      winnerMessage.value = data.winner === playerId ? 'Вы победили!' : 'Вы проиграли!';
     }
   };
+};
 
-  ws.value.onopen = () => {
-    console.log('WebSocket connection established');
-  };
+const startNewGame = async () => {
+  try {
+    await axios.post(`${url_serv}/api/start-new-game/${roomId}`);
+    winnerModal.value = false;
+    window.location.reload();
+  } catch (error) {
+    console.error("Error starting new game:", error);
+  }
+};
 
-  ws.value.onclose = () => {
-    console.log('WebSocket connection closed');
-  };
+const exitGame = () => {
+  router.push('/');
+};
 
-  ws.value.onerror = (error) => {
-    console.error('WebSocket error:', error);
-  };
+onMounted(() => {
+  axios.get(`${url_serv}/api/game-state/${roomId}`, {
+    params: { playerId }
+  })
+  .then(response => {
+    currentTurn.value = response.data.current_turn;
+    myBoard.value = playerId === response.data.admin.id ? response.data.adminBoard : response.data.playerBoard;
+    opponentBoard.value = playerId === response.data.admin.id ? response.data.playerBoard : response.data.adminBoard;
+    opponentName.value = playerId === response.data.admin.id ? response.data.player.name : response.data.admin.name;
+  })
+  .catch(error => {
+    console.error("Error fetching game state:", error);
+  });
+  initializeWebSocket();
 });
 
-onBeforeUnmount(() => {
-  ws.value.close();
+onUnmounted(() => {
+  if (ws.value) {
+    ws.value.close();
+  }
 });
 </script>
 
-<style>
-.containerBattle {
+<style scoped>
+.game-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
 }
-.boards {
+
+.game-board {
+  margin-bottom: 20px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(11, 30px); /* 10 columns + 1 for labels */
+  /* gap: 2px; */
+}
+
+.row {
+  display: grid;
+  /* grid-template-columns: repeat(11, 30px); 10 columns + 1 for labels */
+  /* gap: 2px; */
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(59, 55, 55, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hit {
+  /* background-image: linear-gradient(120deg, #f093fb 0%, #f5576c 100%); */
+  background-color: IndianRed;
+  /* border: 1px solid rgba(59, 55, 55, 0.9); */
+
+}
+
+.miss {
+  /* background-image: radial-gradient(circle 248px at center, #16d9e3 0%, #30c7ec 47%, #46aef7 100%); */
+  background-color: DodgerBlue;    
+  /* border: 1px solid rgba(59, 55, 55, 0.9); */
+
+}
+.ship {
+  /* background-image: radial-gradient( circle farthest-corner at -4% -12.9%,  rgba(74,98,110,1) 0.3%, rgba(30,33,48,1) 90.2% ); */
+  background-color: DimGrey; 
+  /* border: 1px solid rgba(59, 55, 55, 0.9); */
+
+}
+
+.empty {
+  background-color: white;
+}
+
+.label {
+  /* background-color: lightgray; */
+}
+
+.current-turn {
+  border: 2px solid SeaGreen;
+  padding: 10px;
+}
+
+.opponent-turn {
+  border: 2px solid IndianRed;
+  padding: 10px;
+
+}
+
+.label-current-turn {
+  background-color: SeaGreen;
+ 
+}
+
+.label-opponent-turn {
+  background-color: IndianRed;
+}
+
+.label-row {
+  display: grid;
+  /* gap: 2px; */
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border: 1px solid black;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
 }
-.board {
-  display: flex;
-  flex-direction: column;
-  margin: 10px 0;
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #007BFF;
+  color: white;
+  cursor: pointer;
 }
-.row {
-  display: flex;
-}
-.cell {
-  width: 40px;
-  height: 40px;
-  border: 1px solid black;
-}
-.cell.ship {
-  background-color: gray;
-}
-.cell.hit {
-  background-color: red;
-}
-.cell.miss {
-  background-color: lightblue;
+
+button:hover {
+  background-color: #0056b3;
 }
 </style>

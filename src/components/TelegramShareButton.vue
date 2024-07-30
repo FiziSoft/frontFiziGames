@@ -1,108 +1,134 @@
 <template>
-    <div class="share-buttons">
-        
-      <qrcode-vue :value="props.url" :size="128" class="qrShare"></qrcode-vue>
+  <div class="share-buttons">
+    <qrcode-vue :value="props.url" :size="128" class="qrShare"></qrcode-vue>
 
-      
-      <button @click="shareToWhatsApp" class="share-button whatsapp">
-        <img src="@/assets/whatsapp.png" alt="WhatsApp" class="icon"/>
-      </button>
+    <button @click="shareToWhatsApp" class="share-button whatsapp">
+      <img src="@/assets/whatsapp.png" alt="WhatsApp" class="icon" />
+    </button>
 
-      <button @click="shareToViber" class="share-button viber">
-        <img src="@/assets/viber.png" alt="Viber" class="icon"/>
-      </button>
-      
-      <button @click="shareToTelegram" class="share-button telegram">
-        <img src="@/assets/telegram.png" alt="Telegram" class="icon"/>
-      </button>
-      <a class="a_" :href="props.url" target="_blank">{{ props.url }}</a>  
-    </div>
-  </template>
-  
-  <script setup>
-  import { defineProps } from 'vue';
-  import QrcodeVue from '@chenfengyuan/vue-qrcode';
-  
-  const props = defineProps({
-    url: {
-      type: String,
-      required: true
-    },
-    text: {
-      type: String,
-      required: false,
-      default: ''
-    }
+    <button @click="shareToViber" class="share-button viber">
+      <img src="@/assets/viber.png" alt="Viber" class="icon" />
+    </button>
+
+    <button @click="shareToTelegram" class="share-button telegram">
+      <img src="@/assets/telegram.png" alt="Telegram" class="icon" />
+    </button>
+
+    <a class="a_" @click.prevent="copyToClipboard">{{ props.url }}</a>
+
+    <div v-if="showNotification" class="notification">Ссылка скопирована в буфер обмена!</div>
+  </div>
+</template>
+
+<script setup>
+import { defineProps, ref } from 'vue';
+import QrcodeVue from '@chenfengyuan/vue-qrcode';
+
+const props = defineProps({
+  url: {
+    type: String,
+    required: true
+  },
+  text: {
+    type: String,
+    required: false,
+    default: ''
+  }
+});
+
+const showNotification = ref(false);
+
+const shareToTelegram = () => {
+  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(props.url)}&text=${encodeURIComponent(props.text)}`;
+  window.open(telegramUrl, '_blank');
+};
+
+const shareToWhatsApp = () => {
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(props.text)}%20${encodeURIComponent(props.url)}`;
+  window.open(whatsappUrl, '_blank');
+};
+
+const shareToViber = () => {
+  const viberUrl = `viber://forward?text=${encodeURIComponent(props.text)}%20${encodeURIComponent(props.url)}`;
+  window.open(viberUrl, '_blank');
+};
+
+const copyToClipboard = () => {
+  navigator.clipboard.writeText(props.url).then(() => {
+    showNotification.value = true;
+    setTimeout(() => {
+      showNotification.value = false;
+    }, 3000); // Уведомление исчезает через 3 секунды
+  }).catch(err => {
+    console.error('Ошибка копирования в буфер обмена: ', err);
   });
-  
-  const shareToTelegram = () => {
-    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(props.url)}&text=${encodeURIComponent(props.text)}`;
-    window.open(telegramUrl, '_blank');
-  };
-  
-  const shareToWhatsApp = () => {
-    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(props.text)}%20${encodeURIComponent(props.url)}`;
-    window.open(whatsappUrl, '_blank');
-  };
-  
-  const shareToViber = () => {
-    const viberUrl = `viber://forward?text=${encodeURIComponent(props.text)}%20${encodeURIComponent(props.url)}`;
-    window.open(viberUrl, '_blank');
-  };
-  </script>
-  
-  <style scoped>
-  .a_ {
-    color: black;
-  }
+};
+</script>
 
+<style scoped>
+.a_ {
+  color: black;
+  cursor: pointer;
+}
 
-  .share-buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.share-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.share-button {
+  padding: 10px;
+  margin: 10px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-button:hover {
+  background-color: #0077b3;
+}
+
+.share-button.whatsapp:hover {
+  background-color: #1EBE53;
+}
+
+.share-button.viber:hover {
+  background-color: #58499B;
+}
+
+.icon {
+  width: auto;
+  height: 45px;
+}
+
+.qrShare {
+  margin-top: 20px;
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  color: green;
+  padding: 10px 20px;
+  border: 1px solid green;
+  border-radius: 5px;
+  opacity: 1;
+  animation: fadeOut 3s forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
   }
-  
-  .share-button {
-    padding: 10px;
-    margin: 10px;
-    /* background-color: #0088cc; */
-    /* color: white; */
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  100% {
+    opacity: 0;
   }
-  
-  .share-button:hover {
-    background-color: #0077b3;
-  }
-  
-  .share-button.whatsapp {
-    /* background-color: #25D366; */
-  }
-  
-  .share-button.whatsapp:hover {
-    background-color: #1EBE53;
-  }
-  
-  .share-button.viber {
-    /* background-color: #665CAC; */
-  }
-  
-  .share-button.viber:hover {
-    background-color: #58499B;
-  }
-  
-  .icon {
-    width: auto;
-    height: 45px;
-  }
-  
-  .qrShare {
-    margin-top: 20px;
-  }
-  </style>
-  
+}
+</style>
