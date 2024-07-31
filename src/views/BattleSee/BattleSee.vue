@@ -1,7 +1,12 @@
 <template>
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
-      <div :class="['game-board', isMyTurn() ? 'current-turn' : '']">
+      <div class="turn-indicator">
+        <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
+        <div v-else class="turn-box opponent-turn">Хід опонента</div>
+      </div>
+
+      <div :class="['game-board', isMyTurn() ? 'player-turn' : 'opponent-turn']">
         <h3>
           Гравець {{ playerName }}
         </h3>
@@ -30,12 +35,7 @@
         <h2> &#8592; Додай собі оппонента </h2>  
       </div>
       
-      <div v-else class="turn-indicator">
-        <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
-        <div v-else class="turn-box opponent-turn">Хід опонента</div>
-      </div>
-      
-      <div :class="['game-board', !isMyTurn() ? 'current-turn' : '']">
+      <div :class="['game-board', !isMyTurn() ? 'player-turn' : 'opponent-turn']">
         <h3>
           Гравець {{ opponentName }}
         </h3>
@@ -218,8 +218,12 @@ onUnmounted(() => {
   border: 2px solid transparent;
 }
 
-.current-turn {
+.player-turn {
   border-color: SeaGreen;
+}
+
+.opponent-turn {
+  border-color: IndianRed;
 }
 
 .board {
