@@ -1,10 +1,9 @@
 <template>
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
-      <div :class="['game-board', 'player-board']">
+      <div :class="['game-board', isMyTurn() ? 'current-turn' : '']">
         <h3>
-          Гравець {{ playerName }} 
-         
+          Гравець {{ playerName }}
         </h3>
         <br>
         <div class="board">
@@ -36,7 +35,7 @@
         <div v-else class="turn-box opponent-turn">Хід опонента</div>
       </div>
       
-      <div :class="['game-board', 'opponent-board']">
+      <div :class="['game-board', !isMyTurn() ? 'current-turn' : '']">
         <h3>
           Гравець {{ opponentName }}
         </h3>
@@ -207,24 +206,20 @@ onUnmounted(() => {
   margin-left: 30px;
 }
 
-.game-container {
+.containerFormCreate {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
 }
 
 .game-board {
   margin-bottom: 20px;
+  border: 2px solid transparent;
 }
 
-.player-board {
-  /* border: 2px solid SeaGreen; */
-}
-
-.opponent-board {
-  /* border: 2px solid IndianRed; */
+.current-turn {
+  border-color: SeaGreen;
 }
 
 .board {
@@ -262,14 +257,6 @@ onUnmounted(() => {
 }
 
 .label {
-}
-
-.label-current-turn {
-  background-color: SeaGreen;
-}
-
-.label-opponent-turn {
-  background-color: IndianRed;
 }
 
 .label-row {
@@ -328,5 +315,25 @@ button:hover {
 .opponent-turn {
   color: IndianRed;
   background-color: #f7e0e0;
+}
+
+@media (max-width: 768px) {
+  .containerFormCreate {
+    flex-direction: column;
+  }
+  
+  .game-board {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .board {
+    grid-template-columns: repeat(11, 20px); /* 10 columns + 1 for labels */
+  }
+
+  .cell {
+    width: 20px;
+    height: 20px;
+  }
 }
 </style>
