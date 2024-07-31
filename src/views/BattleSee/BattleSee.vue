@@ -2,7 +2,7 @@
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
       <div class="game-board" :class="currentTurnClass('my')">
-        <h3>Гравець {{ playerName }}</h3>
+        <h3>Гравець {{ playerName }} <span v-if="isMyTurn()" class="your-turn">(Ваш хід)</span></h3>
         <br>
         <div class="board">
           <div class="label-row">
@@ -24,10 +24,10 @@
       </div>
       <div class="shareLocal" v-show="!opponentName">
         <ShareButton :url="url_connect" text="Давай грати в Морський Бій"></ShareButton> 
-        <h2>  &#8592;	  Додай собі оппонента </h2>  
+        <h2>  &#8592; Додай собі оппонента </h2>  
       </div>
       <div class="game-board" :class="currentTurnClass('opponent')">
-        <h3>Гравець {{ opponentName }}</h3>
+        <h3>Гравець {{ opponentName }} <span v-if="!isMyTurn()" class="opponent-turn">(Хід опонента)</span></h3>
         <br>
         <div class="board">
           <div class="label-row">
@@ -48,7 +48,6 @@
           </div>
         </div>
       </div>
-     
     </div>
     <div v-if="winnerModal" class="modal">
       <div class="modal-content">
@@ -116,6 +115,10 @@ const currentTurnClassLabel = (board) => {
   return '';
 };
 
+const isMyTurn = () => {
+  return currentTurn.value === playerId;
+};
+
 const makeMove = async (row, col) => {
   try {
     console.log(`Making move: row=${row}, col=${col}, playerId=${playerId}`);
@@ -128,7 +131,7 @@ const makeMove = async (row, col) => {
   } catch (error) {
     console.error("Error making move:", error);
     if (error.response && error.response.status === 403) {
-      console.error("Не ваш ход или недопустимый ход.");
+      alert("Не ваш ход или недопустимый ход.");
     }
   }
 };
@@ -325,5 +328,16 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+.your-turn {
+  color: SeaGreen;
+  font-weight: bold;
+  margin-left: 10px;
+}
+.opponent-turn {
+  color: IndianRed;
+  font-weight: bold;
+  margin-left: 10px;
 }
 </style>
