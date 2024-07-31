@@ -60,9 +60,9 @@ const selectItem = (item) => {
 }
 
 .dropdown-selected {
-  padding: 10px;
+  padding: 20px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 40px;
   background-color: #fff;
 }
 
@@ -72,7 +72,7 @@ const selectItem = (item) => {
   left: 0;
   right: 0;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 20px;
   background-color: #fff;
   margin: 0;
   padding: 0;

@@ -21,7 +21,7 @@ import CodenamesPlayerView from './views/Codenames/CodenamesPlayerView.vue'
 import SpyNewCreateRoom from './views/SPY/SpyNewCreateRoom.vue'
 import SpyNewGameRoom from './views/SPY/SpyNewGameRoom.vue'
 import BattleSeeConnect from './views/BattleSee/BattleSeeConnect.vue'
-
+import SpyOfflineRoom from './views/SPY/SpyOfflineRoom.vue'
 
 const routes = [
     {
@@ -42,6 +42,7 @@ const routes = [
         component: SpyNewCreateRoom
     },
     
+    { path: '/spy/offline/:idRoom', name: 'spyOfflineRoom', component: SpyOfflineRoom },
 
     {
         path: '/rsp-room/:id',

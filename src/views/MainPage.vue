@@ -102,7 +102,7 @@ onMounted(() => {
   padding: 20px
   background: var(--bg-color) !important
   color: var(--text-color) !important
-
+  margin-bottom: 50px
 .header
   display: flex
   flex-direction: column
