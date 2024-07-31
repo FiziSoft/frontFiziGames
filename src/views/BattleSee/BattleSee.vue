@@ -131,7 +131,7 @@ const makeMove = async (row, col) => {
   } catch (error) {
     console.error("Error making move:", error);
     if (error.response && error.response.status === 403) {
-      alert("Не ваш ход или недопустимый ход.");
+      console.error("Не ваш ход или недопустимый ход.");
     }
   }
 };
@@ -164,18 +164,14 @@ const initializeWebSocket = () => {
 
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    currentTurn.value = data.current_turn;
-    myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
-    opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
-    opponentName.value = playerId === data.admin.id ? data.player.name : data.admin.name;
-    if (data.player_joined && playerId === data.admin.id) {
-      window.location.reload();
-    }
-    if (data.winner) {
-      winner.value = data.winner;
-      winnerModal.value = true;
-      winnerMessage.value = data.winner === playerId ? 'Вы победили!' : 'Вы проиграли!';
-    }
+    updateGameState(); // Обновляем состояние игры при получении сообщения
+  };
+
+  ws.value.onclose = () => {
+    // Пытаемся переподключиться при разрыве соединения
+    setTimeout(() => {
+      initializeWebSocket();
+    }, 1000);
   };
 };
 
@@ -194,18 +190,7 @@ const exitGame = () => {
 };
 
 onMounted(() => {
-  axios.get(`${url_serv}/api/game-state/${roomId}`, {
-    params: { playerId }
-  })
-  .then(response => {
-    currentTurn.value = response.data.current_turn;
-    myBoard.value = playerId === response.data.admin.id ? response.data.adminBoard : response.data.playerBoard;
-    opponentBoard.value = playerId === response.data.admin.id ? response.data.playerBoard : response.data.adminBoard;
-    opponentName.value = playerId === response.data.admin.id ? response.data.player.name : response.data.admin.name;
-  })
-  .catch(error => {
-    console.error("Error fetching game state:", error);
-  });
+  updateGameState();
   initializeWebSocket();
 });
 
