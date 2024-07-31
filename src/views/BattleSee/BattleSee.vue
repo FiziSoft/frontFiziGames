@@ -1,8 +1,8 @@
 <template>
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
-      <div class="game-board" :class="myTurnClass">
-        <h3>Гравець {{ playerName }}</h3>
+      <div :class="['game-board', myTurnClass]">
+        <h3>Гравець {{ playerName }} <span v-if="isMyTurn()" class="your-turn">(Ваш хід)</span></h3>
         <br>
         <div class="board">
           <div class="label-row">
@@ -26,11 +26,8 @@
         <ShareButton :url="url_connect" text="Давай грати в Морський Бій"></ShareButton> 
         <h2>  &#8592; Додай собі оппонента </h2>  
       </div>
-      <div class="game-board" :class="opponentTurnClass">
-        <h3>Гравець {{ opponentName }} 
-          <span v-if="!isMyTurn()" class="opponent-turn">(Хід опонента)</span>
-          <span v-if="isMyTurn()" class="your-turn">(Ваш хід)</span>
-        </h3>
+      <div :class="['game-board', opponentTurnClass]">
+        <h3>Гравець {{ opponentName }} <span v-if="!isMyTurn()" class="opponent-turn">(Хід опонента)</span></h3>
         <br>
         <div class="board">
           <div class="label-row">
@@ -107,13 +104,6 @@ const isMyTurn = () => {
   return currentTurn.value === playerId;
 };
 
-const updateTurnClasses = () => {
-  myTurnClass.value = currentTurn.value === playerId ? 'current-turn' : 'opponent-turn';
-  opponentTurnClass.value = currentTurn.value !== playerId ? 'current-turn' : 'opponent-turn';
-  myTurnClassLabel.value = currentTurn.value === playerId ? 'label-current-turn' : 'label-opponent-turn';
-  opponentTurnClassLabel.value = currentTurn.value !== playerId ? 'label-current-turn' : 'label-opponent-turn';
-};
-
 const makeMove = async (row, col) => {
   try {
     console.log(`Making move: row=${row}, col=${col}, playerId=${playerId}`);
@@ -142,7 +132,20 @@ const updateGameState = async () => {
     opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
     currentTurn.value = data.current_turn;
     opponentName.value = playerId === data.admin.id ? data.player.name : data.admin.name;
-    updateTurnClasses();
+
+    // Обновляем классы для отображения текущего хода
+    if (isMyTurn()) {
+      myTurnClass.value = 'current-turn';
+      opponentTurnClass.value = 'opponent-turn';
+      myTurnClassLabel.value = 'label-current-turn';
+      opponentTurnClassLabel.value = 'label-opponent-turn';
+    } else {
+      myTurnClass.value = 'opponent-turn';
+      opponentTurnClass.value = 'current-turn';
+      myTurnClassLabel.value = 'label-opponent-turn';
+      opponentTurnClassLabel.value = 'label-current-turn';
+    }
+
     if (data.winner) {
       winner.value = data.winner;
       winnerModal.value = true;
@@ -158,9 +161,8 @@ const initializeWebSocket = () => {
   // ws.value = new WebSocket(`ws://localhost:7001/ws/${roomId}/${playerId}`);
   ws.value = new WebSocket(`wss://seabattle-acb2eb1faa50.herokuapp.com/ws/${roomId}/${playerId}`);
 
-  ws.value.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    updateGameState(); // Обновляем состояние игры при получении сообщения
+  ws.value.onmessage = async (event) => {
+    await updateGameState(); // Обновляем состояние игры при получении сообщения
   };
 
   ws.value.onclose = () => {
