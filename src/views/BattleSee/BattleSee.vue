@@ -22,6 +22,10 @@
           </div>
         </div>
       </div>
+      <div class="shareLocal" v-show="!opponentName">
+        <ShareButton :url="url_connect" text="Давай грати в Морський Бій"></ShareButton> 
+        <h2>  &#8592;	  Додай собі оппонента </h2>  
+      </div>
       <div class="game-board" :class="currentTurnClass('opponent')">
         <h3>Гравець {{ opponentName }}</h3>
         <br>
@@ -44,9 +48,7 @@
           </div>
         </div>
       </div>
-      <div v-show="!opponentName">
-        <ShareButton :url="url_connect"></ShareButton>
-      </div>
+     
     </div>
     <div v-if="winnerModal" class="modal">
       <div class="modal-content">
@@ -82,6 +84,8 @@ const roomId = route.params.roomId;
 const playerId = route.params.playerId;
 
 const url_connect = `https://fizi.cc/battle-sea/connect/${roomId}`;
+// const url_connect = `http://localhost:8080/battle-sea/connect/${roomId}`;
+
 
 
 // const url_serv = "http://localhost:7001";  // или ваш сервер
@@ -190,6 +194,20 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+
+.shareLocal {
+  max-width: 400px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+
+}
+
+.shareLocal h2 {
+  margin-left: 30px;
+}
+
 .game-container {
   display: flex;
   flex-direction: column;
