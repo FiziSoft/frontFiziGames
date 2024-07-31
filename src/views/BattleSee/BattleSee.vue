@@ -4,7 +4,7 @@
       <div :class="['game-board', 'player-board']">
         <h3>
           Гравець {{ playerName }} 
-          <span v-if="isMyTurn()" class="your-turn">(Ваш хід)</span>
+         
         </h3>
         <br>
         <div class="board">
@@ -220,11 +220,11 @@ onUnmounted(() => {
 }
 
 .player-board {
-  border: 2px solid SeaGreen;
+  /* border: 2px solid SeaGreen; */
 }
 
 .opponent-board {
-  border: 2px solid IndianRed;
+  /* border: 2px solid IndianRed; */
 }
 
 .board {
