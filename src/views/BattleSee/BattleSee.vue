@@ -1,11 +1,6 @@
 <template>
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
-      <div class="turn-indicator">
-        <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
-        <div v-else class="turn-box opponent-turn">Хід опонента</div>
-      </div>
-
       <div class="game-board">
         <h3>
           Гравець {{ playerName }}
@@ -34,7 +29,10 @@
         <ShareButton :url="url_connect" text="Давай грати в Морський Бій"></ShareButton> 
         <h2> &#8592; Додай собі оппонента </h2>  
       </div>
-      
+      <div class="turn-indicator">
+        <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
+        <div v-else class="turn-box opponent-turn">Хід опонента</div>
+      </div>
       <div class="game-board">
         <h3>
           Гравець {{ opponentName }}
@@ -156,6 +154,8 @@ const initializeWebSocket = () => {
   ws.value = new WebSocket(`wss://seabattle-acb2eb1faa50.herokuapp.com/ws/${roomId}/${playerId}`);
 
   ws.value.onmessage = async (event) => {
+    const data = JSON.parse(event.data);
+    currentTurn.value = data.current_turn;
     await updateGameState(); // Обновляем состояние игры при получении сообщения
   };
 
@@ -217,14 +217,6 @@ onUnmounted(() => {
   margin-bottom: 20px;
   border: 2px solid transparent;
 }
-
-/* .player-turn {
-  border-color: SeaGreen;
-}
-
-.opponent-turn {
-  border-color: IndianRed;
-} */
 
 .board {
   display: grid;
