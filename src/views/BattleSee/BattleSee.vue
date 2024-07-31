@@ -6,7 +6,7 @@
         <div v-else class="turn-box opponent-turn">Хід опонента</div>
       </div>
 
-      <div :class="['game-board', isMyTurn() ? 'player-turn' : 'opponent-turn']">
+      <div class="game-board">
         <h3>
           Гравець {{ playerName }}
         </h3>
@@ -35,7 +35,7 @@
         <h2> &#8592; Додай собі оппонента </h2>  
       </div>
       
-      <div :class="['game-board', !isMyTurn() ? 'player-turn' : 'opponent-turn']">
+      <div class="game-board">
         <h3>
           Гравець {{ opponentName }}
         </h3>
@@ -218,13 +218,13 @@ onUnmounted(() => {
   border: 2px solid transparent;
 }
 
-.player-turn {
+/* .player-turn {
   border-color: SeaGreen;
 }
 
 .opponent-turn {
   border-color: IndianRed;
-}
+} */
 
 .board {
   display: grid;
