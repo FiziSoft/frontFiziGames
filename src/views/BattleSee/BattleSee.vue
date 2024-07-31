@@ -1,12 +1,12 @@
 <template>
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
-      <div class="game-board" :class="currentTurnClass('my')">
-        <h3>Гравець {{ playerName }} <span v-if="isMyTurn()" class="your-turn">(Ваш хід)</span></h3>
+      <div class="game-board" :class="myTurnClass">
+        <h3>Гравець {{ playerName }}</h3>
         <br>
         <div class="board">
           <div class="label-row">
-            <div :class="['cell', 'label', currentTurnClassLabel('my')]"></div>
+            <div :class="['cell', 'label', myTurnClassLabel]"></div>
             <div v-for="colIndex in 10" :key="'top-label-' + colIndex" class="cell label">
               {{ String.fromCharCode(1040 + colIndex - 1) }}
             </div>
@@ -26,12 +26,15 @@
         <ShareButton :url="url_connect" text="Давай грати в Морський Бій"></ShareButton> 
         <h2>  &#8592; Додай собі оппонента </h2>  
       </div>
-      <div class="game-board" :class="currentTurnClass('opponent')">
-        <h3>Гравець {{ opponentName }} <span v-if="!isMyTurn()" class="opponent-turn">(Хід опонента)</span></h3>
+      <div class="game-board" :class="opponentTurnClass">
+        <h3>Гравець {{ opponentName }} 
+          <span v-if="!isMyTurn()" class="opponent-turn">(Хід опонента)</span>
+          <span v-if="isMyTurn()" class="your-turn">(Ваш хід)</span>
+        </h3>
         <br>
         <div class="board">
           <div class="label-row">
-            <div :class="['cell', 'label', currentTurnClassLabel('opponent')]"></div>
+            <div :class="['cell', 'label', opponentTurnClassLabel]"></div>
             <div v-for="colIndex in 10" :key="'top-label-' + colIndex" class="cell label">
               {{ String.fromCharCode(1040 + colIndex - 1) }}
             </div>
@@ -88,6 +91,11 @@ const url_connect = `https://fizi.cc/battle-sea/connect/${roomId}`;
 // const url_serv = "http://localhost:7001";  // или ваш сервер
 const url_serv = "https://seabattle-acb2eb1faa50.herokuapp.com";
 
+const myTurnClass = ref('');
+const opponentTurnClass = ref('');
+const myTurnClassLabel = ref('');
+const opponentTurnClassLabel = ref('');
+
 const getCellClass = (cell, isMyBoard) => {
   if (cell === 'hit') return 'hit';
   if (cell === 'miss') return 'miss';
@@ -95,28 +103,15 @@ const getCellClass = (cell, isMyBoard) => {
   return 'empty';
 };
 
-const currentTurnClass = (board) => {
-  if (currentTurn.value === playerId && board === 'opponent') {
-    return 'current-turn';
-  }
-  if (currentTurn.value !== playerId && board === 'my') {
-    return 'opponent-turn';
-  }
-  return '';
-};
-
-const currentTurnClassLabel = (board) => {
-  if (currentTurn.value === playerId && board === 'opponent') {
-    return 'label-current-turn';
-  }
-  if (currentTurn.value !== playerId && board === 'my') {
-    return 'label-opponent-turn';
-  }
-  return '';
-};
-
 const isMyTurn = () => {
   return currentTurn.value === playerId;
+};
+
+const updateTurnClasses = () => {
+  myTurnClass.value = currentTurn.value === playerId ? 'current-turn' : 'opponent-turn';
+  opponentTurnClass.value = currentTurn.value !== playerId ? 'current-turn' : 'opponent-turn';
+  myTurnClassLabel.value = currentTurn.value === playerId ? 'label-current-turn' : 'label-opponent-turn';
+  opponentTurnClassLabel.value = currentTurn.value !== playerId ? 'label-current-turn' : 'label-opponent-turn';
 };
 
 const makeMove = async (row, col) => {
@@ -147,6 +142,7 @@ const updateGameState = async () => {
     opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
     currentTurn.value = data.current_turn;
     opponentName.value = playerId === data.admin.id ? data.player.name : data.admin.name;
+    updateTurnClasses();
     if (data.winner) {
       winner.value = data.winner;
       winnerModal.value = true;
