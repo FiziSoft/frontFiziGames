@@ -86,12 +86,8 @@ const playerId = route.params.playerId;
 const url_connect = `https://fizi.cc/battle-sea/connect/${roomId}`;
 // const url_connect = `http://localhost:8080/battle-sea/connect/${roomId}`;
 
-
-
 // const url_serv = "http://localhost:7001";  // или ваш сервер
 const url_serv = "https://seabattle-acb2eb1faa50.herokuapp.com";
-
-
 
 const getCellClass = (cell, isMyBoard) => {
   if (cell === 'hit') return 'hit';
@@ -128,8 +124,33 @@ const makeMove = async (row, col) => {
       col,
       playerId
     });
+    await updateGameState(); // Обновляем состояние игры после хода
   } catch (error) {
     console.error("Error making move:", error);
+    if (error.response && error.response.status === 403) {
+      console.error("Не ваш ход или недопустимый ход.");
+    }
+  }
+};
+
+const updateGameState = async () => {
+  try {
+    const response = await axios.get(`${url_serv}/api/game-state/${roomId}`, {
+      params: { playerId }
+    });
+    const data = response.data;
+    // Обновляем состояние досок и другой информации в компоненте
+    myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
+    opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
+    currentTurn.value = data.current_turn;
+    opponentName.value = playerId === data.admin.id ? data.player.name : data.admin.name;
+    if (data.winner) {
+      winner.value = data.winner;
+      winnerModal.value = true;
+      winnerMessage.value = data.winner === playerId ? 'Вы победили!' : 'Вы проиграли!';
+    }
+  } catch (error) {
+    console.error("Error fetching game state:", error);
   }
 };
 
@@ -137,7 +158,6 @@ const initializeWebSocket = () => {
   console.log(`Connecting to WebSocket for room: ${roomId}, playerId: ${playerId}`);
   // ws.value = new WebSocket(`ws://localhost:7001/ws/${roomId}/${playerId}`);
   ws.value = new WebSocket(`wss://seabattle-acb2eb1faa50.herokuapp.com/ws/${roomId}/${playerId}`);
-
 
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data);
@@ -194,14 +214,12 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-
 .shareLocal {
   max-width: 400px;
   display: flex;
   justify-content: center;
   align-content: center;
   align-items: center;
-
 }
 
 .shareLocal h2 {
@@ -223,13 +241,10 @@ onUnmounted(() => {
 .board {
   display: grid;
   grid-template-columns: repeat(11, 30px); /* 10 columns + 1 for labels */
-  /* gap: 2px; */
 }
 
 .row {
   display: grid;
-  /* grid-template-columns: repeat(11, 30px); 10 columns + 1 for labels */
-  /* gap: 2px; */
 }
 
 .cell {
@@ -242,23 +257,15 @@ onUnmounted(() => {
 }
 
 .hit {
-  /* background-image: linear-gradient(120deg, #f093fb 0%, #f5576c 100%); */
   background-color: IndianRed;
-  /* border: 1px solid rgba(59, 55, 55, 0.9); */
-
 }
 
 .miss {
-  /* background-image: radial-gradient(circle 248px at center, #16d9e3 0%, #30c7ec 47%, #46aef7 100%); */
   background-color: DodgerBlue;    
-  /* border: 1px solid rgba(59, 55, 55, 0.9); */
-
 }
-.ship {
-  /* background-image: radial-gradient( circle farthest-corner at -4% -12.9%,  rgba(74,98,110,1) 0.3%, rgba(30,33,48,1) 90.2% ); */
-  background-color: DimGrey; 
-  /* border: 1px solid rgba(59, 55, 55, 0.9); */
 
+.ship {
+  background-color: DimGrey; 
 }
 
 .empty {
@@ -266,7 +273,6 @@ onUnmounted(() => {
 }
 
 .label {
-  /* background-color: lightgray; */
 }
 
 .current-turn {
@@ -277,12 +283,10 @@ onUnmounted(() => {
 .opponent-turn {
   border: 2px solid IndianRed;
   padding: 10px;
-
 }
 
 .label-current-turn {
   background-color: SeaGreen;
- 
 }
 
 .label-opponent-turn {
@@ -291,7 +295,6 @@ onUnmounted(() => {
 
 .label-row {
   display: grid;
-  /* gap: 2px; */
 }
 
 .modal {
