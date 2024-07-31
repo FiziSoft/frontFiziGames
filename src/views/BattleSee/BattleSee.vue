@@ -34,10 +34,8 @@
         <div v-else class="turn-box opponent-turn">Хід опонента</div>
       </div>
       <div class="game-board">
-        <h3>
-          Гравець {{ opponentName }}
-        </h3>
-        <br>
+       
+        
         <div class="board">
           <div class="label-row">
             <div class="cell label"></div>
@@ -56,6 +54,9 @@
             ></div>
           </div>
         </div>
+        <h3>
+          Гравець {{ opponentName }}
+        </h3>
       </div>
     </div>
     
@@ -319,7 +320,7 @@ button:hover {
   }
   
   .game-board {
-    width: 100%;
+    
     max-width: 360px;
   }
 
