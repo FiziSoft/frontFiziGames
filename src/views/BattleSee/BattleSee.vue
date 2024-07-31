@@ -5,7 +5,6 @@
         <h3>
           Гравець {{ playerName }}
         </h3>
-        <br>
         <div class="board">
           <div class="label-row">
             <div class="cell label"></div>
@@ -215,7 +214,7 @@ onUnmounted(() => {
 }
 
 .game-board {
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   border: 2px solid transparent;
 }
 
