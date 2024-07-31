@@ -1,12 +1,15 @@
 <template>
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
-      <div :class="['game-board', myTurnClass]">
-        <h3>Гравець {{ playerName }} <span v-if="isMyTurn()" class="your-turn">(Ваш хід)</span></h3>
+      <div :class="['game-board', 'player-board']">
+        <h3>
+          Гравець {{ playerName }} 
+          <span v-if="isMyTurn()" class="your-turn">(Ваш хід)</span>
+        </h3>
         <br>
         <div class="board">
           <div class="label-row">
-            <div :class="['cell', 'label', myTurnClassLabel]"></div>
+            <div class="cell label"></div>
             <div v-for="colIndex in 10" :key="'top-label-' + colIndex" class="cell label">
               {{ String.fromCharCode(1040 + colIndex - 1) }}
             </div>
@@ -22,16 +25,25 @@
           </div>
         </div>
       </div>
-      <div class="shareLocal" v-show="!opponentName">
+      
+      <div v-if="!opponentName" class="shareLocal">
         <ShareButton :url="url_connect" text="Давай грати в Морський Бій"></ShareButton> 
-        <h2>  &#8592; Додай собі оппонента </h2>  
+        <h2> &#8592; Додай собі оппонента </h2>  
       </div>
-      <div :class="['game-board', opponentTurnClass]">
-        <h3>Гравець {{ opponentName }} <span v-if="!isMyTurn()" class="opponent-turn">(Хід опонента)</span></h3>
+      
+      <div v-else class="turn-indicator">
+        <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
+        <div v-else class="turn-box opponent-turn">Хід опонента</div>
+      </div>
+      
+      <div :class="['game-board', 'opponent-board']">
+        <h3>
+          Гравець {{ opponentName }}
+        </h3>
         <br>
         <div class="board">
           <div class="label-row">
-            <div :class="['cell', 'label', opponentTurnClassLabel]"></div>
+            <div class="cell label"></div>
             <div v-for="colIndex in 10" :key="'top-label-' + colIndex" class="cell label">
               {{ String.fromCharCode(1040 + colIndex - 1) }}
             </div>
@@ -49,6 +61,7 @@
         </div>
       </div>
     </div>
+    
     <div v-if="winnerModal" class="modal">
       <div class="modal-content">
         <p>{{ winnerMessage }}</p>
@@ -87,11 +100,6 @@ const url_connect = `https://fizi.cc/battle-sea/connect/${roomId}`;
 
 // const url_serv = "http://localhost:7001";  // или ваш сервер
 const url_serv = "https://seabattle-acb2eb1faa50.herokuapp.com";
-
-const myTurnClass = ref('');
-const opponentTurnClass = ref('');
-const myTurnClassLabel = ref('');
-const opponentTurnClassLabel = ref('');
 
 const getCellClass = (cell, isMyBoard) => {
   if (cell === 'hit') return 'hit';
@@ -132,20 +140,7 @@ const updateGameState = async () => {
     opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
     currentTurn.value = data.current_turn;
     opponentName.value = playerId === data.admin.id ? data.player.name : data.admin.name;
-
-    // Обновляем классы для отображения текущего хода
-    if (isMyTurn()) {
-      myTurnClass.value = 'current-turn';
-      opponentTurnClass.value = 'opponent-turn';
-      myTurnClassLabel.value = 'label-current-turn';
-      opponentTurnClassLabel.value = 'label-opponent-turn';
-    } else {
-      myTurnClass.value = 'opponent-turn';
-      opponentTurnClass.value = 'current-turn';
-      myTurnClassLabel.value = 'label-opponent-turn';
-      opponentTurnClassLabel.value = 'label-current-turn';
-    }
-
+    
     if (data.winner) {
       winner.value = data.winner;
       winnerModal.value = true;
@@ -224,6 +219,14 @@ onUnmounted(() => {
   margin-bottom: 20px;
 }
 
+.player-board {
+  border: 2px solid SeaGreen;
+}
+
+.opponent-board {
+  border: 2px solid IndianRed;
+}
+
 .board {
   display: grid;
   grid-template-columns: repeat(11, 30px); /* 10 columns + 1 for labels */
@@ -259,16 +262,6 @@ onUnmounted(() => {
 }
 
 .label {
-}
-
-.current-turn {
-  border: 2px solid SeaGreen;
-  padding: 10px;
-}
-
-.opponent-turn {
-  border: 2px solid IndianRed;
-  padding: 10px;
 }
 
 .label-current-turn {
@@ -313,14 +306,27 @@ button:hover {
   background-color: #0056b3;
 }
 
+.turn-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.turn-box {
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
 .your-turn {
   color: SeaGreen;
-  font-weight: bold;
-  margin-left: 10px;
+  background-color: #e0f7e0;
 }
+
 .opponent-turn {
   color: IndianRed;
-  font-weight: bold;
-  margin-left: 10px;
+  background-color: #f7e0e0;
 }
 </style>
