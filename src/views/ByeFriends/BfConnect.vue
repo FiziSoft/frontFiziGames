@@ -9,9 +9,6 @@
         <label class="btn-gradient-1" for="playerPhoto">Ваше фото:</label>
         <input type="file" @change="onFileChange" id="playerPhoto" accept="image/*" class="input-gradient">
       </div>
-      <div class="formElement">
-        <button type="button" @click="capturePhoto" class="btn-grad">Сделать фото</button>
-      </div>
       <div class="btnDiv">
         <button :disabled="!isButtonActive" type="submit" class="btn-grad">Долучитись до гри</button>
       </div>
@@ -31,9 +28,8 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import axios from 'axios';
 
-const playerName = ref('');
+const playerName = ref(localStorage.getItem('playerName') || '');
 const playerPhoto = ref(null);
 const playerPhotoPreview = ref(null);
 const cartoonPhoto = ref(null);
@@ -48,24 +44,39 @@ const onFileChange = (e) => {
   const reader = new FileReader();
   reader.onload = (event) => {
     playerPhotoPreview.value = event.target.result;
+    console.log('File selected:', playerPhotoPreview.value); // Debugging line
   };
   reader.readAsDataURL(file);
 };
 
 const uploadPhoto = async () => {
   loading.value = true;
+  console.log('Uploading photo...'); // Debugging line
   try {
     const formData = new FormData();
     formData.append('image', playerPhoto.value);
+    formData.append('text', 'portrait of a funny avatar'); // Adding description
 
-    const response = await axios.post('https://api.deepai.org/api/toonify', formData, {
-      headers: {
-        'Api-Key': 'a34c51f1-0d6e-4c27-a10e-28005f33620a',
-        'Content-Type': 'multipart/form-data'
-      },
+    console.log('FormData prepared:'); // Debugging line
+    formData.forEach((value, key) => {
+      console.log(key, value); // Debugging line
     });
 
-    cartoonPhoto.value = response.data.output_url;
+    const resp = await fetch('https://api.deepai.org/api/image-editor', {
+      method: 'POST',
+      headers: {
+        'api-key': 'a34c51f1-0d6e-4c27-a10e-28005f33620a'
+      },
+      body: formData
+    });
+
+    const data = await resp.json();
+    console.log('Response from server:', data); // Debugging line
+    if (data.output_url) {
+      cartoonPhoto.value = data.output_url;
+    } else {
+      throw new Error('Invalid response from server');
+    }
   } catch (error) {
     console.error('Error uploading photo:', error);
   } finally {
