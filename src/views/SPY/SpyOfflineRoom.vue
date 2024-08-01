@@ -141,6 +141,7 @@
   <style scoped>
   .container {
     text-align: center;
+    font-size: x-large;
   }
   
   .currentWord {
@@ -172,9 +173,7 @@
     margin: 20px 0;
   }
   
-  p {
-    font-size: 18px;
-  }
+ 
   
   .word-list {
     
