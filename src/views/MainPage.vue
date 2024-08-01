@@ -40,11 +40,11 @@ const network_url = 'https://fizi.cc';
 
 
 const games = ref([
-// {
-//     key: 'ByeFriends',
-//     url: '/bye-friends',
-//     icon: 'fa-solid fa-ship',
-//   },
+{
+    key: 'ByeFriends',
+    url: '/bye-friends',
+    icon: 'fa-solid fa-ship',
+  },
   {
     key: 'battleSee',
     url: '/battle-sea',
