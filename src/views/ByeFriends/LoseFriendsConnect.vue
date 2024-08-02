@@ -1,6 +1,6 @@
 <template>
-  <div class="containerFormCreate">
-    <form class="formCreate" @submit.prevent="createAndJoinRoom">
+  <div class="containerFormJoin">
+    <form class="formJoin" @submit.prevent="joinGame">
       <div class="formElement">
         <label class="btn-gradient-1" for="playerName">Ваше ім'я:</label>
         <input v-model="playerName" type="text" id="playerName" class="input-gradient">
@@ -13,7 +13,7 @@
         <button :disabled="!isButtonActive" @click="uploadPhoto" type="button" class="btn-grad">Загрузить аватар</button>
       </div>
       <div class="btnDiv">
-        <button :disabled="!isButtonActive" type="submit" class="btn-grad">Создать и подключиться к комнате</button>
+        <button :disabled="!isButtonActive" type="submit" class="btn-grad">Присоединиться к игре</button>
       </div>
     </form>
     <div v-if="loading" class="loading">Загрузка...</div>
@@ -28,7 +28,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 
 const playerName = ref(localStorage.getItem('playerName') || '');
@@ -37,8 +37,11 @@ const playerPhotoPreview = ref(null);
 const cartoonPhoto = ref(localStorage.getItem('LoseFriends_cartoonPhoto') || null);
 const loading = ref(false);
 const hiddenFileInput = ref(null);
+const route = useRoute();
 const router = useRouter();
+const roomId = ref(route.params.roomId);
 
+// Определим playerId, если он не существует
 let playerId = ref(localStorage.getItem('LoseFriends_playerId') || '');
 if (!playerId.value || playerId.value === "undefined") {
   playerId.value = uuidv4();
@@ -96,18 +99,12 @@ const uploadPhoto = async () => {
   }
 };
 
-const createAndJoinRoom = async () => {
+const joinGame = async () => {
   localStorage.setItem('playerName', playerName.value);
-
-  // Создание комнаты
-  const createResponse = await fetch('http://localhost:8002/create_room', {
-    method: 'POST',
-  });
-  const { room_id } = await createResponse.json();
 
   // Присоединяемся к комнате
   const formData = new URLSearchParams();
-  formData.append('room_id', room_id);
+  formData.append('room_id', roomId.value);
   formData.append('player_id', playerId.value); // Убедитесь, что значение передается как строка
   formData.append('player_name', playerName.value);
   formData.append('player_photo', cartoonPhoto.value);
@@ -123,7 +120,7 @@ const createAndJoinRoom = async () => {
   }
 
   // Перенаправление в игровую комнату
-  router.push({ name: 'LoseFriendsGameRoom', params: { roomId: room_id } });
+  router.push({ name: 'LoseFriendsGameRoom', params: { roomId: roomId.value } });
 };
 
 const removeAvatar = () => {
@@ -139,13 +136,13 @@ onMounted(() => {
 </script>
 
 <style>
-.containerFormCreate {
+.containerFormJoin {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
 }
-.formCreate {
+.formJoin {
   display: flex;
   flex-direction: column;
   width: 300px;

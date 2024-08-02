@@ -24,6 +24,8 @@ import BattleSeeConnect from './views/BattleSee/BattleSeeConnect.vue'
 import SpyOfflineRoom from './views/SPY/SpyOfflineRoom.vue'
 
 import BfConnect from './views/ByeFriends/BfConnect.vue'
+import LoseFriendsRoom from './views/ByeFriends/LoseFriendsRoom.vue'
+import LoseFriendsConnect from './views/ByeFriends/LoseFriendsConnect.vue'
 
 const routes = [
     {
@@ -33,6 +35,12 @@ const routes = [
     },
 
     { path: '/bye-friends', name: 'byefriends', component: BfConnect },
+
+    { path: '/lose-friend/:roomId', name: 'LoseFriendsGameRoom', component: LoseFriendsRoom },
+
+
+    { path: '/lose-friends/connect/:roomId', name: 'LoseFriendsConnect', component: LoseFriendsConnect },
+
 
     {
         path: '/rsp-createRoom',

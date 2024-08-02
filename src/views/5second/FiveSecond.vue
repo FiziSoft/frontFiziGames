@@ -195,27 +195,7 @@ router.beforeEach((to, from, next) => {
   color: var(--text-color);
 }
 
-.card {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  margin: 20px 0;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  width: 80%;
-  max-width: 450px;
-  min-height: 100px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #000 !important;
-}
 
-.card h3 {
-  margin: 0;
-}
 
 .card p {
   font-size: 1.5em;

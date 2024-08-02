@@ -35,16 +35,16 @@ import { useI18n } from 'vue-i18n';
 import ModalMain from '@/components/ModalMain.vue';
 
 // const network_url = 'https://fizigames-799b6804c93a.herokuapp.com';
-// const network_url = 'http://localhost:8080';
-const network_url = 'https://fizi.cc';
+const network_url = 'http://localhost:8080';
+// const network_url = 'https://fizi.cc';
 
 
 const games = ref([
-// {
-//     key: 'ByeFriends',
-//     url: '/bye-friends',
-//     icon: 'fa-solid fa-ship',
-//   },
+{
+    key: 'ByeFriends',
+    url: '/bye-friends',
+    icon: 'fa-solid fa-ship',
+  },
   {
     key: 'battleSee',
     url: '/battle-sea',
