@@ -19,23 +19,30 @@
         </div>
       </div>
       <div v-else-if="winner">
-        <h2>Победитель</h2>
-        <div class="winner" v-if="winner">
-          <img :src="winner.player_photo" :alt="winner.player_name" class="winner-avatar">
+          
+          <div class="winner" v-if="winner">
+            <h4 v-if="unanimous">Единогласно!</h4>
+            <!-- <h4 v-else>Голоса за:</h4>
+            <ul v-if="!unanimous">
+              <li v-for="voter in votes" :key="voter.voter_id">{{ voter.voter_name }}</li>
+            </ul> -->
+
+
           <p>{{ winner.player_name }}</p>
           <p>Счет: {{ winner.score }}</p>
-          <h4 v-if="unanimous">Единогласно!</h4>
-          <h4 v-else>Голоса за:</h4>
-          <ul v-if="!unanimous">
-            <li v-for="voter in votes" :key="voter.voter_id">{{ voter.voter_name }}</li>
-          </ul>
+          <img :src="winner.player_photo" :alt="winner.player_name" class="winner-avatar">
+         
+          
           <h4 v-if="!unanimous">Все голоса:</h4>
           <ul v-if="!unanimous">
             <li v-for="vote in votesAll" :key="vote.voter_id">
-              {{ vote.voter_name }} голосовал за {{ vote.voted_for }}
+              <span :class="{ bold: vote.voted_for === playerName }">{{ vote.voter_name }}</span>  за 
+               <span v-if="vote.voted_for !==playerName">{{ vote.voted_for }} </span> 
+               <span v-if="vote.voted_for ===playerName">Вас</span>
             </li>
           </ul>
         </div>
+        <button v-if="winner && winner.player_id === playerId" @click="nextRound" class="btn-grad">Продолжить</button>
       </div>
       <div v-else-if="tie">
         <h2>Голосование продолжается</h2>
@@ -70,36 +77,6 @@
         <div> Додай ще майбутніх колишніх друзів </div>
       </div>
     </div>
-
-    <div v-if="showWinnerModal" class="modal-overlay" @click.self="closeWinnerModal">
-      <div class="modal-content">
-        <header class="modal-header">
-          <h3>Победитель</h3>
-          <button class="close-button" @click="closeWinnerModal">&times;</button>
-        </header>
-        <section class="modal-body">
-          <div class="winner" v-if="winner">
-            <img :src="winner.player_photo" :alt="winner.player_name" class="winner-avatar">
-            <p>{{ winner.player_name }}</p>
-            <p>Счет: {{ winner.score }}</p>
-            <h4 v-if="unanimous">Единогласно!</h4>
-            <h4 v-else>Голоса за:</h4>
-            <ul v-if="!unanimous">
-              <li v-for="voter in votes" :key="voter.voter_id">{{ voter.voter_name }}</li>
-            </ul>
-            <h4 v-if="!unanimous">Все голоса:</h4>
-            <ul v-if="!unanimous">
-              <li v-for="vote in votesAll" :key="vote.voter_id">
-                {{ vote.voter_name }} голосовал за {{ vote.voted_for }}
-              </li>
-            </ul>
-          </div>
-        </section>
-        <footer class="modal-footer">
-          <button v-if="winner && winner.player_id === playerId" @click="nextRound" class="btn-grad">Продолжить</button>
-        </footer>
-      </div>
-    </div>
   </GameLayout>
 </template>
 
@@ -113,6 +90,9 @@ const route = useRoute();
 const router = useRouter();
 const roomId = ref(route.params.roomId);
 let playerId = ref(localStorage.getItem('LoseFriends_playerId'));
+let playerName = ref(localStorage.getItem('playerName'));
+
+
 
 const question = ref(null);
 const players = ref([]);
@@ -171,10 +151,6 @@ const vote = (votedPlayerId) => {
     selectedPlayerId.value = votedPlayerId;
     ws.send(JSON.stringify({ action: 'vote', player_id: votedPlayerId }));
   }
-};
-
-const closeWinnerModal = () => {
-  showWinnerModal.value = false;
 };
 
 const nextRound = () => {
@@ -271,43 +247,7 @@ onMounted(() => {
   display: flex;
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: #fff;
-  border-radius: 8px;
-  padding: 20px;
-  max-width: 500px;
-  width: 100%;
-  color: #000;
-}
-
-.modal-header,
-.modal-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.close-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.modal-body {
-  margin: 20px 0;
+.bold {
+  font-weight: bold;
 }
 </style>
