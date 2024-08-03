@@ -19,28 +19,30 @@
         </div>
       </div>
       <div v-else-if="winner">
+        <div class="winner" v-if="winner">
           
-          <div class="winner" v-if="winner">
-            <h4 v-if="unanimous">Единогласно!</h4>
-            <!-- <h4 v-else>Голоса за:</h4>
-            <ul v-if="!unanimous">
-              <li v-for="voter in votes" :key="voter.voter_id">{{ voter.voter_name }}</li>
-            </ul> -->
+          <h2>{{ aaa }}</h2>
 
-
-          <p>{{ winner.player_name }}</p>
-          <p>Счет: {{ winner.score }}</p>
+          <h4 > {{ unanimous ? "Единогласно! это:" : "Конечно это:"}} <strong>{{ winner.player_name }}</strong> </h4>
+           
+          
+          
           <img :src="winner.player_photo" :alt="winner.player_name" class="winner-avatar">
-         
-          
-          <h4 v-if="!unanimous">Все голоса:</h4>
-          <ul v-if="!unanimous">
-            <li v-for="vote in votesAll" :key="vote.voter_id">
-              <span :class="{ bold: vote.voted_for === playerName }">{{ vote.voter_name }}</span>  за 
-               <span v-if="vote.voted_for !==playerName">{{ vote.voted_for }} </span> 
-               <span v-if="vote.voted_for ===playerName">Вас</span>
-            </li>
-          </ul>
+        
+          <table v-if="!unanimous" class="votes-table">
+            <thead>
+              <tr>
+                <th>Кто</th>
+                <th>За кого</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="vote in votesAll" :key="vote.voter_id">
+                <td :class="{ bold: vote.voted_for === playerName }">{{ vote.voter_name }}</td>
+                <td>{{ vote.voted_for === playerName ? 'Вас' : vote.voted_for }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <button v-if="winner && winner.player_id === playerId" @click="nextRound" class="btn-grad">Продолжить</button>
       </div>
@@ -92,8 +94,6 @@ const roomId = ref(route.params.roomId);
 let playerId = ref(localStorage.getItem('LoseFriends_playerId'));
 let playerName = ref(localStorage.getItem('playerName'));
 
-
-
 const question = ref(null);
 const players = ref([]);
 const winner = ref(null);
@@ -104,6 +104,8 @@ const votesAll = ref([]);
 const unanimous = ref(false);
 const tie = ref(false);
 const tiePlayers = ref([]);
+
+const aaa = ref(localStorage.getItem('lose_friend_cur_q') || "not have")
 
 let ws;
 
@@ -119,6 +121,7 @@ const connectWebSocket = () => {
       winner.value = null;
       selectedPlayerId.value = null;
       showWinnerModal.value = false;
+      localStorage.setItem('lose_friend_cur_q', data.question);
     }
     if (data.players) {
       players.value = data.players;
@@ -128,7 +131,7 @@ const connectWebSocket = () => {
       votes.value = data.votes;
       votesAll.value = data.votes_all;
       unanimous.value = data.unanimous;
-      question.value = null;
+      question.value = data.cur_question; // Обновление вопроса
       selectedPlayerId.value = null;
       showWinnerModal.value = true;
     }
@@ -213,9 +216,10 @@ onMounted(() => {
 }
 
 .winner-avatar {
-  max-width: 300px;
+  max-width: 200px;
   border-radius: 50%;
-  transition: transform 0.3s;
+  transition: transform 0.5s;
+  border: 1px solid;
 }
 
 .winner-avatar:hover {
@@ -245,9 +249,28 @@ onMounted(() => {
   padding: 15px;
   margin-top: 40px;
   display: flex;
+  position: absolute;
+  bottom: 50px;
 }
 
 .bold {
   font-weight: bold;
+}
+
+.votes-table {
+  margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.votes-table th,
+.votes-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.votes-table th {
+  background-color: #f2f2f2;
 }
 </style>
