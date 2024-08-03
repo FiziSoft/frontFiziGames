@@ -69,7 +69,11 @@ const uploadPhoto = async () => {
   try {
     const formData = new FormData();
     formData.append('image', playerPhoto.value);
-    formData.append('text', 'portrait of a funny avatar'); // Adding description
+    // formData.append('text', 'portrait of a funny avatar'); // Adding description
+    // formData.append('text', 'portrait of a funny avatar anime');
+    formData.append('text', 'portrait of a funny avatar anime baby face');
+
+
 
     console.log('FormData prepared:'); // Debugging line
     formData.forEach((value, key) => {

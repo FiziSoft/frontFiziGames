@@ -39,7 +39,7 @@ const loading = ref(false);
 const hiddenFileInput = ref(null);
 const router = useRouter();
 
-let playerId = ref(localStorage.getItem('LoseFriends_playerId') || '');
+const playerId = ref(localStorage.getItem('LoseFriends_playerId'));
 if (!playerId.value || playerId.value === "undefined") {
   playerId.value = uuidv4();
   localStorage.setItem('LoseFriends_playerId', playerId.value);
@@ -49,29 +49,21 @@ const isButtonActive = computed(() => playerName.value.trim().length > 0 && (pla
 
 const onFileChange = (e) => {
   const file = e.target.files[0];
-  if (file) {
-    playerPhoto.value = file;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      playerPhotoPreview.value = event.target.result;
-      console.log('File selected:', playerPhotoPreview.value); // Debugging line
-    };
-    reader.readAsDataURL(file);
-  }
+  playerPhoto.value = file;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    playerPhotoPreview.value = event.target.result;
+  };
+  reader.readAsDataURL(file);
 };
 
 const uploadPhoto = async () => {
   loading.value = true;
-  console.log('Uploading photo...'); // Debugging line
   try {
     const formData = new FormData();
     formData.append('image', playerPhoto.value);
-    formData.append('text', 'portrait of a funny avatar'); // Adding description
-
-    console.log('FormData prepared:'); // Debugging line
-    formData.forEach((value, key) => {
-      console.log(key, value); // Debugging line
-    });
+    // formData.append('text', 'portrait of a funny avatar');
+    formData.append('text', 'portrait of a very funny avatar anime');
 
     const resp = await fetch('https://api.deepai.org/api/image-editor', {
       method: 'POST',
@@ -82,7 +74,6 @@ const uploadPhoto = async () => {
     });
 
     const data = await resp.json();
-    console.log('Response from server:', data); // Debugging line
     if (data.output_url) {
       cartoonPhoto.value = data.output_url;
       localStorage.setItem('LoseFriends_cartoonPhoto', data.output_url);
@@ -99,30 +90,24 @@ const uploadPhoto = async () => {
 const createAndJoinRoom = async () => {
   localStorage.setItem('playerName', playerName.value);
 
-  // Создание комнаты
   const createResponse = await fetch('http://localhost:8002/create_room', {
     method: 'POST',
   });
   const { room_id } = await createResponse.json();
 
-  // Присоединяемся к комнате
-  const formData = new URLSearchParams();
+  const formData = new FormData();
   formData.append('room_id', room_id);
-  formData.append('player_id', playerId.value); // Убедитесь, что значение передается как строка
+  formData.append('player_id', playerId.value);
   formData.append('player_name', playerName.value);
-  formData.append('player_photo', cartoonPhoto.value);
+  formData.append('player_photo', cartoonPhoto.value || playerPhoto.value);
 
   const joinResponse = await fetch('http://localhost:8002/join_room', {
     method: 'POST',
     body: formData
   });
+  const { player_id } = await joinResponse.json();
+  localStorage.setItem('LoseFriends_playerId', player_id);
 
-  if (!joinResponse.ok) {
-    console.error('Error joining room:', await joinResponse.text());
-    return;
-  }
-
-  // Перенаправление в игровую комнату
   router.push({ name: 'LoseFriendsGameRoom', params: { roomId: room_id } });
 };
 
