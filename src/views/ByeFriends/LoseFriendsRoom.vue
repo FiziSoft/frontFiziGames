@@ -1,18 +1,7 @@
 <template>
   <GameLayout name-game="Як втратити друзів">
     <div class="containerFormCreate">
-      <div v-if="players.length < 3">
-        <h2>Ожидание подключения игроков...</h2>
-        <div class="players-container">
-          <div v-for="player in players" :key="player.player_id" class="player">
-            <img :src="player.player_photo" :alt="player.player_name" class="player-avatar">
-            <p>{{ player.player_name }}</p>
-            <p>Очки: {{ player.score }}</p>
-          </div>
-        </div>
-        <TelegramShareButton :url="url_share" text="Заходи не бойся, выходи не плач"></TelegramShareButton>
-      </div>
-      <div class="formCreate" v-else-if="question && !tie">
+      <div class="formCreate" v-if="question && !tie && players.length >= 3">
         <div class="card">
           <span>{{ question }}</span>
         </div>
@@ -30,9 +19,9 @@
         </div>
       </div>
       <div v-else-if="winner">
-        <div class="winner">
-           <div class="win_text card">
-            <span>{{  bbb }}</span>
+        <div class="winner" v-if="winner">
+          <div class="win_text card">
+            <span>{{ bbb }}</span>
             <hr>
             <h4>{{ unanimous ? "Единогласно! это:" : ""}} <div class="win_name">{{ winner.player_name }}</div></h4>
           </div>
@@ -72,6 +61,17 @@
           </div>
         </div>
       </div>
+      <div v-else>
+        <h2>Ожидание подключения игроков...</h2>
+        <TelegramShareButton :url="url_share" text="Заходи не бойся, выходи не плач"></TelegramShareButton>
+        <div class="players-container">
+          <div v-for="player in players" :key="player.player_id" class="player">
+            <img :src="player.player_photo" :alt="player.player_name" class="player-avatar">
+            <p>{{ player.player_name }}</p>
+            <p>Очки: {{ player.score }}</p>
+          </div>
+        </div>
+      </div>
       <div class="share">
         <ShareButton :url="url_share"></ShareButton> &#8592;
         <div> Додай ще майбутніх колишніх друзів </div>
@@ -84,6 +84,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ShareButton from '@/components/ShareButton.vue';
+import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import GameLayout from '../GameLayout.vue';
 
 const route = useRoute();
@@ -117,7 +118,7 @@ const connectWebSocket = () => {
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log(data); // Логирование данных для отладки
-    if (data.question) {
+    if (data.question && players.value.length >= 3) {
       question.value = data.question;
       winner.value = null;
       selectedPlayerId.value = null;
@@ -275,7 +276,6 @@ onMounted(() => {
   padding: 15px;
   margin-top: 40px;
   display: flex;
-  
 }
 
 .bold {
