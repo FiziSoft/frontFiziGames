@@ -43,8 +43,8 @@ const closeModal = () => {
   position: relative;
   bottom: 0px;
   left: 0;
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   background-color: #007bff;
   border-radius: 35px;
   display: flex;

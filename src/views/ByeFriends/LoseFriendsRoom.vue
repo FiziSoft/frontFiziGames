@@ -3,7 +3,7 @@
     <div class="containerFormCreate">
       <div class="formCreate" v-if="question && !tie">
         <div class="card">
-          <h2>{{ question }}</h2>
+          <span>{{ question }}</span>
         </div>
         <div class="players-container">
           <div
@@ -21,7 +21,7 @@
       <div v-else-if="winner">
         <div class="winner" v-if="winner">
            <div class="win_text card">
-            <h2>{{  bbb }}</h2>
+            <span>{{  bbb }}</span>
             <hr>
             <h4>{{ unanimous ? "Единогласно! это:" : ""}} <div class="win_name">{{ winner.player_name }}</div></h4>
           </div>
@@ -46,7 +46,7 @@
       <div v-else-if="tie">
         <h2>Голосование продолжается</h2>
         <div class="card">
-          <h2>{{ question }}</h2>
+          <span>{{ question }}</span>
         </div>
         <div class="players-container">
           <div
@@ -63,6 +63,7 @@
       </div>
       <div v-else>
         <h2>Ожидание подключения игроков...</h2>
+        <TelegramShareButton :url="url_share" text="Заходи не бойся, выходи не плач"></TelegramShareButton>
         <div class="players-container">
           <div v-for="player in players" :key="player.player_id" class="player">
             <img :src="player.player_photo" :alt="player.player_name" class="player-avatar">
@@ -102,11 +103,6 @@ const unanimous = ref(false);
 const tie = ref(false);
 const tiePlayers = ref([]);
 
-
-
-
-
-
 const url_share = `https://fizi.cc/lose-friends/connect/${roomId.value}`;
 
 const storedQuestion = computed(() => localStorage.getItem('lose_friend_cur_q'));
@@ -116,7 +112,6 @@ const bbb = ref('')
 let ws;
 
 const connectWebSocket = () => {
-  // ws = new WebSocket(`ws://localhost:8003/ws/${roomId.value}/${playerId.value}`);
   ws = new WebSocket(`wss://lose-friends-b2c531fd41a8.herokuapp.com/ws/${roomId.value}/${playerId.value}`);
 
   ws.onmessage = (event) => {
@@ -155,13 +150,17 @@ const connectWebSocket = () => {
       tiePlayers.value = [];
     }
   };
+
+  ws.onclose = () => {
+    console.log("WebSocket connection closed");
+    setTimeout(() => {
+      connectWebSocket();
+    }, 1000);
+  };
 };
 
 const tacke_q = ()=>{
-  
- bbb.value = localStorage.getItem('lose_friend_cur_q')
-
- 
+  bbb.value = localStorage.getItem('lose_friend_cur_q')
 }
 
 const vote = (votedPlayerId) => {
@@ -242,7 +241,6 @@ onMounted(() => {
   transform: scale(1.1);
 }
 
-
 .win_text {
   font-size: larger;
 }
@@ -253,7 +251,6 @@ onMounted(() => {
   padding: 15px;
   margin-top: 15px;
 }
-
 
 .card {
   background-color: #fff;
@@ -278,8 +275,7 @@ onMounted(() => {
   padding: 15px;
   margin-top: 40px;
   display: flex;
-  position: absolute;
-  bottom: 50px;
+  
 }
 
 .bold {
