@@ -90,7 +90,7 @@ const uploadPhoto = async () => {
 const createAndJoinRoom = async () => {
   localStorage.setItem('playerName', playerName.value);
 
-  const createResponse = await fetch('http://localhost:8002/create_room', {
+  const createResponse = await fetch('http://localhost:8003/create_room', {
     method: 'POST',
   });
   const { room_id } = await createResponse.json();
@@ -101,7 +101,7 @@ const createAndJoinRoom = async () => {
   formData.append('player_name', playerName.value);
   formData.append('player_photo', cartoonPhoto.value || playerPhoto.value);
 
-  const joinResponse = await fetch('http://localhost:8002/join_room', {
+  const joinResponse = await fetch('http://localhost:8003/join_room', {
     method: 'POST',
     body: formData
   });

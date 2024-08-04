@@ -112,7 +112,7 @@ let ws;
 const url_share = `http://localhost:8080/lose-friends/connect/${roomId.value}`;
 
 const connectWebSocket = () => {
-  ws = new WebSocket(`ws://localhost:8002/ws/${roomId.value}/${playerId.value}`);
+  ws = new WebSocket(`ws://localhost:8003/ws/${roomId.value}/${playerId.value}`);
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log(data); // Логирование данных для отладки

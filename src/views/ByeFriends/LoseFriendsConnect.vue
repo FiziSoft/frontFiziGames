@@ -68,31 +68,23 @@ const uploadPhoto = async () => {
   console.log('Uploading photo...'); // Debugging line
   try {
     const formData = new FormData();
-    formData.append('image', playerPhoto.value);
-    // formData.append('text', 'portrait of a funny avatar'); // Adding description
-    // formData.append('text', 'portrait of a funny avatar anime');
-    formData.append('text', 'portrait of a funny avatar anime baby face');
-
-
+    formData.append('file', playerPhoto.value);
 
     console.log('FormData prepared:'); // Debugging line
     formData.forEach((value, key) => {
       console.log(key, value); // Debugging line
     });
 
-    const resp = await fetch('https://api.deepai.org/api/image-editor', {
+    const resp = await fetch('http://localhost:8003/generate_avatar/', {  // изменено на 8003
       method: 'POST',
-      headers: {
-        'api-key': 'a34c51f1-0d6e-4c27-a10e-28005f33620a'
-      },
       body: formData
     });
 
     const data = await resp.json();
     console.log('Response from server:', data); // Debugging line
-    if (data.output_url) {
-      cartoonPhoto.value = data.output_url;
-      localStorage.setItem('LoseFriends_cartoonPhoto', data.output_url);
+    if (data.url) {
+      cartoonPhoto.value = `http://localhost:8003${data.url}`;
+      localStorage.setItem('LoseFriends_cartoonPhoto', cartoonPhoto.value);
     } else {
       throw new Error('Invalid response from server');
     }
@@ -101,6 +93,27 @@ const uploadPhoto = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const downloadFile = async (url) => {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    cartoonPhoto.value = objectUrl;
+    saveFile(blob);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+  }
+};
+
+const saveFile = (blob) => {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'avatar.jpg';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 const joinGame = async () => {
@@ -113,7 +126,7 @@ const joinGame = async () => {
   formData.append('player_name', playerName.value);
   formData.append('player_photo', cartoonPhoto.value);
 
-  const joinResponse = await fetch('http://localhost:8002/join_room', {
+  const joinResponse = await fetch('http://localhost:8003/join_room', {  // изменено на 8003
     method: 'POST',
     body: formData
   });
