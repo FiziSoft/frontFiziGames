@@ -118,15 +118,21 @@ const connectWebSocket = () => {
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log(data); // Логирование данных для отладки
+    if (data.players) {
+      players.value = data.players;
+    }
+    if (data.waiting) {
+      question.value = null;
+      winner.value = null;
+      selectedPlayerId.value = null;
+      showWinnerModal.value = false;
+    }
     if (data.question && players.value.length >= 3) {
       question.value = data.question;
       winner.value = null;
       selectedPlayerId.value = null;
       showWinnerModal.value = false;
       localStorage.setItem('lose_friend_cur_q', question.value);
-    }
-    if (data.players) {
-      players.value = data.players;
     }
     if (data.winner) {
       winner.value = data.winner;

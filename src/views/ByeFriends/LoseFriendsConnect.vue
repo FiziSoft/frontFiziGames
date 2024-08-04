@@ -1,5 +1,5 @@
 <template>
-   <GameLayout name-game="Як втратити друзів">
+  <GameLayout name-game="Як втратити друзів">
     <div class="containerFormJoin">
       <form class="formJoin" @submit.prevent="joinGame">
         <div class="formElement">
@@ -11,22 +11,6 @@
           <input type="file" @change="onFileChange" id="playerPhoto" accept="image/*" class="input-file photoUp">
           <div class="input-gradient" @click="triggerFileInput">Сделать фото</div>
         </div>
-        <!-- Фильтры отключены, так как они не были включены в требования -->
-        <!-- <div v-if="cartoonPhoto" class="filterSection">
-          <label for="filterSelect">Выберите фильтр:</label>
-          <select v-model="selectedFilter" id="filterSelect">
-            <option value="none">Без фильтра</option>
-            <option value="edge_blur">Размытие краев</option>
-            <option value="sharpen">Повышение резкости</option>
-            <option value="gaussian_blur">Гауссово размытие</option>
-            <option value="median_blur">Медианное размытие</option>
-            <option value="bilateral_filter">Билатеральный фильтр</option>
-            <option value="sobel">Собель</option>
-            <option value="laplacian">Лапласиан</option>
-            <option value="canny">Кенни</option>
-          </select>
-          <button @click="applyFilter" class="btn-grad">Применить фильтр</button>
-        </div> -->
         <div class="btnDiv">
           <button :disabled="!isButtonActive" type="submit" class="btn-grad">Присоединиться к игре</button>
         </div>
@@ -39,21 +23,19 @@
       </div>
       <input type="file" ref="hiddenFileInput" @change="onFileChange" accept="image/*" capture="environment" style="display: none;">
     </div>
-</GameLayout>
+  </GameLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import GameLayout from '../GameLayout.vue';
-
 
 const playerName = ref(localStorage.getItem('playerName') || '');
 const playerPhoto = ref(null);
 const playerPhotoPreview = ref(null);
 const cartoonPhoto = ref(localStorage.getItem('LoseFriends_cartoonPhoto') || null);
-const selectedFilter = ref('none');
 const loading = ref(false);
 const hiddenFileInput = ref(null);
 const route = useRoute();
@@ -70,10 +52,7 @@ const triggerFileInput = () => {
 };
 
 const url_serv = "https://lose-friends-b2c531fd41a8.herokuapp.com"
-// const url_serv = "http://localhost:8003"
 
-
-// Определим playerId, если он не существует
 let playerId = ref(localStorage.getItem('LoseFriends_playerId') || '');
 if (!playerId.value || playerId.value === "undefined") {
   playerId.value = uuidv4();
@@ -89,32 +68,32 @@ const onFileChange = async (e) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       playerPhotoPreview.value = event.target.result;
-      console.log('File selected:', playerPhotoPreview.value); // Debugging line
+      console.log('File selected:', playerPhotoPreview.value); 
     };
     reader.readAsDataURL(file);
-    await uploadPhoto();  // Запуск загрузки аватара автоматически после выбора файла
+    await uploadPhoto();  
   }
 };
 
 const uploadPhoto = async () => {
   loading.value = true;
-  console.log('Uploading photo...'); // Debugging line
+  console.log('Uploading photo...'); 
   try {
     const formData = new FormData();
     formData.append('file', playerPhoto.value);
 
-    console.log('FormData prepared:'); // Debugging line
+    console.log('FormData prepared:'); 
     formData.forEach((value, key) => {
-      console.log(key, value); // Debugging line
+      console.log(key, value); 
     });
 
-    const resp = await fetch(`${url_serv}/generate_avatar/`, {  // изменено на 8003
+    const resp = await fetch(`${url_serv}/generate_avatar/`, {  
       method: 'POST',
       body: formData
     });
 
     const data = await resp.json();
-    console.log('Response from server:', data); // Debugging line
+    console.log('Response from server:', data); 
     if (data.url) {
       cartoonPhoto.value = `${url_serv}${data.url}`;
       localStorage.setItem('LoseFriends_cartoonPhoto', cartoonPhoto.value);
@@ -136,14 +115,13 @@ const removeAvatar = () => {
 const joinGame = async () => {
   localStorage.setItem('playerName', playerName.value);
 
-  // Присоединяемся к комнате
   const formData = new URLSearchParams();
   formData.append('room_id', roomId.value);
-  formData.append('player_id', playerId.value); // Убедитесь, что значение передается как строка
+  formData.append('player_id', playerId.value); 
   formData.append('player_name', playerName.value);
   formData.append('player_photo', cartoonPhoto.value);
 
-  const joinResponse = await fetch(`${url_serv}/join_room`, {  // изменено на 8003
+  const joinResponse = await fetch(`${url_serv}/join_room`, {  
     method: 'POST',
     body: formData
   });
@@ -153,15 +131,8 @@ const joinGame = async () => {
     return;
   }
 
-  // Перенаправление в игровую комнату
   router.push({ name: 'LoseFriendsGameRoom', params: { roomId: roomId.value } });
 };
-
-onMounted(() => {
-  if (cartoonPhoto.value) {
-    console.log('Loaded cartoon photo from local storage');
-  }
-});
 </script>
 
 <style>
@@ -212,9 +183,6 @@ onMounted(() => {
 .btn-grad:disabled {
   background: #ccc;
   cursor: not-allowed;
-}
-.filterSection {
-  margin: 20px 0;
 }
 .preview {
   text-align: center;
