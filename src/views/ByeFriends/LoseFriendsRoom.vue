@@ -118,15 +118,21 @@ const connectWebSocket = () => {
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log(data); // Логирование данных для отладки
+
     if (data.players) {
       players.value = data.players;
+      if (players.value.length >= 3 && !question.value) {
+        askQuestion();
+      }
     }
+
     if (data.waiting) {
       question.value = null;
       winner.value = null;
       selectedPlayerId.value = null;
       showWinnerModal.value = false;
     }
+    
     if (data.question && players.value.length >= 3) {
       question.value = data.question;
       winner.value = null;
@@ -134,6 +140,7 @@ const connectWebSocket = () => {
       showWinnerModal.value = false;
       localStorage.setItem('lose_friend_cur_q', question.value);
     }
+
     if (data.winner) {
       winner.value = data.winner;
       votes.value = data.votes;
@@ -145,6 +152,7 @@ const connectWebSocket = () => {
       selectedPlayerId.value = null;
       showWinnerModal.value = true;
     }
+
     if (data.tie) {
       tie.value = true;
       question.value = data.question;
@@ -165,6 +173,13 @@ const connectWebSocket = () => {
     }, 1000);
   };
 };
+
+const askQuestion = () => {
+  if (players.value.length >= 3) {
+    ws.send(JSON.stringify({ action: 'next_round' }));
+  }
+};
+
 
 const tacke_q = ()=>{
   bbb.value = localStorage.getItem('lose_friend_cur_q')
