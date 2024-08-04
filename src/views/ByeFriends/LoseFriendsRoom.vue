@@ -23,7 +23,7 @@
           <div class="win_text card">
             <span>{{ bbb }}</span>
             <hr>
-            <h4>{{ unanimous ? "Единогласно! это:" : ""}} <div class="win_name">{{ winner.player_name }}</div></h4>
+            <div>{{ unanimous ? "Единогласно! это:" : ""}} <div class="win_name">{{ winner.player_name }}</div></div>
           </div>
           <img :src="winner.player_photo" :alt="winner.player_name" class="winner-avatar">
           <table v-if="!unanimous" class="votes-table">
@@ -314,6 +314,7 @@ onMounted(() => {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: center;
+  color: #000 !important;
 }
 
 .votes-table th {
