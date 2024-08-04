@@ -1,7 +1,18 @@
 <template>
   <GameLayout name-game="Як втратити друзів">
     <div class="containerFormCreate">
-      <div class="formCreate" v-if="question && !tie">
+      <div v-if="players.length < 3">
+        <h2>Ожидание подключения игроков...</h2>
+        <div class="players-container">
+          <div v-for="player in players" :key="player.player_id" class="player">
+            <img :src="player.player_photo" :alt="player.player_name" class="player-avatar">
+            <p>{{ player.player_name }}</p>
+            <p>Очки: {{ player.score }}</p>
+          </div>
+        </div>
+        <TelegramShareButton :url="url_share" text="Заходи не бойся, выходи не плач"></TelegramShareButton>
+      </div>
+      <div class="formCreate" v-else-if="question && !tie">
         <div class="card">
           <span>{{ question }}</span>
         </div>
@@ -19,7 +30,7 @@
         </div>
       </div>
       <div v-else-if="winner">
-        <div class="winner" v-if="winner">
+        <div class="winner">
            <div class="win_text card">
             <span>{{  bbb }}</span>
             <hr>
@@ -55,17 +66,6 @@
             :class="['player', { selected: player.player_id === selectedPlayerId }]"
             @click="vote(player.player_id)"
           >
-            <img :src="player.player_photo" :alt="player.player_name" class="player-avatar">
-            <p>{{ player.player_name }}</p>
-            <p>Очки: {{ player.score }}</p>
-          </div>
-        </div>
-      </div>
-      <div v-else>
-        <h2>Ожидание подключения игроков...</h2>
-        <TelegramShareButton :url="url_share" text="Заходи не бойся, выходи не плач"></TelegramShareButton>
-        <div class="players-container">
-          <div v-for="player in players" :key="player.player_id" class="player">
             <img :src="player.player_photo" :alt="player.player_name" class="player-avatar">
             <p>{{ player.player_name }}</p>
             <p>Очки: {{ player.score }}</p>
