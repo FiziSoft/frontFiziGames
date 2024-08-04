@@ -1,35 +1,36 @@
 <template>
-  <div class="containerFormCreate">
-    <form class="formCreate" @submit.prevent="createAndJoinRoom">
-      <div class="formElement">
-        <label class="btn-gradient-1" for="playerName">Ваше ім'я:</label>
-        <input v-model="playerName" type="text" id="playerName" class="input-gradient">
+  <GameLayout name-game="Як втратити друзів">
+    <div class="containerFormCreate">
+      <form class="formCreate" @submit.prevent="createAndJoinRoom">
+        <div class="formElement">
+          <label class="btn-gradient-1" for="playerName">Ваше ім'я:</label>
+          <input v-model="playerName" type="text" id="playerName" class="input-gradient">
+        </div>
+        <div class="formElement">
+          <label class="btn-gradient-1" for="playerPhoto">Аватарка</label>
+          <input type="file" @change="onFileChange" id="playerPhoto" accept="image/*" class="input-file photoUp">
+          <div class="input-gradient" @click="triggerFileInput">Сделать фото</div>
+        </div>
+        <div class="btnDiv">
+          <button :disabled="!isButtonActive" type="submit" class="btn-grad">Создать и подключиться к комнате</button>
+        </div>
+      </form>
+      <div v-if="loading" class="loading">Загрузка...</div>
+      <div v-if="cartoonPhoto" class="preview">
+        <h3>Ваш аватар</h3>
+        <img :src="cartoonPhoto" alt="Мультяшная аватарка" class="photo-preview">
+        <button @click="removeAvatar" class="btn-grad">Изменить аватар</button>
       </div>
-      <div class="formElement">
-        <label class="btn-gradient-1" for="playerPhoto">Выбрать или сделать фото:</label>
-        <input type="file" @change="onFileChange" id="playerPhoto" accept="image/*" class="input-file">
-      </div>
-      <div class="btnDiv" v-if="!cartoonPhoto">
-        <button :disabled="!isButtonActive" @click="uploadPhoto" type="button" class="btn-grad">Загрузить аватар</button>
-      </div>
-      <div class="btnDiv">
-        <button :disabled="!isButtonActive" type="submit" class="btn-grad">Создать и подключиться к комнате</button>
-      </div>
-    </form>
-    <div v-if="loading" class="loading">Загрузка...</div>
-    <div v-if="cartoonPhoto" class="preview">
-      <h3>Ваш аватар</h3>
-      <img :src="cartoonPhoto" alt="Мультяшная аватарка" class="photo-preview">
-      <button @click="removeAvatar" class="btn-grad">Изменить аватар</button>
+      <input type="file" ref="hiddenFileInput" @change="onFileChange" accept="image/*" capture="environment" style="display: none;">
     </div>
-    <input type="file" ref="hiddenFileInput" @change="onFileChange" accept="image/*" capture="environment" style="display: none;">
-  </div>
+  </GameLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
+import GameLayout from '../GameLayout.vue';
 
 const playerName = ref(localStorage.getItem('playerName') || '');
 const playerPhoto = ref(null);
@@ -45,38 +46,50 @@ if (!playerId.value || playerId.value === "undefined") {
   localStorage.setItem('LoseFriends_playerId', playerId.value);
 }
 
+const triggerFileInput = () => {
+  const inputElement = document.getElementById('playerPhoto');
+  if (inputElement) {
+    inputElement.click();
+  } else {
+    console.error('Element with id "playerPhoto" not found');
+  }
+};
+
+const url_serv = "https://lose-friends-b2c531fd41a8.herokuapp.com"
+// const url_serv = "http://localhost:8003"
+
+
+
 const isButtonActive = computed(() => playerName.value.trim().length > 0 && (playerPhoto.value || cartoonPhoto.value));
 
-const onFileChange = (e) => {
+const onFileChange = async (e) => {
   const file = e.target.files[0];
-  playerPhoto.value = file;
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    playerPhotoPreview.value = event.target.result;
-  };
-  reader.readAsDataURL(file);
+  if (file) {
+    playerPhoto.value = file;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      playerPhotoPreview.value = event.target.result;
+    };
+    reader.readAsDataURL(file);
+    await uploadPhoto();  // Запуск загрузки аватара автоматически после выбора файла
+  }
 };
 
 const uploadPhoto = async () => {
   loading.value = true;
   try {
     const formData = new FormData();
-    formData.append('image', playerPhoto.value);
-    // formData.append('text', 'portrait of a funny avatar');
-    formData.append('text', 'portrait of a very funny avatar anime');
+    formData.append('file', playerPhoto.value);
 
-    const resp = await fetch('https://api.deepai.org/api/image-editor', {
+    const resp = await fetch(`${url_serv}/generate_avatar/`, {
       method: 'POST',
-      headers: {
-        'api-key': 'a34c51f1-0d6e-4c27-a10e-28005f33620a'
-      },
       body: formData
     });
 
     const data = await resp.json();
-    if (data.output_url) {
-      cartoonPhoto.value = data.output_url;
-      localStorage.setItem('LoseFriends_cartoonPhoto', data.output_url);
+    if (data.url) {
+      cartoonPhoto.value = `${url_serv}${data.url}`;
+      localStorage.setItem('LoseFriends_cartoonPhoto', cartoonPhoto.value);
     } else {
       throw new Error('Invalid response from server');
     }
@@ -88,9 +101,13 @@ const uploadPhoto = async () => {
 };
 
 const createAndJoinRoom = async () => {
+  if (!cartoonPhoto.value && playerPhoto.value) {
+    await uploadPhoto(); // Загружаем аватар, если он еще не загружен
+  }
+
   localStorage.setItem('playerName', playerName.value);
 
-  const createResponse = await fetch('http://localhost:8003/create_room', {
+  const createResponse = await fetch(`${url_serv}/create_room`, {
     method: 'POST',
   });
   const { room_id } = await createResponse.json();
@@ -101,7 +118,7 @@ const createAndJoinRoom = async () => {
   formData.append('player_name', playerName.value);
   formData.append('player_photo', cartoonPhoto.value || playerPhoto.value);
 
-  const joinResponse = await fetch('http://localhost:8003/join_room', {
+  const joinResponse = await fetch(`${url_serv}/join_room`, {
     method: 'POST',
     body: formData
   });

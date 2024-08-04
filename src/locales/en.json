@@ -9,6 +9,10 @@
     "theme4": "Pink"
   },
   "games": {
+    "loseFriends": {
+      "name": "How lose friends",
+      "description": ""
+    },
     "battleSee": {
       "name": "Sea Battle",
       "description": ""

@@ -9,6 +9,10 @@
     "theme4": "Розовый"
   },
   "games": {
+    "loseFriends": {
+      "name": "как потерять друзей",
+      "description": ""
+    },
     "battleSee": {
       "name": "Морской Бой",
       "description": ""

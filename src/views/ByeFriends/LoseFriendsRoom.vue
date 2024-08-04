@@ -20,15 +20,12 @@
       </div>
       <div v-else-if="winner">
         <div class="winner" v-if="winner">
-          
-          <h2>{{ aaa }}</h2>
-
-          <h4 > {{ unanimous ? "Единогласно! это:" : "Конечно это:"}} <strong>{{ winner.player_name }}</strong> </h4>
-           
-          
-          
+           <div class="win_text card">
+            <h2>{{  bbb }}</h2>
+            <hr>
+            <h4>{{ unanimous ? "Единогласно! это:" : ""}} <div class="win_name">{{ winner.player_name }}</div></h4>
+          </div>
           <img :src="winner.player_photo" :alt="winner.player_name" class="winner-avatar">
-        
           <table v-if="!unanimous" class="votes-table">
             <thead>
               <tr>
@@ -83,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ShareButton from '@/components/ShareButton.vue';
 import GameLayout from '../GameLayout.vue';
@@ -105,14 +102,23 @@ const unanimous = ref(false);
 const tie = ref(false);
 const tiePlayers = ref([]);
 
-const aaa = ref(localStorage.getItem('lose_friend_cur_q') || "not have")
+
+
+
+
+
+const url_share = `https://fizi.cc/lose-friends/connect/${roomId.value}`;
+
+const storedQuestion = computed(() => localStorage.getItem('lose_friend_cur_q'));
+const aaa = computed(() => question.value || storedQuestion.value);
+const bbb = ref('')
 
 let ws;
 
-const url_share = `http://localhost:8080/lose-friends/connect/${roomId.value}`;
-
 const connectWebSocket = () => {
-  ws = new WebSocket(`ws://localhost:8003/ws/${roomId.value}/${playerId.value}`);
+  // ws = new WebSocket(`ws://localhost:8003/ws/${roomId.value}/${playerId.value}`);
+  ws = new WebSocket(`wss://lose-friends-b2c531fd41a8.herokuapp.com/ws/${roomId.value}/${playerId.value}`);
+
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log(data); // Логирование данных для отладки
@@ -121,7 +127,7 @@ const connectWebSocket = () => {
       winner.value = null;
       selectedPlayerId.value = null;
       showWinnerModal.value = false;
-      localStorage.setItem('lose_friend_cur_q', data.question);
+      localStorage.setItem('lose_friend_cur_q', question.value);
     }
     if (data.players) {
       players.value = data.players;
@@ -132,6 +138,8 @@ const connectWebSocket = () => {
       votesAll.value = data.votes_all;
       unanimous.value = data.unanimous;
       question.value = data.cur_question; // Обновление вопроса
+      tacke_q()
+
       selectedPlayerId.value = null;
       showWinnerModal.value = true;
     }
@@ -148,6 +156,13 @@ const connectWebSocket = () => {
     }
   };
 };
+
+const tacke_q = ()=>{
+  
+ bbb.value = localStorage.getItem('lose_friend_cur_q')
+
+ 
+}
 
 const vote = (votedPlayerId) => {
   if (!selectedPlayerId.value) {
@@ -166,6 +181,7 @@ onMounted(() => {
     router.push({ name: 'Home' });
   } else {
     connectWebSocket();
+    question.value = storedQuestion.value;
   }
 });
 </script>
@@ -225,6 +241,19 @@ onMounted(() => {
 .winner-avatar:hover {
   transform: scale(1.1);
 }
+
+
+.win_text {
+  font-size: larger;
+}
+
+.win_name {
+  border: 1px solid;
+  border-radius: 50%;
+  padding: 15px;
+  margin-top: 15px;
+}
+
 
 .card {
   background-color: #fff;
