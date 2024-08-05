@@ -122,7 +122,7 @@ const bbb = ref('')
 let ws;
 
 const connectWebSocket = () => {
-  ws = new WebSocket(${url_serv_lose_friends_wss}/ws/${roomId.value}/${playerId.value});
+  ws = new WebSocket(`${url_serv_lose_friends_wss}/ws/${roomId.value}/${playerId.value}`);
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
