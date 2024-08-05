@@ -126,8 +126,8 @@ const createAndJoinRoom = async () => {
     method: 'POST',
     body: formData
   });
-  const { player_id } = await joinResponse.json();
-  localStorage.setItem('LoseFriends_playerId', player_id);
+  
+  
 
   router.push({ name: 'LoseFriendsGameRoom', params: { roomId: room_id } });
 };

@@ -31,8 +31,7 @@ import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import GameLayout from '../GameLayout.vue';
-import {url_serv_lose_friends} from "@/link"
-
+import { url_serv_lose_friends } from "@/link"
 
 const playerName = ref(localStorage.getItem('playerName') || '');
 const playerPhoto = ref(null);
@@ -53,8 +52,7 @@ const triggerFileInput = () => {
   }
 };
 
-
-let playerId = ref(localStorage.getItem('LoseFriends_playerId') || '');
+let playerId = ref(localStorage.getItem('LoseFriends_playerId'));
 if (!playerId.value || playerId.value === "undefined") {
   playerId.value = uuidv4();
   localStorage.setItem('LoseFriends_playerId', playerId.value);
@@ -69,32 +67,32 @@ const onFileChange = async (e) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       playerPhotoPreview.value = event.target.result;
-      console.log('File selected:', playerPhotoPreview.value); 
+      console.log('File selected:', playerPhotoPreview.value);
     };
     reader.readAsDataURL(file);
-    await uploadPhoto();  
+    await uploadPhoto();
   }
 };
 
 const uploadPhoto = async () => {
   loading.value = true;
-  console.log('Uploading photo...'); 
+  console.log('Uploading photo...');
   try {
     const formData = new FormData();
     formData.append('file', playerPhoto.value);
 
-    console.log('FormData prepared:'); 
+    console.log('FormData prepared:');
     formData.forEach((value, key) => {
-      console.log(key, value); 
+      console.log(key, value);
     });
 
-    const resp = await fetch(`${url_serv_lose_friends}/generate_avatar/`, {  
+    const resp = await fetch(`${url_serv_lose_friends}/generate_avatar/`, {
       method: 'POST',
       body: formData
     });
 
     const data = await resp.json();
-    console.log('Response from server:', data); 
+    console.log('Response from server:', data);
     if (data.url) {
       cartoonPhoto.value = `${url_serv_lose_friends}${data.url}`;
       localStorage.setItem('LoseFriends_cartoonPhoto', cartoonPhoto.value);
@@ -114,23 +112,26 @@ const removeAvatar = () => {
 };
 
 const joinGame = async () => {
+  console.log('Joining game...');
   localStorage.setItem('playerName', playerName.value);
 
   const formData = new URLSearchParams();
   formData.append('room_id', roomId.value);
-  formData.append('player_id', playerId.value); 
+  formData.append('player_id', playerId.value);
   formData.append('player_name', playerName.value);
   formData.append('player_photo', cartoonPhoto.value);
 
-  const joinResponse = await fetch(`${url_serv_lose_friends}/join_room`, {  
+  console.log('FormData:', formData.toString());
+
+  const joinResponse = await fetch(`${url_serv_lose_friends}/join_room`, {
     method: 'POST',
     body: formData
   });
 
-  if (!joinResponse.ok) {
-    console.error('Error joining room:', await joinResponse.text());
-    return;
-  }
+  const responseData = await joinResponse.json();
+  console.log('Join response:', responseData);
+
+  
 
   router.push({ name: 'LoseFriendsGameRoom', params: { roomId: roomId.value } });
 };

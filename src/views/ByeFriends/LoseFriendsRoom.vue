@@ -93,16 +93,14 @@ import ShareButton from '@/components/ShareButton.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import GameLayout from '../GameLayout.vue';
 
-import {url_serv_lose_friends_share, url_serv_lose_friends_wss} from "@/link"
+import { url_serv_lose_friends_share, url_serv_lose_friends_wss, url_serv_lose_friends } from "@/link"
 
 const route = useRoute();
 const router = useRouter();
 const roomId = ref(route.params.roomId || localStorage.getItem('LoseFriends_roomId'));
 let playerId = ref(localStorage.getItem('LoseFriends_playerId'));
 let playerName = ref(localStorage.getItem('playerName'));
-let storedScore = localStorage.getItem('LoseFriends_score') || 0;
-if (storedScore === "") storedScore = 0; // Проверка на пустое значение
-storedScore = parseInt(storedScore);
+let playerScore = ref(parseInt(localStorage.getItem('LoseFriends_score') || '0'));
 
 const question = ref(null);
 const players = ref([]);
@@ -128,7 +126,7 @@ const connectWebSocket = () => {
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log(data); // Логирование данных для отладки
+    console.log('Received data:', data); // Логирование данных для отладки
 
     if (data.players) {
       players.value = data.players;
@@ -143,7 +141,7 @@ const connectWebSocket = () => {
       selectedPlayerId.value = null;
       showWinnerModal.value = false;
     }
-    
+
     if (data.question && players.value.length >= 3) {
       question.value = data.question;
       winner.value = null;
@@ -156,10 +154,10 @@ const connectWebSocket = () => {
       winner.value = data.winner;
       votes.value = data.votes;
       votesAll.value = data.votes_all;
-      console.log(votesAll.value)
+      console.log('Votes all:', votesAll.value);
       unanimous.value = data.unanimous;
       question.value = data.cur_question; // Обновление вопроса
-      tacke_q()
+      tacke_q();
 
       selectedPlayerId.value = null;
       showWinnerModal.value = true;
@@ -208,6 +206,34 @@ const nextRound = () => {
   ws.send(JSON.stringify({ action: 'next_round' }));
 };
 
+const createAndJoinRoom = async () => {
+  console.log('Player ID:', playerId.value);
+  console.log('Room ID:', roomId.value);
+  console.log('Player Score:', playerScore.value);
+
+  const formData = new URLSearchParams();
+  formData.append('room_id', roomId.value);
+  formData.append('player_id', playerId.value);
+  formData.append('player_name', playerName.value);
+  formData.append('player_photo', localStorage.getItem('LoseFriends_cartoonPhoto'));
+  formData.append('player_score', playerScore.value.toString());
+
+  const joinResponse = await fetch(`${url_serv_lose_friends}/join_room`, {
+    method: 'POST',
+    body: formData
+  });
+
+  const responseData = await joinResponse.json();
+  console.log('Join response:', responseData);
+
+  if (!joinResponse.ok) {
+    console.error('Error joining room:', responseData);
+    return;
+  }
+
+  router.push({ name: 'LoseFriendsGameRoom', params: { roomId: roomId.value } });
+};
+
 onMounted(() => {
   if (!playerId.value || playerId.value === "undefined" || playerId.value === null || playerId.value.trim() === "" ||
       !roomId.value || roomId.value === "undefined" || roomId.value === null || roomId.value.trim() === "") {
@@ -215,33 +241,14 @@ onMounted(() => {
       console.error('Redirect error:', err);
     });
   } else {
+    createAndJoinRoom();
     connectWebSocket();
     question.value = storedQuestion.value;
-
-    // Обновление информации об игроке при повторном подключении
-    const joinRoom = async () => {
-      const formData = new URLSearchParams();
-      formData.append('room_id', roomId.value);
-      formData.append('player_id', playerId.value);
-      formData.append('player_name', playerName.value);
-      formData.append('player_photo', localStorage.getItem('LoseFriends_cartoonPhoto') || '');
-      formData.append('score', storedScore);
-
-      const joinResponse = await fetch(`${url_serv_lose_friends_share}/join_room`, {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!joinResponse.ok) {
-        console.error('Error joining room:', await joinResponse.text());
-        return;
-      }
-    };
-
-    joinRoom();
   }
 });
 </script>
+
+
 
 <style>
 .game-room {
