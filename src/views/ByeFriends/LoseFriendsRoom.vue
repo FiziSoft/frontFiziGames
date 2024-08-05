@@ -180,8 +180,7 @@ const askQuestion = () => {
   }
 };
 
-
-const tacke_q = ()=>{
+const tacke_q = () => {
   bbb.value = localStorage.getItem('lose_friend_cur_q')
 }
 
@@ -309,11 +308,15 @@ onMounted(() => {
   border-collapse: collapse;
 }
 
-.votes-table th,
+
 .votes-table td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: center;
+  
+}
+
+.votes-table th {
   color: #000 !important;
 }
 
