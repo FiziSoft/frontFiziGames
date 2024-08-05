@@ -93,7 +93,7 @@ import ShareButton from '@/components/ShareButton.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import GameLayout from '../GameLayout.vue';
 
-import {url_serv_lose_friends_share, url_serv_lose_friends_wss} from "@/link"
+import {url_serv_lose_friends_share, url_serv_lose_friends_wss, url_serv_lose_friends} from "@/link"
 
 const route = useRoute();
 const router = useRouter();
@@ -101,6 +101,7 @@ const roomId = ref(route.params.roomId || localStorage.getItem('LoseFriends_room
 let playerId = ref(localStorage.getItem('LoseFriends_playerId'));
 let playerName = ref(localStorage.getItem('playerName'));
 let playerScore = ref(parseInt(localStorage.getItem('LoseFriends_score') || '0'));
+const cartoonPhoto = ref(localStorage.getItem('LoseFriends_cartoonPhoto') || null);
 
 const question = ref(null);
 const players = ref([]);
@@ -213,16 +214,35 @@ const nextRound = () => {
 };
 
 onMounted(() => {
+  const storedScore = localStorage.getItem('LoseFriends_score');
+  const playerScore = storedScore ? parseInt(storedScore, 10) : 0;
+  
   if (!playerId.value || playerId.value === "undefined" || playerId.value === null || playerId.value.trim() === "" ||
       !roomId.value || roomId.value === "undefined" || roomId.value === null || roomId.value.trim() === "") {
     router.push({ name: 'Home' }).catch(err => {
       console.error('Redirect error:', err);
     });
   } else {
-    connectWebSocket();
-    question.value = storedQuestion.value;
+    // Добавляем проверку на существование игрока в комнате
+    fetch(`${url_serv_lose_friends}/join_room`, {
+      method: 'POST',
+      body: new URLSearchParams({
+        'room_id': roomId.value,
+        'player_id': playerId.value,
+        'player_name': playerName.value,
+        'player_photo': cartoonPhoto.value || '',
+        'player_score': playerScore.toString()
+      })
+    }).then(response => response.json())
+      .then(data => {
+        connectWebSocket();
+        question.value = storedQuestion.value;
+      }).catch(err => {
+        console.error('Error joining room:', err);
+      });
   }
 });
+
 </script>
 
 <style>
