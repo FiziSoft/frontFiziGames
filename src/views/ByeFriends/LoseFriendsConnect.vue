@@ -37,7 +37,6 @@ const playerName = ref(localStorage.getItem('playerName') || '');
 const playerPhoto = ref(null);
 const playerPhotoPreview = ref(null);
 const cartoonPhoto = ref(localStorage.getItem('LoseFriends_cartoonPhoto') || null);
-const playerScore = ref(parseInt(localStorage.getItem('LoseFriends_score')) || 0);
 const loading = ref(false);
 const hiddenFileInput = ref(null);
 const route = useRoute();
@@ -58,6 +57,8 @@ if (!playerId.value || playerId.value === "undefined") {
   playerId.value = uuidv4();
   localStorage.setItem('LoseFriends_playerId', playerId.value);
 }
+
+let playerScore = ref(parseInt(localStorage.getItem('LoseFriends_score') || '0'));
 
 const isButtonActive = computed(() => playerName.value.trim().length > 0 && (playerPhoto.value || cartoonPhoto.value));
 
@@ -121,7 +122,7 @@ const joinGame = async () => {
   formData.append('player_id', playerId.value); 
   formData.append('player_name', playerName.value);
   formData.append('player_photo', cartoonPhoto.value);
-  formData.append('player_score', playerScore.value.toString());
+  formData.append('player_score', playerScore.value);
 
   const joinResponse = await fetch(`${url_serv_lose_friends}/join_room`, {  
     method: 'POST',
