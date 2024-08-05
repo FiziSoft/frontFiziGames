@@ -59,7 +59,7 @@
           >
             <img :src="player.player_photo" :alt="player.player_name" class="player-avatar">
             <p>{{ player.player_name }}</p>
-            
+
             <div class="score">
               <p>{{ player.score }}</p>
             </div>
@@ -113,7 +113,7 @@ const unanimous = ref(false);
 const tie = ref(false);
 const tiePlayers = ref([]);
 
-const url_share = ${url_serv_lose_friends_share}/lose-friends/connect/${roomId.value};
+const url_share = `${url_serv_lose_friends_share}/lose-friends/connect/${roomId.value}`;
 
 const storedQuestion = computed(() => localStorage.getItem('LoseFriends_cur_q'));
 const aaa = computed(() => question.value || storedQuestion.value);
