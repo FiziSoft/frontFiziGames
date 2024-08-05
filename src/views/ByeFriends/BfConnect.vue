@@ -41,6 +41,11 @@ const hiddenFileInput = ref(null);
 const router = useRouter();
 
 const playerId = ref(localStorage.getItem('LoseFriends_playerId'));
+
+import {url_serv_lose_friends} from "@/link"
+
+
+
 if (!playerId.value || playerId.value === "undefined") {
   playerId.value = uuidv4();
   localStorage.setItem('LoseFriends_playerId', playerId.value);
@@ -55,8 +60,7 @@ const triggerFileInput = () => {
   }
 };
 
-const url_serv = "https://lose-friends-b2c531fd41a8.herokuapp.com"
-// const url_serv = "http://localhost:8003"
+
 
 
 
@@ -81,14 +85,14 @@ const uploadPhoto = async () => {
     const formData = new FormData();
     formData.append('file', playerPhoto.value);
 
-    const resp = await fetch(`${url_serv}/generate_avatar/`, {
+    const resp = await fetch(`${url_serv_lose_friends}/generate_avatar/`, {
       method: 'POST',
       body: formData
     });
 
     const data = await resp.json();
     if (data.url) {
-      cartoonPhoto.value = `${url_serv}${data.url}`;
+      cartoonPhoto.value = `${url_serv_lose_friends}${data.url}`;
       localStorage.setItem('LoseFriends_cartoonPhoto', cartoonPhoto.value);
     } else {
       throw new Error('Invalid response from server');
@@ -107,7 +111,7 @@ const createAndJoinRoom = async () => {
 
   localStorage.setItem('playerName', playerName.value);
 
-  const createResponse = await fetch(`${url_serv}/create_room`, {
+  const createResponse = await fetch(`${url_serv_lose_friends}/create_room`, {
     method: 'POST',
   });
   const { room_id } = await createResponse.json();
@@ -118,7 +122,7 @@ const createAndJoinRoom = async () => {
   formData.append('player_name', playerName.value);
   formData.append('player_photo', cartoonPhoto.value || playerPhoto.value);
 
-  const joinResponse = await fetch(`${url_serv}/join_room`, {
+  const joinResponse = await fetch(`${url_serv_lose_friends}/join_room`, {
     method: 'POST',
     body: formData
   });

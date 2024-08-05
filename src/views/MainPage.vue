@@ -14,7 +14,7 @@
     <br>
     <div>{{ $t('best_online_games') }}</div>
     <div class="name_game" v-for="game in games" :key="game.key">
-      <a :href="`${network_url}${game.url}?locale=${currentLocale}`">
+      <a :href="`${url_main_page}${game.url}?locale=${currentLocale}`">
         <h1>
           <i :class="game.icon"></i>
           <div class="game-name">{{ $t(`games.${game.key}.name`) }}</div>
@@ -34,9 +34,8 @@ import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ModalMain from '@/components/ModalMain.vue';
 
-// const network_url = 'https://fizigames-799b6804c93a.herokuapp.com';
-// const network_url = 'http://localhost:8080';
-const network_url = 'https://fizi.cc';
+import {url_main_page} from "@/link"
+
 
 
 const games = ref([

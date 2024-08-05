@@ -14,12 +14,14 @@
           >
             <img :src="player.player_photo" :alt="player.player_name" class="player-avatar">
             <p>{{ player.player_name }}</p>
-            <p>Очки: {{ player.score }}</p>
+            <div class="score">
+              <p>{{ player.score }}</p>
+            </div>
           </div>
         </div>
       </div>
       <div v-else-if="winner">
-        <div class="winner" v-if="winner">
+        <div class="winner formCreate" v-if="winner">
           <div class="win_text card">
             <span>{{ bbb }}</span>
             <hr>
@@ -44,7 +46,7 @@
         <button v-if="winner && winner.player_id === playerId" @click="nextRound" class="btn-grad">Продолжить</button>
       </div>
       <div v-else-if="tie">
-        <h2>Голосование продолжается</h2>
+        <h2>Переголосовоние между:</h2>
         <div class="card">
           <span>{{ question }}</span>
         </div>
@@ -57,7 +59,9 @@
           >
             <img :src="player.player_photo" :alt="player.player_name" class="player-avatar">
             <p>{{ player.player_name }}</p>
-            <p>Очки: {{ player.score }}</p>
+            <div class="score">
+              <p>{{ player.score }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -68,7 +72,9 @@
           <div v-for="player in players" :key="player.player_id" class="player">
             <img :src="player.player_photo" :alt="player.player_name" class="player-avatar">
             <p>{{ player.player_name }}</p>
-            <p>Очки: {{ player.score }}</p>
+            <div class="score">
+              <p>{{ player.score }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -87,10 +93,12 @@ import ShareButton from '@/components/ShareButton.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import GameLayout from '../GameLayout.vue';
 
+import {url_serv_lose_friends_share, url_serv_lose_friends_wss} from "@/link"
+
 const route = useRoute();
 const router = useRouter();
-const roomId = ref(route.params.roomId || localStorage.getItem('lose_friends_roomId'));
-let playerId = ref(localStorage.getItem('lose_friends_playerId'));
+const roomId = ref(route.params.roomId || localStorage.getItem('LoseFriends_roomId'));
+let playerId = ref(localStorage.getItem('LoseFriends_playerId'));
 let playerName = ref(localStorage.getItem('playerName'));
 
 const question = ref(null);
@@ -104,16 +112,16 @@ const unanimous = ref(false);
 const tie = ref(false);
 const tiePlayers = ref([]);
 
-const url_share = `https://fizi.cc/lose-friends/connect/${roomId.value}`;
+const url_share = `${url_serv_lose_friends_share}/lose-friends/connect/${roomId.value}`;
 
-const storedQuestion = computed(() => localStorage.getItem('lose_friend_cur_q'));
+const storedQuestion = computed(() => localStorage.getItem('LoseFriends_cur_q'));
 const aaa = computed(() => question.value || storedQuestion.value);
 const bbb = ref('')
 
 let ws;
 
 const connectWebSocket = () => {
-  ws = new WebSocket(`wss://lose-friends-b2c531fd41a8.herokuapp.com/ws/${roomId.value}/${playerId.value}`);
+  ws = new WebSocket(`${url_serv_lose_friends_wss}/ws/${roomId.value}/${playerId.value}`);
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
@@ -138,13 +146,14 @@ const connectWebSocket = () => {
       winner.value = null;
       selectedPlayerId.value = null;
       showWinnerModal.value = false;
-      localStorage.setItem('lose_friend_cur_q', question.value);
+      localStorage.setItem('LoseFriends_cur_q', question.value);
     }
 
     if (data.winner) {
       winner.value = data.winner;
       votes.value = data.votes;
       votesAll.value = data.votes_all;
+      console.log(votesAll.value)
       unanimous.value = data.unanimous;
       question.value = data.cur_question; // Обновление вопроса
       tacke_q()
@@ -181,7 +190,7 @@ const askQuestion = () => {
 };
 
 const tacke_q = () => {
-  bbb.value = localStorage.getItem('lose_friend_cur_q');
+  bbb.value = localStorage.getItem('LoseFriends_cur_q');
 };
 
 const vote = (votedPlayerId) => {
@@ -197,8 +206,11 @@ const nextRound = () => {
 };
 
 onMounted(() => {
-  if (!playerId.value || playerId.value === "undefined" || !roomId.value) {
-    router.push({ name: 'Home' });
+  if (!playerId.value || playerId.value === "undefined" || playerId.value === null || playerId.value.trim() === "" ||
+      !roomId.value || roomId.value === "undefined" || roomId.value === null || roomId.value.trim() === "") {
+    router.push({ name: 'Home' }).catch(err => {
+      console.error('Redirect error:', err);
+    });
   } else {
     connectWebSocket();
     question.value = storedQuestion.value;
@@ -273,6 +285,16 @@ onMounted(() => {
   margin-top: 15px;
 }
 
+.score {
+  border: 1px solid;
+  border-radius: 50%;
+  padding: 5px;
+  margin-top: 5px;
+  width: 37px;
+  height: auto;
+  text-align: center;
+}
+
 .card {
   background-color: #fff;
   border: 1px solid #ddd;
@@ -316,6 +338,7 @@ onMounted(() => {
 
 .votes-table th {
   color: #000 !important;
+  text-align: center;
 }
 
 .votes-table th {
