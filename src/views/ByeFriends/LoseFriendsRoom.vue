@@ -180,9 +180,10 @@ const askQuestion = () => {
   }
 };
 
-const tacke_q = () => {
-  bbb.value = localStorage.getItem('lose_friend_cur_q');
-};
+
+const tacke_q = ()=>{
+  bbb.value = localStorage.getItem('lose_friend_cur_q')
+}
 
 const vote = (votedPlayerId) => {
   if (!selectedPlayerId.value) {
@@ -308,10 +309,12 @@ onMounted(() => {
   border-collapse: collapse;
 }
 
+
 .votes-table td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: center;
+  
 }
 
 .votes-table th {
