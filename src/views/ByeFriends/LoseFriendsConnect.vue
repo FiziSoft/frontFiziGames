@@ -8,7 +8,7 @@
         </div>
         <div class="formElement">
           <label class="btn-gradient-1" for="playerPhoto">Аватарка</label>
-          <input type="file" @change="onFileChange" id="playerPhoto" accept="image/*" class="input-file photoUp">
+          <input type="file" @change="onFileChange" id="playerPhoto" accept="image/*" capture="environment" class="input-file photoUp">
           <div class="input-gradient" @click="triggerFileInput">Сделать фото</div>
         </div>
         <div class="btnDiv">
@@ -31,8 +31,7 @@ import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import GameLayout from '../GameLayout.vue';
-import {url_serv_lose_friends} from "@/link"
-
+import { url_serv_lose_friends } from "@/link"
 
 const playerName = ref(localStorage.getItem('playerName') || '');
 const playerPhoto = ref(null);
@@ -45,14 +44,8 @@ const router = useRouter();
 const roomId = ref(route.params.roomId);
 
 const triggerFileInput = () => {
-  const inputElement = document.getElementById('playerPhoto');
-  if (inputElement) {
-    inputElement.click();
-  } else {
-    console.error('Element with id "playerPhoto" not found');
-  }
+  hiddenFileInput.value.click();
 };
-
 
 let playerId = ref(localStorage.getItem('LoseFriends_playerId') || '');
 if (!playerId.value || playerId.value === "undefined") {

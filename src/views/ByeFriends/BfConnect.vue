@@ -8,7 +8,7 @@
         </div>
         <div class="formElement">
           <label class="btn-gradient-1" for="playerPhoto">Аватарка</label>
-          <input type="file" @change="onFileChange" id="playerPhoto" accept="image/*" class="input-file photoUp">
+          <input type="file" @change="onFileChange" id="playerPhoto" accept="image/*" capture="environment" class="input-file photoUp">
           <div class="input-gradient" @click="triggerFileInput">Сделать фото</div>
         </div>
         <div class="btnDiv">
