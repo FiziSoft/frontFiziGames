@@ -59,7 +59,6 @@
           >
             <img :src="player.player_photo" :alt="player.player_name" class="player-avatar">
             <p>{{ player.player_name }}</p>
-
             <div class="score">
               <p>{{ player.score }}</p>
             </div>
