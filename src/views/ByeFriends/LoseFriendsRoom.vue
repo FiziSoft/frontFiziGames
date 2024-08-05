@@ -112,7 +112,7 @@ const unanimous = ref(false);
 const tie = ref(false);
 const tiePlayers = ref([]);
 
-const url_share = `${url_serv_lose_friends_share}/lose-friends/connect/${roomId.value}`;
+const url_share = ${url_serv_lose_friends_share}/lose-friends/connect/${roomId.value};
 
 const storedQuestion = computed(() => localStorage.getItem('LoseFriends_cur_q'));
 const aaa = computed(() => question.value || storedQuestion.value);
@@ -121,7 +121,7 @@ const bbb = ref('')
 let ws;
 
 const connectWebSocket = () => {
-  ws = new WebSocket(`${url_serv_lose_friends_wss}/ws/${roomId.value}/${playerId.value}`);
+  ws = new WebSocket(${url_serv_lose_friends_wss}/ws/${roomId.value}/${playerId.value});
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
