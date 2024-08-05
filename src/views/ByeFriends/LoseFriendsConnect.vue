@@ -8,7 +8,7 @@
         </div>
         <div class="formElement">
           <label class="btn-gradient-1" for="playerPhoto">Аватарка</label>
-          <input type="file" @change="onFileChange" id="playerPhoto" accept="image/*" capture="environment" class="input-file photoUp">
+          <input type="file" @change="onFileChange" id="playerPhoto" accept="image/*" class="input-file photoUp">
           <div class="input-gradient" @click="triggerFileInput">Сделать фото</div>
         </div>
         <div class="btnDiv">
@@ -37,6 +37,7 @@ const playerName = ref(localStorage.getItem('playerName') || '');
 const playerPhoto = ref(null);
 const playerPhotoPreview = ref(null);
 const cartoonPhoto = ref(localStorage.getItem('LoseFriends_cartoonPhoto') || null);
+const playerScore = ref(parseInt(localStorage.getItem('LoseFriends_score')) || 0);
 const loading = ref(false);
 const hiddenFileInput = ref(null);
 const route = useRoute();
@@ -44,7 +45,12 @@ const router = useRouter();
 const roomId = ref(route.params.roomId);
 
 const triggerFileInput = () => {
-  hiddenFileInput.value.click();
+  const inputElement = document.getElementById('playerPhoto');
+  if (inputElement) {
+    inputElement.click();
+  } else {
+    console.error('Element with id "playerPhoto" not found');
+  }
 };
 
 let playerId = ref(localStorage.getItem('LoseFriends_playerId') || '');
@@ -108,12 +114,14 @@ const removeAvatar = () => {
 
 const joinGame = async () => {
   localStorage.setItem('playerName', playerName.value);
+  localStorage.setItem('LoseFriends_score', playerScore.value);
 
   const formData = new URLSearchParams();
   formData.append('room_id', roomId.value);
   formData.append('player_id', playerId.value); 
   formData.append('player_name', playerName.value);
   formData.append('player_photo', cartoonPhoto.value);
+  formData.append('player_score', playerScore.value.toString());
 
   const joinResponse = await fetch(`${url_serv_lose_friends}/join_room`, {  
     method: 'POST',
