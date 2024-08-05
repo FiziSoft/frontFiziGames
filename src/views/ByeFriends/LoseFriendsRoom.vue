@@ -93,15 +93,16 @@ import ShareButton from '@/components/ShareButton.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import GameLayout from '../GameLayout.vue';
 
-import {url_serv_lose_friends_share, url_serv_lose_friends_wss, url_serv_lose_friends} from "@/link"
+import {url_serv_lose_friends_share, url_serv_lose_friends_wss} from "@/link"
 
 const route = useRoute();
 const router = useRouter();
 const roomId = ref(route.params.roomId || localStorage.getItem('LoseFriends_roomId'));
 let playerId = ref(localStorage.getItem('LoseFriends_playerId'));
 let playerName = ref(localStorage.getItem('playerName'));
-let playerScore = ref(parseInt(localStorage.getItem('LoseFriends_score') || '0'));
-const cartoonPhoto = ref(localStorage.getItem('LoseFriends_cartoonPhoto') || null);
+let storedScore = localStorage.getItem('LoseFriends_score') || 0;
+if (storedScore === "") storedScore = 0; // Проверка на пустое значение
+storedScore = parseInt(storedScore);
 
 const question = ref(null);
 const players = ref([]);
@@ -162,12 +163,6 @@ const connectWebSocket = () => {
 
       selectedPlayerId.value = null;
       showWinnerModal.value = true;
-
-      // Сохранение очков победителя
-      if (winner.value.player_id === playerId.value) {
-        playerScore.value = winner.value.score;
-        localStorage.setItem('LoseFriends_score', playerScore.value);
-      }
     }
 
     if (data.tie) {
@@ -214,35 +209,38 @@ const nextRound = () => {
 };
 
 onMounted(() => {
-  const storedScore = localStorage.getItem('LoseFriends_score');
-  const playerScore = storedScore ? parseInt(storedScore, 10) : 0;
-  
   if (!playerId.value || playerId.value === "undefined" || playerId.value === null || playerId.value.trim() === "" ||
       !roomId.value || roomId.value === "undefined" || roomId.value === null || roomId.value.trim() === "") {
     router.push({ name: 'Home' }).catch(err => {
       console.error('Redirect error:', err);
     });
   } else {
-    // Добавляем проверку на существование игрока в комнате
-    fetch(`${url_serv_lose_friends}/join_room`, {
-      method: 'POST',
-      body: new URLSearchParams({
-        'room_id': roomId.value,
-        'player_id': playerId.value,
-        'player_name': playerName.value,
-        'player_photo': cartoonPhoto.value || '',
-        'player_score': playerScore.toString()
-      })
-    }).then(response => response.json())
-      .then(data => {
-        connectWebSocket();
-        question.value = storedQuestion.value;
-      }).catch(err => {
-        console.error('Error joining room:', err);
+    connectWebSocket();
+    question.value = storedQuestion.value;
+
+    // Обновление информации об игроке при повторном подключении
+    const joinRoom = async () => {
+      const formData = new URLSearchParams();
+      formData.append('room_id', roomId.value);
+      formData.append('player_id', playerId.value);
+      formData.append('player_name', playerName.value);
+      formData.append('player_photo', localStorage.getItem('LoseFriends_cartoonPhoto') || '');
+      formData.append('score', storedScore);
+
+      const joinResponse = await fetch(`${url_serv_lose_friends_share}/join_room`, {
+        method: 'POST',
+        body: formData
       });
+
+      if (!joinResponse.ok) {
+        console.error('Error joining room:', await joinResponse.text());
+        return;
+      }
+    };
+
+    joinRoom();
   }
 });
-
 </script>
 
 <style>
