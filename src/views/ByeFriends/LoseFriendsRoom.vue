@@ -89,8 +89,8 @@ import GameLayout from '../GameLayout.vue';
 
 const route = useRoute();
 const router = useRouter();
-const roomId = ref(route.params.roomId);
-let playerId = ref(localStorage.getItem('LoseFriends_playerId'));
+const roomId = ref(route.params.roomId || localStorage.getItem('lose_friends_roomId'));
+let playerId = ref(localStorage.getItem('lose_friends_playerId'));
 let playerName = ref(localStorage.getItem('playerName'));
 
 const question = ref(null);
@@ -197,7 +197,7 @@ const nextRound = () => {
 };
 
 onMounted(() => {
-  if (!playerId.value || playerId.value === "undefined") {
+  if (!playerId.value || playerId.value === "undefined" || !roomId.value) {
     router.push({ name: 'Home' });
   } else {
     connectWebSocket();
