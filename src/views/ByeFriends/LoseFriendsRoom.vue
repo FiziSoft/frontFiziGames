@@ -100,6 +100,7 @@ const router = useRouter();
 const roomId = ref(route.params.roomId || localStorage.getItem('LoseFriends_roomId'));
 let playerId = ref(localStorage.getItem('LoseFriends_playerId'));
 let playerName = ref(localStorage.getItem('playerName'));
+let playerScore = ref(parseInt(localStorage.getItem('LoseFriends_score') || '0'));
 
 const question = ref(null);
 const players = ref([]);
@@ -160,6 +161,12 @@ const connectWebSocket = () => {
 
       selectedPlayerId.value = null;
       showWinnerModal.value = true;
+
+      // Сохранение очков победителя
+      if (winner.value.player_id === playerId.value) {
+        playerScore.value = winner.value.score;
+        localStorage.setItem('LoseFriends_score', playerScore.value);
+      }
     }
 
     if (data.tie) {
