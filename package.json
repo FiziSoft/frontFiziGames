@@ -20,6 +20,7 @@
     "materialize-css": "^1.0.0-rc.2",
     "postcss": "^8",
     "qrcode.vue": "^3.4.1",
+    "reconnecting-websocket": "^4.4.0",
     "sass": "^1.77.1",
     "share-button-links-react": "^2.3.0",
     "socket.io-client": "^4.7.5",

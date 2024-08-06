@@ -1,7 +1,7 @@
 <template>
     <div class="mainContainer">
       <div class="mainHeader">
-        <div>{{ nameGame }}</div>
+        <div class="game_name">{{ nameGame }}</div>
       </div>
       <div class="mainBody">
         <slot></slot>
@@ -43,5 +43,17 @@
     margin: 10px
     width: 100%
     flex: 1
+
+  
+@media (max-width: 768px)
+  .game_name 
+    font-size: 1.5em
+    
+
+  
+@media (max-width: 480px)
+.game_name 
+    font-size: 1em
+    
   </style>
   

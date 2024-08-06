@@ -51,6 +51,7 @@
           <span>{{ question }}</span>
         </div>
         <h2>Переголосовоние между:</h2>
+        <br>
         <div class="players-container">
           <div
             v-for="player in tiePlayers"
@@ -122,9 +123,17 @@ const bbb = ref('');
 
 let ws;
 
-const connectWebSocket = () => {
-  ws = new WebSocket(`${url_serv_lose_friends_wss}/ws/${roomId.value}/${playerId.value}`);
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
+
+
+
+const connectWebSocket = () => {
+  const wsUrl = `${url_serv_lose_friends_wss}/ws/${roomId.value}/${playerId.value}`;
+  ws = new ReconnectingWebSocket(wsUrl, [], {
+    maxRetries: 10, // Максимальное количество попыток переподключения
+    minReconnectionDelay: 1000, // Минимальная задержка перед переподключением (1 секунда)
+  });
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log('Received data:', data); // Логирование данных для отладки
