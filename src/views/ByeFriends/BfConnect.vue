@@ -2,12 +2,9 @@
   <GameLayout name-game="Як втратити друзів">
     <div class="containerFormCreate">
       <form class="formCreate" @submit.prevent="createAndJoinRoom">
-        <div class="formElement">
-          <label class="btn-gradient-1" for="playerName">Ваше ім'я:</label>
-          <input v-model="playerName" type="text" id="playerName" class="input-gradient">
-        </div>
+     
         <div class="btnDiv">
-          <button :disabled="!isButtonActive" type="submit" class="btn-grad">Создать комнату</button>
+          <button  type="submit" class="btn-grad">Создать комнату</button>
         </div>
       </form>
     </div>
