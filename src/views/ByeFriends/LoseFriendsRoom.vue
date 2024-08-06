@@ -122,10 +122,14 @@ const aaa = computed(() => question.value || storedQuestion.value);
 const bbb = ref('');
 
 let ws;
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 const connectWebSocket = () => {
-  ws = new WebSocket(`${url_serv_lose_friends_wss}/ws/${roomId.value}/${playerId.value}`);
-
+  const wsUrl = `${url_serv_lose_friends_wss}/ws/${roomId.value}/${playerId.value}`;
+  ws = new ReconnectingWebSocket(wsUrl, [], {
+    maxRetries: 10, // Максимальное количество попыток переподключения
+    minReconnectionDelay: 1000, // Минимальная задержка перед переподключением (1 секунда)
+  });
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log('Received data:', data); // Логирование данных для отладки
