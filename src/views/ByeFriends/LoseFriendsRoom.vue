@@ -94,8 +94,7 @@ import { useRoute, useRouter } from 'vue-router';
 import ShareButton from '@/components/ShareButton.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import GameLayout from '../GameLayout.vue';
-
-import { url_serv_lose_friends_share, url_serv_lose_friends_wss, url_serv_lose_friends } from "@/link"
+import { url_serv_lose_friends_share, url_serv_lose_friends_wss, url_serv_lose_friends } from "@/link";
 
 const route = useRoute();
 const router = useRouter();
@@ -125,8 +124,23 @@ let ws;
 
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
+const fetchRoomData = async () => {
+  const response = await fetch(`${url_serv_lose_friends}/room_data/${roomId.value}`);
+  if (!response.ok) {
+    console.error('Error fetching room data:', await response.json());
+    return;
+  }
 
+  const data = await response.json();
+  players.value = data.players;
+  question.value = data.current_question;
+  votes.value = data.votes;
+  tiePlayers.value = data.tie_players;
 
+  if (players.value.length >= 3 && !question.value) {
+    askQuestion();
+  }
+};
 
 const connectWebSocket = () => {
   const wsUrl = `${url_serv_lose_friends_wss}/ws/${roomId.value}/${playerId.value}`;
@@ -134,7 +148,7 @@ const connectWebSocket = () => {
     maxRetries: 10, // Максимальное количество попыток переподключения
     minReconnectionDelay: 1000, // Минимальная задержка перед переподключением (1 секунда)
   });
-  
+
   ws.onopen = () => {
     console.log("WebSocket connection established");
   };
@@ -142,11 +156,6 @@ const connectWebSocket = () => {
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log('Received data:', data); // Логирование данных для отладки
-
-    if (data.type === "ping") {
-      console.log("Received ping from server");
-      return;
-    }
 
     if (data.players) {
       players.value = data.players;
@@ -205,8 +214,6 @@ const connectWebSocket = () => {
     }, 1000);
   };
 };
-
-
 
 const askQuestion = () => {
   if (players.value.length >= 3) {
@@ -299,6 +306,7 @@ const joinExistingRoom = async () => {
   localStorage.setItem('LoseFriends_roomId', roomId.value); // Сохраняем текущий roomId
   connectWebSocket();
   question.value = storedQuestion.value;
+  fetchRoomData(); // Получаем актуальные данные комнаты
 };
 
 onMounted(() => {
@@ -309,8 +317,10 @@ onMounted(() => {
     });
   } else {
     joinExistingRoom();
+    setInterval(fetchRoomData, 5000); // Запускаем регулярное обновление данных
   }
 });
+
 </script>
 
 <style>
