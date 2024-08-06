@@ -10,6 +10,7 @@
         </select>
       </div>
     </div>
+    
     <hr>
     <br>
     <div>{{ $t('best_online_games') }}</div>
