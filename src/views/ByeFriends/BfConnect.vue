@@ -42,13 +42,11 @@ const hiddenFileInput = ref(null);
 const router = useRouter();
 
 const playerId = ref(localStorage.getItem('LoseFriends_playerId'));
+
 if (!playerId.value || playerId.value === "undefined") {
   playerId.value = uuidv4();
   localStorage.setItem('LoseFriends_playerId', playerId.value);
 }
-
-// Определяем переменную playerScore
-const playerScore = ref(parseInt(localStorage.getItem('LoseFriends_score') || '0'));
 
 const triggerFileInput = () => {
   const inputElement = document.getElementById('playerPhoto');
@@ -113,7 +111,6 @@ const createAndJoinRoom = async () => {
   const { room_id } = await createResponse.json();
 
   // Обнуление очков при создании новой комнаты
-  playerScore.value = 0;
   localStorage.setItem('LoseFriends_score', '0');
 
   const formData = new URLSearchParams();
@@ -128,7 +125,6 @@ const createAndJoinRoom = async () => {
     body: formData
   });
 
-  localStorage.setItem('LoseFriends_roomId', room_id); // Сохраняем текущий roomId
   router.push({ name: 'LoseFriendsGameRoom', params: { roomId: room_id } });
 };
 
