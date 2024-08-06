@@ -80,8 +80,8 @@
         </div>
       </div>
       <div class="share">
-        <ShareButton :url="url_share"></ShareButton> &#8592;
-        <div> Додай ще майбутніх колишніх друзів </div>
+        <ShareButton :url="url_share"></ShareButton> 
+        <div style="font-size: small; padding-left: 10px;"> &#8592; Додай ще майбутніх колишніх друзів </div>
       </div>
     </div>
   </GameLayout>
@@ -392,6 +392,7 @@ onMounted(() => {
   padding: 15px;
   margin-top: 40px;
   display: flex;
+  align-items: center;
 }
 
 .bold {

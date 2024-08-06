@@ -45,7 +45,7 @@ const closeModal = () => {
   left: 0;
   width: 60px;
   height: 60px;
-  background-color: #007bff;
+  /* background-color: #007bff; */
   border-radius: 35px;
   display: flex;
   align-items: center;
@@ -53,6 +53,7 @@ const closeModal = () => {
   color: white;
   font-size: 24px;
   cursor: pointer;
+  border: 1px solid;
 }
 
 .share-button i {
