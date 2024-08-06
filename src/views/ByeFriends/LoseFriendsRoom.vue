@@ -117,7 +117,7 @@ const url_share = `${url_serv_lose_friends_share}/lose-friends/connect/${roomId.
 
 const storedQuestion = computed(() => localStorage.getItem('LoseFriends_cur_q'));
 const aaa = computed(() => question.value || storedQuestion.value);
-const bbb = ref('')
+const bbb = ref('');
 
 let ws;
 
@@ -161,6 +161,8 @@ const connectWebSocket = () => {
 
       selectedPlayerId.value = null;
       showWinnerModal.value = true;
+      playerScore.value = winner.value.score;
+      localStorage.setItem('LoseFriends_score', playerScore.value);
     }
 
     if (data.tie) {
@@ -209,6 +211,7 @@ const nextRound = () => {
 const createAndJoinRoom = async () => {
   console.log('Player ID:', playerId.value);
   console.log('Room ID:', roomId.value);
+  playerScore.value = 0;  // Обнуляем очки игрока при создании новой комнаты
   console.log('Player Score:', playerScore.value);
 
   const formData = new URLSearchParams();
@@ -231,7 +234,49 @@ const createAndJoinRoom = async () => {
     return;
   }
 
+  localStorage.setItem('LoseFriends_score', playerScore.value);  // Сохраняем обнуленные очки в локальное хранилище
+  localStorage.setItem('LoseFriends_roomId', roomId.value); // Сохраняем текущий roomId
   router.push({ name: 'LoseFriendsGameRoom', params: { roomId: roomId.value } });
+};
+
+const joinExistingRoom = async () => {
+  console.log('Player ID:', playerId.value);
+  console.log('Room ID:', roomId.value);
+
+  // Проверяем, совпадает ли текущий roomId с сохраненным
+  const storedRoomId = localStorage.getItem('LoseFriends_roomId');
+  if (storedRoomId !== roomId.value) {
+    playerScore.value = 0;  // Обнуляем очки игрока, если комната новая
+  }
+  console.log('Player Score:', playerScore.value);
+
+  const formData = new URLSearchParams();
+  formData.append('room_id', roomId.value);
+  formData.append('player_id', playerId.value);
+  formData.append('player_name', playerName.value);
+  formData.append('player_photo', localStorage.getItem('LoseFriends_cartoonPhoto'));
+  formData.append('player_score', playerScore.value.toString());
+
+  const joinResponse = await fetch(`${url_serv_lose_friends}/join_room`, {
+    method: 'POST',
+    body: formData
+  });
+
+  const responseData = await joinResponse.json();
+  console.log('Join response:', responseData);
+
+  if (!joinResponse.ok) {
+    console.error('Error joining room:', responseData);
+    return;
+  }
+
+  // Обновляем очки игрока на основе данных с сервера
+  playerScore.value = responseData.player_score || 0;
+  localStorage.setItem('LoseFriends_score', playerScore.value);
+
+  localStorage.setItem('LoseFriends_roomId', roomId.value); // Сохраняем текущий roomId
+  connectWebSocket();
+  question.value = storedQuestion.value;
 };
 
 onMounted(() => {
@@ -241,14 +286,10 @@ onMounted(() => {
       console.error('Redirect error:', err);
     });
   } else {
-    createAndJoinRoom();
-    connectWebSocket();
-    question.value = storedQuestion.value;
+    joinExistingRoom();
   }
 });
 </script>
-
-
 
 <style>
 .game-room {

@@ -52,11 +52,13 @@ const triggerFileInput = () => {
   }
 };
 
-let playerId = ref(localStorage.getItem('LoseFriends_playerId'));
+let playerId = ref(localStorage.getItem('LoseFriends_playerId') || '');
 if (!playerId.value || playerId.value === "undefined") {
   playerId.value = uuidv4();
   localStorage.setItem('LoseFriends_playerId', playerId.value);
 }
+
+let playerScore = ref(parseInt(localStorage.getItem('LoseFriends_score') || '0'));
 
 const isButtonActive = computed(() => playerName.value.trim().length > 0 && (playerPhoto.value || cartoonPhoto.value));
 
@@ -115,11 +117,19 @@ const joinGame = async () => {
   console.log('Joining game...');
   localStorage.setItem('playerName', playerName.value);
 
+  // Проверяем, совпадает ли текущий roomId с сохраненным
+  const storedRoomId = localStorage.getItem('LoseFriends_roomId');
+  if (storedRoomId !== roomId.value) {
+    playerScore.value = 0;  // Обнуляем очки игрока, если комната новая
+  }
+  console.log('Player Score:', playerScore.value);
+
   const formData = new URLSearchParams();
   formData.append('room_id', roomId.value);
   formData.append('player_id', playerId.value);
   formData.append('player_name', playerName.value);
   formData.append('player_photo', cartoonPhoto.value);
+  formData.append('player_score', playerScore.value.toString());
 
   console.log('FormData:', formData.toString());
 
@@ -131,8 +141,16 @@ const joinGame = async () => {
   const responseData = await joinResponse.json();
   console.log('Join response:', responseData);
 
-  
+  if (!joinResponse.ok) {
+    console.error('Error joining room:', responseData);
+    return;
+  }
 
+  // Обновляем очки игрока на основе данных с сервера
+  playerScore.value = responseData.player_score || 0;
+  localStorage.setItem('LoseFriends_score', playerScore.value);
+
+  localStorage.setItem('LoseFriends_roomId', roomId.value); // Сохраняем текущий roomId
   router.push({ name: 'LoseFriendsGameRoom', params: { roomId: roomId.value } });
 };
 </script>

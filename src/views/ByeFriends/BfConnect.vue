@@ -27,10 +27,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import GameLayout from '../GameLayout.vue';
+import { url_serv_lose_friends } from "@/link"
 
 const playerName = ref(localStorage.getItem('playerName') || '');
 const playerPhoto = ref(null);
@@ -41,10 +42,6 @@ const hiddenFileInput = ref(null);
 const router = useRouter();
 
 const playerId = ref(localStorage.getItem('LoseFriends_playerId'));
-
-import {url_serv_lose_friends} from "@/link"
-
-
 
 if (!playerId.value || playerId.value === "undefined") {
   playerId.value = uuidv4();
@@ -60,10 +57,6 @@ const triggerFileInput = () => {
   }
 };
 
-
-
-
-
 const isButtonActive = computed(() => playerName.value.trim().length > 0 && (playerPhoto.value || cartoonPhoto.value));
 
 const onFileChange = async (e) => {
@@ -75,7 +68,7 @@ const onFileChange = async (e) => {
       playerPhotoPreview.value = event.target.result;
     };
     reader.readAsDataURL(file);
-    await uploadPhoto();  // Запуск загрузки аватара автоматически после выбора файла
+    await uploadPhoto();
   }
 };
 
@@ -106,28 +99,31 @@ const uploadPhoto = async () => {
 
 const createAndJoinRoom = async () => {
   if (!cartoonPhoto.value && playerPhoto.value) {
-    await uploadPhoto(); // Загружаем аватар, если он еще не загружен
+    await uploadPhoto();
   }
 
   localStorage.setItem('playerName', playerName.value);
 
+  // Создание новой комнаты
   const createResponse = await fetch(`${url_serv_lose_friends}/create_room`, {
     method: 'POST',
   });
   const { room_id } = await createResponse.json();
 
-  const formData = new FormData();
+  // Обнуление очков при создании новой комнаты
+  localStorage.setItem('LoseFriends_score', '0');
+
+  const formData = new URLSearchParams();
   formData.append('room_id', room_id);
   formData.append('player_id', playerId.value);
   formData.append('player_name', playerName.value);
   formData.append('player_photo', cartoonPhoto.value || playerPhoto.value);
+  formData.append('player_score', '0'); // Очки обнуляются при создании новой комнаты
 
   const joinResponse = await fetch(`${url_serv_lose_friends}/join_room`, {
     method: 'POST',
     body: formData
   });
-  
-  
 
   router.push({ name: 'LoseFriendsGameRoom', params: { roomId: room_id } });
 };
@@ -136,12 +132,6 @@ const removeAvatar = () => {
   cartoonPhoto.value = null;
   localStorage.removeItem('LoseFriends_cartoonPhoto');
 };
-
-onMounted(() => {
-  if (cartoonPhoto.value) {
-    console.log('Loaded cartoon photo from local storage');
-  }
-});
 </script>
 
 <style>
