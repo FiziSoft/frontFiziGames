@@ -46,10 +46,11 @@
         <button v-if="winner && winner.player_id === playerId" @click="nextRound" class="btn-grad">Продолжить</button>
       </div>
       <div v-else-if="tie">
-        <h2>Переголосовоние между:</h2>
+       
         <div class="card">
           <span>{{ question }}</span>
         </div>
+        <h2>Переголосовоние между:</h2>
         <div class="players-container">
           <div
             v-for="player in tiePlayers"
