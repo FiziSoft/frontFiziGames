@@ -122,6 +122,7 @@ const aaa = computed(() => question.value || storedQuestion.value);
 const bbb = ref('');
 
 let ws;
+
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 const connectWebSocket = () => {
