@@ -134,9 +134,19 @@ const connectWebSocket = () => {
     maxRetries: 10, // Максимальное количество попыток переподключения
     minReconnectionDelay: 1000, // Минимальная задержка перед переподключением (1 секунда)
   });
+  
+  ws.onopen = () => {
+    console.log("WebSocket connection established");
+  };
+
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log('Received data:', data); // Логирование данных для отладки
+
+    if (data.type === "ping") {
+      console.log("Received ping from server");
+      return;
+    }
 
     if (data.players) {
       players.value = data.players;
@@ -195,6 +205,8 @@ const connectWebSocket = () => {
     }, 1000);
   };
 };
+
+
 
 const askQuestion = () => {
   if (players.value.length >= 3) {
