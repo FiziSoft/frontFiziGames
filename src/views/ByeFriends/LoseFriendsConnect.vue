@@ -44,11 +44,11 @@ const router = useRouter();
 const roomId = ref(route.params.roomId);
 
 const triggerFileInput = () => {
-  const inputElement = document.getElementById('playerPhoto');
+  const inputElement = hiddenFileInput.value;
   if (inputElement) {
     inputElement.click();
   } else {
-    console.error('Element with id "playerPhoto" not found');
+    console.error('Element with id "hiddenFileInput" not found');
   }
 };
 
@@ -117,10 +117,9 @@ const joinGame = async () => {
   console.log('Joining game...');
   localStorage.setItem('playerName', playerName.value);
 
-  // Проверяем, совпадает ли текущий roomId с сохраненным
   const storedRoomId = localStorage.getItem('LoseFriends_roomId');
   if (storedRoomId !== roomId.value) {
-    playerScore.value = 0;  // Обнуляем очки игрока, если комната новая
+    playerScore.value = 0;
   }
   console.log('Player Score:', playerScore.value);
 
@@ -146,11 +145,9 @@ const joinGame = async () => {
     return;
   }
 
-  // Обновляем очки игрока на основе данных с сервера
   playerScore.value = responseData.player_score || 0;
   localStorage.setItem('LoseFriends_score', playerScore.value);
-
-  localStorage.setItem('LoseFriends_roomId', roomId.value); // Сохраняем текущий roomId
+  localStorage.setItem('LoseFriends_roomId', roomId.value);
   router.push({ name: 'LoseFriendsGameRoom', params: { roomId: roomId.value } });
 };
 </script>

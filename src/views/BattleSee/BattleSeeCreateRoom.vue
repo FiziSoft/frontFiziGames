@@ -22,9 +22,9 @@ import axios from "axios";
 import { ref, computed } from "vue";
 import { useRouter } from 'vue-router';
 import GameLayout from "../GameLayout.vue";
+import { url_serv_battle_sea } from "@/link";
 
-// const url_serv = "http://localhost:7001";  // или ваш сервер
-const url_serv = "https://seabattle-acb2eb1faa50.herokuapp.com";
+
 
 const router = useRouter();
 const playerName = ref(localStorage.getItem('playerName') || '');
@@ -35,7 +35,7 @@ const isButtonActive = computed(() => {
 
 const createRoom = async () => {
   try {
-    const response = await axios.post(`${url_serv}/api/create-room`, { name: playerName.value });
+    const response = await axios.post(`${url_serv_battle_sea}/api/create-room`, { name: playerName.value });
     const { roomId, adminId } = response.data;
     localStorage.setItem('playerName', playerName.value);
     localStorage.setItem('seaBattleAdminId', adminId);

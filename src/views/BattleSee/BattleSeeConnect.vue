@@ -22,10 +22,9 @@
   import { ref, computed } from "vue";
   import { useRouter, useRoute } from 'vue-router';
   import GameLayout from "../GameLayout.vue";
-  
-  // const url_serv = "http://localhost:7001";  // или ваш сервер
-const url_serv = "https://seabattle-acb2eb1faa50.herokuapp.com";
-  
+  import { url_serv_battle_sea } from "@/link";
+
+
   const router = useRouter();
   const route = useRoute();
   const playerName = ref(localStorage.getItem('playerName') || '');
@@ -42,7 +41,7 @@ const url_serv = "https://seabattle-acb2eb1faa50.herokuapp.com";
         return;
       }
       
-      const response = await axios.post(`${url_serv}/api/join-room/${roomId}`, { name: playerName.value });
+      const response = await axios.post(`${url_serv_battle_sea}/api/join-room/${roomId}`, { name: playerName.value });
       const { playerId } = response.data;
       localStorage.setItem('playerName', playerName.value);
       localStorage.setItem('seaBattlePlayerId', playerId);

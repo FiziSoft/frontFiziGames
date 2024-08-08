@@ -47,13 +47,13 @@
   
 @media (max-width: 768px)
   .game_name 
-    font-size: 1.5em
+    font-size: 1em
     
 
   
 @media (max-width: 480px)
 .game_name 
-    font-size: 1em
+    font-size: 0.7em
     
   </style>
   

@@ -2,9 +2,7 @@
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
       <div class="game-board">
-        <h3>
-          Гравець {{ playerName }}
-        </h3>
+        <h3>Гравець <strong>{{ playerName }}</strong></h3>
         <div class="board">
           <div class="label-row">
             <div class="cell label"></div>
@@ -23,21 +21,21 @@
           </div>
         </div>
       </div>
-      
+
       <div v-if="!opponentName" class="shareLocal">
         <ShareButton :url="url_connect" text="Давай грати в Морський Бій"></ShareButton> 
         <h2> &#8592; Додай собі оппонента </h2>  
       </div>
+
       <div class="turn-indicator">
         <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
         <div v-else class="turn-box opponent-turn">Хід опонента</div>
       </div>
+
       <div class="game-board">
-       
-        
         <div class="board">
           <div class="label-row">
-            <div class="cell label"></div>
+            <div class="cell label" :class="cornerClass"></div>
             <div v-for="colIndex in 10" :key="'top-label-' + colIndex" class="cell label">
               {{ String.fromCharCode(1040 + colIndex - 1) }}
             </div>
@@ -53,12 +51,10 @@
             ></div>
           </div>
         </div>
-        <h3>
-          Гравець {{ opponentName }}
-        </h3>
+        <h3>Гравець <strong>{{ opponentName }}</strong></h3>
       </div>
     </div>
-    
+
     <div v-if="winnerModal" class="modal">
       <div class="modal-content">
         <p>{{ winnerMessage }}</p>
@@ -69,12 +65,15 @@
   </GameLayout>
 </template>
 
+
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import ShareButton from '@/components/ShareButton.vue';
 import GameLayout from '../GameLayout.vue';
+import { url_main_page, url_serv_battle_sea, url_serv_battle_sea_wss } from "@/link";
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 const myBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
 const opponentBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
@@ -82,21 +81,20 @@ const currentTurn = ref(null);
 const winner = ref(null);
 const winnerModal = ref(false);
 const winnerMessage = ref('');
+const moveMessage = ref('');
+const moveMessageClass = ref('');
 const route = useRoute();
 const router = useRouter();
 const ws = ref(null);
 const opponentName = ref('');
+const cornerClass = ref('');
 
 const playerName = ref(localStorage.getItem('playerName') || '');
 
 const roomId = route.params.roomId;
 const playerId = route.params.playerId;
 
-const url_connect = `https://fizi.cc/battle-sea/connect/${roomId}`;
-// const url_connect = `http://localhost:8080/battle-sea/connect/${roomId}`;
-
-// const url_serv = "http://localhost:7001";  // или ваш сервер
-const url_serv = "https://seabattle-acb2eb1faa50.herokuapp.com";
+const url_connect = `${url_main_page}/battle-sea/connect/${roomId}`;
 
 const getCellClass = (cell, isMyBoard) => {
   if (cell === 'hit') return 'hit';
@@ -106,17 +104,20 @@ const getCellClass = (cell, isMyBoard) => {
 };
 
 const isMyTurn = () => {
+
   return currentTurn.value === playerId;
+  
 };
 
 const makeMove = async (row, col) => {
   try {
     console.log(`Making move: row=${row}, col=${col}, playerId=${playerId}`);
-    await axios.post(`${url_serv}/api/move/${roomId}`, {
+    const response = await axios.post(`${url_serv_battle_sea}/api/move/${roomId}`, {
       row,
       col,
       playerId
     });
+    handleMoveResponse(response.data);
     await updateGameState(); // Обновляем состояние игры после хода
   } catch (error) {
     console.error("Error making move:", error);
@@ -126,9 +127,27 @@ const makeMove = async (row, col) => {
   }
 };
 
+const handleMoveResponse = (data) => {
+
+  console.log(data.message)
+  if (data.message === 'miss') {
+    moveMessageClass.value = 'miss';
+  } else if (data.message === 'hit') {
+    moveMessageClass.value = 'ahit';
+  } else if (data.message === 'sunk') {
+    moveMessageClass.value = 'asunk';
+  }
+  cornerClass.value = moveMessageClass.value;
+
+  setTimeout(() => {
+    cornerClass.value = 'none';
+
+  }, 700);
+};
+
 const updateGameState = async () => {
   try {
-    const response = await axios.get(`${url_serv}/api/game-state/${roomId}`, {
+    const response = await axios.get(`${url_serv_battle_sea}/api/game-state/${roomId}`, {
       params: { playerId }
     });
     const data = response.data;
@@ -150,31 +169,42 @@ const updateGameState = async () => {
 
 const initializeWebSocket = () => {
   console.log(`Connecting to WebSocket for room: ${roomId}, playerId: ${playerId}`);
-  // ws.value = new WebSocket(`ws://localhost:7001/ws/${roomId}/${playerId}`);
-  ws.value = new WebSocket(`wss://seabattle-acb2eb1faa50.herokuapp.com/ws/${roomId}/${playerId}`);
+  ws.value = new ReconnectingWebSocket(`${url_serv_battle_sea_wss}${roomId}/${playerId}`, [], {
+    maxRetries: 10,
+    minReconnectionDelay: 1000,
+  });
 
   ws.value.onmessage = async (event) => {
     const data = JSON.parse(event.data);
-    currentTurn.value = data.current_turn;
+    if (data.type === 'move') {
+      handleMoveResponse(data);
+    } else {
+      currentTurn.value = data.current_turn;
+    }
     await updateGameState(); // Обновляем состояние игры при получении сообщения
   };
 
+  setInterval(() => {
+    updateGameState();
+  }, 4000);
+
   ws.value.onclose = () => {
-    // Пытаемся переподключиться при разрыве соединения
-    setTimeout(() => {
-      initializeWebSocket();
-    }, 1000);
+    console.log("WebSocket connection closed");
   };
 };
 
 const startNewGame = async () => {
   try {
-    await axios.post(`${url_serv}/api/start-new-game/${roomId}`);
+    await axios.post(`${url_serv_battle_sea}/api/start-new-game/${roomId}`);
     winnerModal.value = false;
     window.location.reload();
   } catch (error) {
     console.error("Error starting new game:", error);
   }
+
+  setTimeout(() => {
+    moveMessage.value = '';
+  }, 10000);
 };
 
 const exitGame = () => {
@@ -194,6 +224,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+
+
+
+
 .shareLocal {
   max-width: 400px;
   display: flex;
@@ -214,7 +248,6 @@ onUnmounted(() => {
 }
 
 .game-board {
-  /* margin-bottom: 20px; */
   border: 2px solid transparent;
 }
 
@@ -293,14 +326,13 @@ button:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20px 0;
+  margin: 5px 0;
 }
 
 .turn-box {
-  padding: 10px;
-  border-radius: 5px;
-  font-weight: bold;
-  font-size: 1.2em;
+  padding: 5px 10px;
+  border-radius: 12px;
+ 
 }
 
 .your-turn {
@@ -313,23 +345,38 @@ button:hover {
   background-color: #f7e0e0;
 }
 
-@media (max-width: 768px) {
-  .containerFormCreate {
-    flex-direction: column;
+
+.amiss {
+  background-color: DodgerBlue;
+}
+
+.ahit {
+  background-color: IndianRed;
+}
+
+.asunk {
+  background-color: black !important;
+}
+
+.corner-none {
+  background-color: transparent;
+}
+
+/* @media (max-width: 768px) {
+  .containerFormCreate {    flex-direction: column;
   }
   
   .game-board {
-    
     max-width: 360px;
   }
 
   .board {
-    grid-template-columns: repeat(11, 20px); /* 10 columns + 1 for labels */
+    grid-template-columns: repeat(11, 20px);
   }
 
   .cell {
     width: 20px;
     height: 20px;
   }
-}
+} */
 </style>
