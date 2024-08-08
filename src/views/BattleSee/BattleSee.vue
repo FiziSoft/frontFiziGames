@@ -186,7 +186,7 @@ const initializeWebSocket = () => {
 
   setInterval(() => {
     updateGameState();
-  }, 4000);
+  }, 2000);
 
   ws.value.onclose = () => {
     console.log("WebSocket connection closed");
@@ -204,7 +204,7 @@ const startNewGame = async () => {
 
   setTimeout(() => {
     moveMessage.value = '';
-  }, 10000);
+  }, 700);
 };
 
 const exitGame = () => {
