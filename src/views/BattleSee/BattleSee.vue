@@ -23,16 +23,16 @@
       </div>
 
       <div v-if="opponentName == 'Opponent'" class="shareLocal">
-        <ShareButton :url="url_connect" text="Давай грати в Морський Бій"></ShareButton> 
+        <TelegramShareButton :url="url_connect" text="Давай грати в Морський Бій"></TelegramShareButton> 
         <h2> &#8592; Додай собі оппонента </h2>  
       </div>
 
-      <div class="turn-indicator">
+      <div class="turn-indicator" v-if="opponentName !== 'Opponent'">
         <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
         <div v-else class="turn-box opponent-turn">Хід опонента</div>
       </div>
 
-      <div class="game-board">
+      <div class="game-board" v-if="opponentName !== 'Opponent'">
         <div class="board">
           <div class="label-row">
             <div class="cell label" :class="cornerClass"></div>
@@ -69,7 +69,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import ShareButton from '@/components/ShareButton.vue';
+import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import GameLayout from '../GameLayout.vue';
 import { url_main_page, url_serv_battle_sea_wss, url_serv_battle_sea } from "@/link";
 import ReconnectingWebSocket from 'reconnecting-websocket';

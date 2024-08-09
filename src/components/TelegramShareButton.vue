@@ -14,7 +14,7 @@
       <img src="@/assets/telegram.png" alt="Telegram" class="icon" />
     </button>
 
-    <a class="a_" @click.prevent="copyToClipboard">{{ props.url }}</a>
+    <button class="btn-grad" @click.prevent="copyToClipboard">Копировать ссылку</button>
 
     <div v-if="showNotification" class="notification">Ссылка скопирована в буфер обмена!</div>
   </div>
@@ -66,9 +66,19 @@ const copyToClipboard = () => {
 </script>
 
 <style scoped>
-.a_ {
-  color: black;
+.copy-button {
+  color: white;
+  background-color: #007bff;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
+  margin: 10px;
+  font-size: 16px;
+}
+
+.copy-button:hover {
+  background-color: #0056b3;
 }
 
 .share-buttons {
