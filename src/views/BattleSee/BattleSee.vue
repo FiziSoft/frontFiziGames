@@ -1,7 +1,7 @@
 <template>
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
-      <div v-if="opponentName == 'Opponent'" class="game-board">
+      <div v-if="opponentName !== 'Opponent'" class="game-board">
         <h3>Гравець <strong>{{ playerName }}</strong></h3>
         <div class="board">
           <div class="label-row">
