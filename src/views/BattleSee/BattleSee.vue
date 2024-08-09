@@ -1,10 +1,15 @@
 <template>
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
-      
+      <i 
+        :class="isBoardVisible ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" 
+        @click="toggleVisibility"
+      ></i>
       <!-- Игровое поле игрока -->
-      <div v-if="opponentName !== 'Opponent'" class="game-board">
-        <h3>Гравець <strong>{{ playerName }}</strong></h3>
+      <div v-if="opponentName !== 'Opponent' && isBoardVisible" class="game-board">
+      <div class="my_board"><h3>Гравець <strong>{{ playerName }}</strong> </h3> 
+        
+      </div>
         <div class="board">
           <div class="label-row">
             <div class="cell label"></div>
@@ -112,6 +117,14 @@ const playerId = route.params.playerId;
 
 const url_connect = `${url_main_page}/battle-sea/connect/${roomId}`;
 
+
+const isBoardVisible = ref(true); // Управляет видимостью блока
+
+const toggleVisibility = () => {
+  isBoardVisible.value = !isBoardVisible.value; // Переключаем видимость
+
+};
+
 const getCellClass = (cell, isMyBoard) => {
   if (cell === 'hit') return 'hit';
   if (cell === 'miss') return 'miss';
@@ -146,45 +159,7 @@ const handleMoveResponse = (data) => {
   }, 700);
 };
 
-const updateGameState = async (data) => {
-  myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
-  opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
-  currentTurn.value = data.current_turn;
-  playerLives.value = playerId === data.admin.id ? data.adminLives : data.playerLives;
-  opponentLives.value = playerId === data.admin.id ? data.playerLives : data.adminLives;
 
-  opponentName.value = playerId === data.admin.id ? (data.player ? data.player.name : "Opponent") : data.admin.name;
-
-  if (data.winner) {
-    winner.value = data.winner;
-    winnerModal.value = true;
-    winnerMessage.value = data.winner === playerId ? 'Вы победили!' : 'Вы проиграли!';
-  }
-
-  if (data.game_started) {
-    window.location.reload();
-  }
-};
-
-const initializeWebSocket = () => {
-  console.log(`Connecting to WebSocket for room: ${roomId}, playerId: ${playerId}`);
-  ws.value = new ReconnectingWebSocket(`${url_serv_battle_sea_wss}${roomId}/${playerId}`, [], {
-    maxRetries: 10,
-    minReconnectionDelay: 1000,
-  });
-
-  ws.value.onmessage = async (event) => {
-    const data = JSON.parse(event.data);
-    if (data.type === 'move') {
-      handleMoveResponse(data);
-    }
-    await updateGameState(data); 
-  };
-
-  ws.value.onclose = () => {
-    console.log("WebSocket connection closed");
-  };
-};
 
 const startNewGame = async () => {
   try {
@@ -201,8 +176,50 @@ const exitGame = () => {
 };
 
 onMounted(() => {
+  const updateGameState = async (data) => {
+    myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
+    opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
+    currentTurn.value = data.current_turn;
+    playerLives.value = playerId === data.admin.id ? data.adminLives : data.playerLives;
+    opponentLives.value = playerId === data.admin.id ? data.playerLives : data.adminLives;
+
+    opponentName.value = playerId === data.admin.id ? (data.player ? data.player.name : "Opponent") : data.admin.name;
+
+    if (data.winner) {
+      winner.value = data.winner;
+      winnerModal.value = true;
+      winnerMessage.value = data.winner === playerId ? 'Вы победили!' : 'Вы проиграли!';
+    }
+
+    if (data.game_started) {
+      alert("Игра началась!");
+      window.location.reload();  // Обновляем страницу
+    }
+  };
+
+  const initializeWebSocket = () => {
+    console.log(`Connecting to WebSocket for room: ${roomId}, playerId: ${playerId}`);
+    ws.value = new ReconnectingWebSocket(`${url_serv_battle_sea_wss}${roomId}/${playerId}`, [], {
+      maxRetries: 10,
+      minReconnectionDelay: 1000,
+    });
+
+    ws.value.onmessage = async (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'move') {
+        handleMoveResponse(data);
+      }
+      await updateGameState(data); 
+    };
+
+    ws.value.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+  };
+
   initializeWebSocket();
 });
+
 
 onUnmounted(() => {
   if (ws.value) {
@@ -212,6 +229,13 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+
+.my_board {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
 .shareLocal {
   max-width: 400px;
   display: flex;
