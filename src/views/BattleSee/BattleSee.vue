@@ -373,7 +373,7 @@ button:hover {
 
 
 .eye_toggle {
-  margin-left: 118px;
+  margin-left: 70px;
   flex-shrink: 0;
   font-size: larger;
 }
