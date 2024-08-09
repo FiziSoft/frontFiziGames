@@ -1,21 +1,35 @@
 {
   "welcome": "Fizi Games",
-  "best_online_games": "The Best Online Board Games",
+  "best_online_games": "Best Online Board Games",
   "themes": {
     "default": "Dark",
     "theme1": "Sunset",
-    "theme2": "Lighting",
+    "theme2": "Light",
     "theme3": "Sunny",
     "theme4": "Pink"
   },
   "games": {
     "loseFriends": {
-      "name": "How lose friends",
+      "name": "How to Lose Friends",
       "description": ""
     },
     "battleSee": {
       "name": "Sea Battle",
-      "description": ""
+      "description": "",
+
+      "create": "Create game",
+      "name_player": "Your name:",
+      "join": "Join to the game",
+
+      "player": "Player",
+      "your_turn": "Your turn",
+      "opponent_turn": "Opponent's turn",
+      "add_opponent": "Add an opponent",
+      "game_won": "You won!",
+      "game_lost": "You lost!",
+      "start_new_game": "Start new game",
+      "exit": "Exit",
+      "play_battleship": "Let's play Battleship"
     },
     "rsp": {
       "name": "Rock Paper Scissors",
@@ -23,73 +37,73 @@
     },
     "spy": {
       "name": "Spy",
-      "description": "Spy is a game where players try to figure out who the spy is by asking each other questions. One player gets the role of a spy and tries to guess the secret word without revealing their identity."
+      "description": "Spy is a game where players try to figure out who the spy is by asking each other questions. One player is assigned the role of the spy and tries to guess the secret word without revealing their identity."
     },
     "tod": {
       "name": "Truth or Dare",
-      "description": "Truth or Dare is a classic party game where players take turns choosing between truth and dare. Choosing truth means the player must honestly answer a question, while dare requires them to complete a task."
+      "description": "Truth or Dare is a classic party game where players take turns choosing between truth and dare. Choosing truth means the player must honestly answer a question, while a dare requires performing a task."
     },
     "five_second": {
       "name": "5 Seconds",
-      "description": "5 Seconds is a fast and fun game where players must name three things in five seconds. For example, three types of fruit or three famous movies. If the player doesn't make it in time, the turn goes to the next player.",
-      "continue_game": "Continue Previous Game",
-      "add_player": "Add Player",
+      "description": "5 Seconds is a fast and fun game where players must name three things in five seconds. For example, three types of fruit or three famous movies. If the player fails, the turn passes to the next player.",
+      "continue_game": "Continue previous game",
+      "add_player": "Add player",
       "delete_player": "Delete",
-      "start_game": "Start",
+      "start_game": "Start game",
       "timer": "Timer",
       "score": "points",
       "answer_correct": "+",
       "answer_wrong": "-",
-      "game_type_3": "Name Three",
-      "game_type_5": "Name Five",
-      "current_player": "Current Player",
+      "game_type_3": "Name three",
+      "game_type_5": "Name five",
+      "current_player": "Current player",
       "default_name": "Name"
     },
     "codenames": {
       "name": "Codenames",
-      "description": "Codenames is a team game where players try to guess words using clues. Two teams compete to be the first to find all their codenames on the board. A clue consists of one word and a number indicating how many related words there are.",
+      "description": "Codenames is a team game where players try to guess words using clues. Two teams compete to be the first to find all their codenames on the board. The clue consists of one word and a number indicating the number of related words.",
       "title": "Codenames",
       "create_game": "Create a game with {count} words",
       "teams": {
         "blue": "Blue",
         "red": "Red",
-        "your_team": "Your Team",
-        "change_team": "Change Team"
+        "your_team": "Your team",
+        "change_team": "Change team"
       },
-      "start_game": "Start Game",
-      "show_colors": "Show Colors",
-      "hide_colors": "Hide Colors",
-      "update_words": "Update Words",
-      "winner_message": "Team {team} wins!",
-      "choose_team": "Choose Your Team",
+      "start_game": "Start game",
+      "show_colors": "Show colors",
+      "hide_colors": "Hide colors",
+      "update_words": "Update words",
+      "winner_message": "Team {team} won!",
+      "choose_team": "Choose your team",
       "confirm_reveal": "Are you sure?",
       "yes": "Yes",
       "no": "No",
-      "add_players": "Add Players",
-      "add_captain": "Add Captain",
-      "play_codenames": "Let's Play Codenames",
+      "add_players": "Add players",
+      "add_captain": "Add captain",
+      "play_codenames": "Let's play Codenames",
       "tour": {
         "teamNameTitle": "Teams",
-        "teamName": "There are two teams, Blue and Red <br/>(in parentheses, the number of players in the team)",
+        "teamName": "There are two teams: Blue and Red <br/>(number of players in the team is in parentheses)",
         "team-progressTitle": "Points",
-        "team-progress": "The number of points needed to win <strong>(Blue starts, so they always have 1 more point)</strong> ",
+        "team-progress": "Points required to win <strong>(Blue starts first, so they always have 1 more point)</strong>",
         "gridTitle": "Guessing Words",
-        "grid": "Here are the words that captains need to encode and players need to guess",
-        "usersTitle": "Add players to whom you will give words",
-        "users": "Using qr code or sending a ready link through social networks",
-        "captainTitle": "Add the captain of the second team",
-        "captain": "Using qr code or sending a ready link through social networks",
-        "startTitle": "After pressing, you will see the color map of words",
-        "start": "1. Only captains see this map <br/> 2. They try to combine words by different meanings <br/> 3. The Blue team starts first (they have 1 more guessed word) <br/> 4. Whoever guesses all the words first wins <br/> 5. Players will mark words on their phones (but the captain can also do it) <br/> 6. Black word is a bomb<br/>(choose = lose)"
+        "grid": "Here are the words that captains need to encrypt, and players need to guess",
+        "usersTitle": "Adding players to guess words",
+        "users": "Using the QR code or by sharing the link through social networks",
+        "captainTitle": "Add a captain to the second team",
+        "captain": "Using the QR code or by sharing the link through social networks",
+        "startTitle": "After clicking, you will see the color map of words",
+        "start": "1. Only captains see this map <br/> 2. They try to link words by different meanings <br/> 3. Blue team starts first (they have one more hidden word) <br/> 4. The team that guesses all the words first wins <br/> 5. Players on their phones will mark words (but the captain can do this too) <br/> 6. The black word is a bomb<br/>(if chosen = lose)"
       }
     }
   },
-  "select_theme": "Select Theme",
-  "select_language": "Select Language",
+  "select_theme": "Select theme",
+  "select_language": "Select language",
   "close": "Close",
-  "tour" : {
-      "back":"Back",
-      "next":"Next",
-      "finish":"Finish"
+  "tour": {
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish"
   }
 }

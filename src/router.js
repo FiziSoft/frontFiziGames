@@ -104,8 +104,9 @@ const routes = [
         path: '/battle-sea',
         name: 'BattleSee',
         component: BattleSeeCreateRoom,
-        props: true
-    },
+        props: route => ({ locale: route.query.locale })
+    }
+    ,
     {
         path: '/battle-sea/connect/:roomId',
         name: 'BattleSeeConnect',
@@ -115,7 +116,9 @@ const routes = [
     {
         path: '/battle-sea/:roomId/:playerId',
         name: 'BattleSeeGameRoom',
-        component: BattleSee
+        component: BattleSee,
+
+        props: true
     }
     ,
     {

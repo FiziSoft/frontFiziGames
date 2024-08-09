@@ -1,13 +1,13 @@
 <template>
-  <GameLayout name-game="Морський Бій">
+  <GameLayout :name-game="$t('games.battleSee.name')">
     <div class="containerFormCreate">
       <form class="formCreate">
         <div class="formElement">
-          <label class="btn-gradient-1" for="playerName">Ваше ім'я:</label>
+          <label class="btn-gradient-1" for="playerName">{{ $t('games.battleSee.name_player') }}</label>
           <input v-model="playerName" type="text" id="playerName" class="input-gradient">
         </div>
         <div class="btnDiv">
-          <button :disabled="!isButtonActive" type="button" @click="createRoom" class="btn-grad">Создать комнату</button>
+          <button :disabled="!isButtonActive" type="button" @click="createRoom" class="btn-grad">{{ $t('games.battleSee.create') }}</button>
         </div>
         <div v-if="errorMessage" class="error-message">
           {{ errorMessage }}
@@ -19,14 +19,35 @@
 
 <script setup>
 import axios from "axios";
-import { ref, computed } from "vue";
-import { useRouter } from 'vue-router';
+import { ref, computed, watch } from "vue";
+import { useRouter, useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import GameLayout from "../GameLayout.vue";
 import { url_serv_battle_sea } from "@/link";
 
-
-
+// Получаем и устанавливаем локаль
+const { locale } = useI18n();
+const route = useRoute();
 const router = useRouter();
+
+// Получаем язык из localStorage или устанавливаем по умолчанию
+const savedLocale = localStorage.getItem('language') || 'en'; // 'en' как язык по умолчанию
+locale.value = savedLocale;
+
+// Обновляем локаль, если параметр locale присутствует в маршруте
+if (route.params.locale && route.params.locale !== locale.value) {
+  locale.value = route.params.locale;
+  localStorage.setItem('language', route.params.locale); // сохраняем новую локаль в localStorage
+}
+
+// Следим за изменениями в маршруте и обновляем локаль
+watch(() => route.params.locale, (newLocale) => {
+  if (newLocale && newLocale !== locale.value) {
+    locale.value = newLocale;
+    localStorage.setItem('language', newLocale); // сохраняем новую локаль в localStorage
+  }
+});
+
 const playerName = ref(localStorage.getItem('playerName') || '');
 const errorMessage = ref('');
 const isButtonActive = computed(() => {
@@ -39,12 +60,12 @@ const createRoom = async () => {
     const { roomId, adminId } = response.data;
     localStorage.setItem('playerName', playerName.value);
     localStorage.setItem('seaBattleAdminId', adminId);
-    router.push({ name: 'BattleSeeGameRoom', params: { roomId, playerId: adminId } }).then(() => {
+    router.push({ name: 'BattleSeeGameRoom', params: { roomId, playerId: adminId, locale: locale.value } }).then(() => {
       window.location.reload(); // Обновляем страницу один раз после перенаправления
     });
   } catch (error) {
     console.error('Error creating room:', error);
-    errorMessage.value = "Произошла ошибка при создании комнаты. Пожалуйста, попробуйте снова позже.";
+    errorMessage.value = `$t('games.battleSee.error_creating_room')`; // Локализованное сообщение об ошибке
   }
 };
 </script>

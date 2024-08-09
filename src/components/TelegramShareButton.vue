@@ -14,7 +14,7 @@
       <img src="@/assets/telegram.png" alt="Telegram" class="icon" />
     </button>
 
-    <button class="btn-grad" @click.prevent="copyToClipboard">Копировать ссылку</button>
+    <button class="btn-grad" @click.prevent="copyToClipboard">Copy</button>
 
     <div v-if="showNotification" class="notification">Ссылка скопирована в буфер обмена!</div>
   </div>

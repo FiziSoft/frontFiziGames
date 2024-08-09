@@ -1,12 +1,10 @@
 <template>
-  <GameLayout name-game="Морський Бій">
+  <GameLayout :name-game="$t('games.battleSee.name')">
     <div class="containerFormCreate">
       
       <!-- Игровое поле игрока -->
       <div v-if="opponentName !== 'Opponent' && isBoardVisible" class="game-board">
-      <div class="my_board"><h3>Гравець: <strong>{{ playerName }}</strong> </h3> 
-        
-      </div>
+        <div class="my_board"><h3>{{ $t('games.battleSee.player') }}: <strong>{{ playerName }}</strong> </h3></div>
         <div class="board">
           <div class="label-row">
             <div class="cell label"></div>
@@ -33,16 +31,14 @@
 
       <!-- Телеграм кнопка и уведомление -->
       <div v-if="opponentName == 'Opponent'" class="shareLocal">
-        <TelegramShareButton :url="url_connect" text="Давай грати в Морський Бій"></TelegramShareButton> 
-        <h2> &#8592; Додай собі оппонента </h2>  
+        <TelegramShareButton :url="url_connect" :text="$t('games.battleSee.play_battleship')"></TelegramShareButton> 
+        <h2> &#8592; {{ $t('games.battleSee.add_opponent') }} </h2>  
       </div>
 
       <!-- Индикатор хода -->
       <div class="turn-indicator" v-if="opponentName !== 'Opponent'">
-        
-        
-          <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
-          <div v-else class="turn-box opponent-turn">Хід опонента</div>
+          <div v-if="isMyTurn()" class="turn-box your-turn">{{ $t('games.battleSee.your_turn') }}</div>
+          <div v-else class="turn-box opponent-turn">{{ $t('games.battleSee.opponent_turn') }}</div>
        
         <div class="eye_toggle">
           <i 
@@ -77,22 +73,25 @@
             ></div>
           </div>
         </div>
-        <h3 class="opponentName" v-if="opponentName !== 'Opponent'">Гравець: <strong>{{ opponentName }}</strong></h3>
+        <h3 class="opponentName" v-if="opponentName !== 'Opponent'">{{ $t('games.battleSee.player') }}: <strong>{{ opponentName }}</strong></h3>
       </div>
     </div>
 
     <!-- Модальное окно победы -->
     <div v-if="winnerModal" class="modal">
       <div class="modal-content">
-        <p>{{ winnerMessage }}</p>
-        <button @click="startNewGame">Начать сначала</button>
-        <button @click="exitGame">Выход</button>
+        <p class="win_text">{{ winnerMessage }}</p>
+        <div style="width: 200px;">
+          <div class="btn-grad" @click="startNewGame">{{ $t('games.battleSee.start_new_game') }}</div>
+          <div class="btn-grad" @click="exitGame">{{ $t('games.battleSee.exit') }}</div>
+        </div>
       </div>
     </div>
   </GameLayout>
 </template>
 
 <script setup>
+
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
@@ -100,6 +99,19 @@ import GameLayout from '../GameLayout.vue';
 import { url_main_page, url_serv_battle_sea_wss, url_serv_battle_sea } from "@/link";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import axios from 'axios';
+
+
+import { useI18n } from 'vue-i18n';
+
+// Инициализация i18n и маршрутизации
+const { t, locale } = useI18n();
+
+
+// Получение языка из localStorage или установка 'ua' по умолчанию
+const savedLocale = localStorage.getItem('language') || 'ua';
+locale.value = savedLocale;
+
+
 
 const myBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
 const opponentBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
@@ -194,7 +206,7 @@ onMounted(() => {
     if (data.winner) {
       winner.value = data.winner;
       winnerModal.value = true;
-      winnerMessage.value = data.winner === playerId ? 'Вы победили!' : 'Вы проиграли!';
+      winnerMessage.value = data.winner === playerId ? t('games.battleSee.game_won') : t('games.battleSee.game_lost');
     }
 
     if (data.game_started) {
@@ -234,7 +246,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-
 .opponentName {
   margin-top: 5px;
   margin-left: 30px;
@@ -333,6 +344,7 @@ onUnmounted(() => {
   border: 1px solid black;
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  color: black!important;
 }
 
 .modal-content {
@@ -342,12 +354,13 @@ onUnmounted(() => {
 }
 
 button {
-  margin-top: 10px;
+  margin-top: 20px;
   padding: 10px 20px;
-  border: none;
+  border: 1px solid;
   background-color: #007BFF;
   color: white;
   cursor: pointer;
+  border-radius: 12px;
 }
 
 button:hover {
@@ -363,14 +376,11 @@ button:hover {
   width: 270px;
 }
 
-
-
 .turn-box {
   padding: 5px 10px;
   border-radius: 12px;
   flex-grow: 1;
 }
-
 
 .eye_toggle {
   margin-left: 70px;
@@ -382,14 +392,12 @@ button:hover {
   color: SeaGreen;
   background-color: #e0f7e0;
   border: 1px solid;
-
 }
 
 .opponent-turn {
   color: IndianRed;
   background-color: #f7e0e0;
   border: 1px solid;
-
 }
 
 .amiss {
@@ -406,5 +414,11 @@ button:hover {
 
 .corner-none {
   background-color: transparent;
+}
+
+.win_text {
+  font-size: xx-large;
+  font-weight: 700;
+  color: midnightblue;
 }
 </style>
