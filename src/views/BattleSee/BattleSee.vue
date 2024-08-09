@@ -51,7 +51,7 @@
             ></div>
           </div>
         </div>
-        <h3 v-if="opponentName == 'Opponent'">Гравець <strong>{{ opponentName }}</strong></h3>
+        <h3 v-if="opponentName !== 'Opponent'">Гравець <strong>{{ opponentName }}</strong></h3>
       </div>
     </div>
 
@@ -156,6 +156,9 @@ const initializeWebSocket = () => {
     const data = JSON.parse(event.data);
     if (data.type === 'move') {
       handleMoveResponse(data);
+    } else if (data.type === 'player_joined') {
+      console.log(data.message);  // Отображаем уведомление
+      location.reload();  // Перезагружаем страницу один раз
     }
     await updateGameState(data); 
   };
