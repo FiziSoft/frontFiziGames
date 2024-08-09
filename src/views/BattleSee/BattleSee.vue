@@ -154,14 +154,9 @@ const initializeWebSocket = () => {
 
   ws.value.onmessage = async (event) => {
     const data = JSON.parse(event.data);
-
-
     if (data.type === 'move') {
-    handleMoveResponse(data);
-  } else if (data.type === 'error') {
-    handleError(data.message);  // Обрабатываем ошибку, отправленную сервером
-  }
-
+      handleMoveResponse(data);
+    }
     await updateGameState(data); 
   };
 
@@ -169,14 +164,6 @@ const initializeWebSocket = () => {
     console.log("WebSocket connection closed");
   };
 };
-
-const handleError = (errorMessage) => {
- 
-  // Также можно обновить UI, например, показать модальное окно с ошибкой
-  winnerMessage.value = errorMessage;
-  winnerModal.value = true;
-};
-
 
 const startNewGame = async () => {
   try {
