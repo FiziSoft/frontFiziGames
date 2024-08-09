@@ -359,6 +359,8 @@ button:hover {
   justify-content: space-between;
   align-items: center;
   margin: 5px 0;
+  text-align: center;
+  width: 270px;
 }
 
 
@@ -371,8 +373,9 @@ button:hover {
 
 
 .eye_toggle {
-  width: 50px;
+  margin-left: 118px;
   flex-shrink: 0;
+  font-size: larger;
 }
 
 .your-turn {
