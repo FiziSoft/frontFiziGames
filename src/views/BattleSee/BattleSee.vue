@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <div v-if="!opponentName" class="shareLocal">
+      <div v-if="opponentName == 'Opponent'" class="shareLocal">
         <ShareButton :url="url_connect" text="Давай грати в Морський Бій"></ShareButton> 
         <h2> &#8592; Додай собі оппонента </h2>  
       </div>
@@ -51,7 +51,7 @@
             ></div>
           </div>
         </div>
-        <h3>Гравець <strong>{{ opponentName }}</strong></h3>
+        <h3 v-if="opponentName == 'Opponent'">Гравець <strong>{{ opponentName }}</strong></h3>
       </div>
     </div>
 
@@ -69,11 +69,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
 import ShareButton from '@/components/ShareButton.vue';
 import GameLayout from '../GameLayout.vue';
-import { url_main_page, url_serv_battle_sea, url_serv_battle_sea_wss } from "@/link";
+import { url_main_page, url_serv_battle_sea_wss, url_serv_battle_sea } from "@/link";
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import axios from 'axios';
 
 const myBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
 const opponentBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
@@ -81,7 +81,6 @@ const currentTurn = ref(null);
 const winner = ref(null);
 const winnerModal = ref(false);
 const winnerMessage = ref('');
-const moveMessage = ref('');
 const moveMessageClass = ref('');
 const route = useRoute();
 const router = useRouter();
@@ -103,33 +102,17 @@ const getCellClass = (cell, isMyBoard) => {
   return 'empty';
 };
 
-const isMyTurn = () => {
-
-  return currentTurn.value === playerId;
-  
-};
+const isMyTurn = () => currentTurn.value === playerId;
 
 const makeMove = async (row, col) => {
-  try {
-    console.log(`Making move: row=${row}, col=${col}, playerId=${playerId}`);
-    const response = await axios.post(`${url_serv_battle_sea}/api/move/${roomId}`, {
-      row,
-      col,
-      playerId
-    });
-    handleMoveResponse(response.data);
-    await updateGameState(); // Обновляем состояние игры после хода
-  } catch (error) {
-    console.error("Error making move:", error);
-    if (error.response && error.response.status === 403) {
-      console.error("Не ваш ход или недопустимый ход.");
-    }
-  }
+  if (!isMyTurn()) return;
+
+  console.log(`Making move: row=${row}, col=${col}, playerId=${playerId}`);
+  const move = { type: 'move', row, col, playerId };
+  ws.value.send(JSON.stringify(move));
 };
 
 const handleMoveResponse = (data) => {
-
-  console.log(data.message)
   if (data.message === 'miss') {
     moveMessageClass.value = 'miss';
   } else if (data.message === 'hit') {
@@ -141,29 +124,24 @@ const handleMoveResponse = (data) => {
 
   setTimeout(() => {
     cornerClass.value = 'none';
-
   }, 700);
 };
 
-const updateGameState = async () => {
-  try {
-    const response = await axios.get(`${url_serv_battle_sea}/api/game-state/${roomId}`, {
-      params: { playerId }
-    });
-    const data = response.data;
-    // Обновляем состояние досок и другой информации в компоненте
-    myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
-    opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
-    currentTurn.value = data.current_turn;
-    opponentName.value = playerId === data.admin.id ? data.player.name : data.admin.name;
-    
-    if (data.winner) {
-      winner.value = data.winner;
-      winnerModal.value = true;
-      winnerMessage.value = data.winner === playerId ? 'Вы победили!' : 'Вы проиграли!';
-    }
-  } catch (error) {
-    console.error("Error fetching game state:", error);
+const updateGameState = async (data) => {
+  myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
+  opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
+  currentTurn.value = data.current_turn;
+
+  
+  
+  opponentName.value = playerId === data.admin.id ? (data.player ? data.player.name : "Opponent") : data.admin.name;
+
+
+
+  if (data.winner) {
+    winner.value = data.winner;
+    winnerModal.value = true;
+    winnerMessage.value = data.winner === playerId ? 'Вы победили!' : 'Вы проиграли!';
   }
 };
 
@@ -178,15 +156,9 @@ const initializeWebSocket = () => {
     const data = JSON.parse(event.data);
     if (data.type === 'move') {
       handleMoveResponse(data);
-    } else {
-      currentTurn.value = data.current_turn;
     }
-    await updateGameState(); // Обновляем состояние игры при получении сообщения
+    await updateGameState(data); 
   };
-
-  setInterval(() => {
-    updateGameState();
-  }, 2000);
 
   ws.value.onclose = () => {
     console.log("WebSocket connection closed");
@@ -201,10 +173,6 @@ const startNewGame = async () => {
   } catch (error) {
     console.error("Error starting new game:", error);
   }
-
-  setTimeout(() => {
-    moveMessage.value = '';
-  }, 700);
 };
 
 const exitGame = () => {
@@ -212,7 +180,6 @@ const exitGame = () => {
 };
 
 onMounted(() => {
-  updateGameState();
   initializeWebSocket();
 });
 
@@ -224,10 +191,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-
-
-
-
 .shareLocal {
   max-width: 400px;
   display: flex;
@@ -361,22 +324,4 @@ button:hover {
 .corner-none {
   background-color: transparent;
 }
-
-/* @media (max-width: 768px) {
-  .containerFormCreate {    flex-direction: column;
-  }
-  
-  .game-board {
-    max-width: 360px;
-  }
-
-  .board {
-    grid-template-columns: repeat(11, 20px);
-  }
-
-  .cell {
-    width: 20px;
-    height: 20px;
-  }
-} */
 </style>
