@@ -51,7 +51,7 @@
             ></div>
           </div>
         </div>
-        <h3>Гравець <strong>{{ opponentName }}</strong></h3>
+        <h3 v-if="opponentName == 'Opponent'">Гравець <strong>{{ opponentName }}</strong></h3>
       </div>
     </div>
 
@@ -226,7 +226,7 @@ onUnmounted(() => {
 .cell {
   width: 30px;
   height: 30px;
-  border: .5px solid rgba(59, 55, 55, 0.3);
+  border: 1px solid rgba(59, 55, 55, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
