@@ -39,12 +39,17 @@
 
       <!-- Индикатор хода -->
       <div class="turn-indicator" v-if="opponentName !== 'Opponent'">
-        <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
-        <div v-else class="turn-box opponent-turn">Хід опонента</div>
-        <i 
-        :class="isBoardVisible ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" 
-        @click="toggleVisibility"
-      ></i>
+        
+        
+          <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
+          <div v-else class="turn-box opponent-turn">Хід опонента</div>
+       
+        <div class="eye_toggle">
+          <i 
+          :class="isBoardVisible ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" 
+          @click="toggleVisibility"
+          ></i>
+        </div>
       </div>
 
       <!-- Ряд для жизней оппонента -->
@@ -351,26 +356,37 @@ button:hover {
 
 .turn-indicator {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   margin: 5px 0;
-  border: 1px solid;
 }
+
+
 
 .turn-box {
   padding: 5px 10px;
   border-radius: 12px;
- 
+  flex-grow: 1;
+}
+
+
+.eye_toggle {
+  width: 50px;
+  flex-shrink: 0;
 }
 
 .your-turn {
   color: SeaGreen;
   background-color: #e0f7e0;
+  border: 1px solid;
+
 }
 
 .opponent-turn {
   color: IndianRed;
   background-color: #f7e0e0;
+  border: 1px solid;
+
 }
 
 .amiss {
