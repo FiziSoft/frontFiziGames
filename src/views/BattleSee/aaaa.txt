@@ -2,6 +2,7 @@
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
       
+
       <!-- Игровое поле игрока -->
       <div v-if="opponentName !== 'Opponent'" class="game-board">
         <h3>Гравець <strong>{{ playerName }}</strong></h3>
@@ -23,11 +24,11 @@
           </div>
         </div>
       </div>
-
-      <!-- Ряд для жизней игрока -->
-      <div v-if="opponentName !== 'Opponent'" class="life-row">
+<!-- Ряд для жизней игрока -->
+<div v-if="opponentName !== 'Opponent'" class="life-row">
         <div v-for="(life, index) in playerLives" :key="'player-life-' + index" class="life-dot"></div>
       </div>
+      
 
       <!-- Телеграм кнопка и уведомление -->
       <div v-if="opponentName == 'Opponent'" class="shareLocal">
@@ -40,12 +41,10 @@
         <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
         <div v-else class="turn-box opponent-turn">Хід опонента</div>
       </div>
-
-      <!-- Ряд для жизней оппонента -->
-      <div v-if="opponentName !== 'Opponent'" class="life-row">
+<!-- Ряд для жизней оппонента -->
+<div v-if="opponentName !== 'Opponent'" class="life-row">
         <div v-for="(life, index) in opponentLives" :key="'opponent-life-' + index" class="life-dot"></div>
       </div>
-      
       <!-- Игровое поле оппонента -->
       <div class="game-board" v-if="opponentName !== 'Opponent'">
         <div class="board">
@@ -81,8 +80,10 @@
   </GameLayout>
 </template>
 
+
+
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import GameLayout from '../GameLayout.vue';
@@ -101,9 +102,11 @@ const route = useRoute();
 const router = useRouter();
 const ws = ref(null);
 const opponentName = ref('');
+const cornerClass = ref('');
+
+// Логика для жизней
 const playerLives = ref(20);
 const opponentLives = ref(20);
-const cornerClass = ref('');
 
 const playerName = ref(localStorage.getItem('playerName') || '');
 
@@ -134,10 +137,18 @@ const handleMoveResponse = (data) => {
     moveMessageClass.value = 'miss';
   } else if (data.message === 'hit') {
     moveMessageClass.value = 'ahit';
-    opponentLives.value -= 1;
+    if (data.player_id !== playerId) {
+      playerLives.value--; // Уменьшаем количество жизней игрока, если попал противник
+    } else {
+      opponentLives.value--; // Уменьшаем количество жизней оппонента при попадании игрока
+    }
   } else if (data.message === 'sunk') {
     moveMessageClass.value = 'asunk';
-    opponentLives.value -= 1;
+    if (data.player_id !== playerId) {
+      playerLives.value--; // Уменьшаем количество жизней игрока, если противник потопил корабль
+    } else {
+      opponentLives.value--; // Уменьшаем количество жизней оппонента при потоплении корабля игроком
+    }
   }
   cornerClass.value = moveMessageClass.value;
 
@@ -147,22 +158,34 @@ const handleMoveResponse = (data) => {
 };
 
 const updateGameState = async (data) => {
-  myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
-  opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
-  currentTurn.value = data.current_turn;
-  playerLives.value = playerId === data.admin.id ? data.adminLives : data.playerLives;
-  opponentLives.value = playerId === data.admin.id ? data.playerLives : data.adminLives;
+  console.log("Received game state data:", data);
 
+  // if (!data || !data.admin || !data.player) {
+  //   console.error("Missing admin or player data:", data);
+    
+  // }
+  try {
+  myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
+  
+  opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
+  }
+  catch (error) {
+    console.error("!!!!!!!!!!", error);
+  }
+  currentTurn.value = data.current_turn;
+  try {
   opponentName.value = playerId === data.admin.id ? (data.player ? data.player.name : "Opponent") : data.admin.name;
+  }
+  catch (error) {
+    console.error("!!!!!!!!!!", error);
+  }
+
+
 
   if (data.winner) {
     winner.value = data.winner;
     winnerModal.value = true;
     winnerMessage.value = data.winner === playerId ? 'Вы победили!' : 'Вы проиграли!';
-  }
-
-  if (data.game_started) {
-    window.location.reload();
   }
 };
 
@@ -177,19 +200,50 @@ const initializeWebSocket = () => {
     const data = JSON.parse(event.data);
     if (data.type === 'move') {
       handleMoveResponse(data);
+    } 
+    else if (data.type === 'player_joined') {
+      console.log(data.message);  // Отображаем уведомление
     }
-    await updateGameState(data); 
-  };
-
-  ws.value.onclose = () => {
-    console.log("WebSocket connection closed");
+    else if (data.type === 'new_game') {
+      console.log(data.message);  // Отображаем сообщение о начале новой игры
+      // Здесь вы можете добавить любую логику, необходимую для старта новой игры
+      console.log('Игра начинается!');
+    }
+    await updateGameState(data);
   };
 };
+
+// Сохраняем жизни в localStorage
+watch(playerLives, (newVal) => {
+  localStorage.setItem('playerLives', newVal);
+});
+
+watch(opponentLives, (newVal) => {
+  localStorage.setItem('opponentLives', newVal);
+});
+
+onMounted(() => {
+  // Инициализируем жизни из localStorage
+  playerLives.value = parseInt(localStorage.getItem('playerLives')) || 20;
+  opponentLives.value = parseInt(localStorage.getItem('opponentLives')) || 20;
+  
+  initializeWebSocket();
+});
+
+onUnmounted(() => {
+  if (ws.value) {
+    ws.value.close();
+  }
+});
 
 const startNewGame = async () => {
   try {
     await axios.post(`${url_serv_battle_sea}/api/start-new-game/${roomId}`);
+    playerLives.value = 20;  // Сбрасываем количество жизней игрока
+    opponentLives.value = 20;  // Сбрасываем количество жизней оппонента
     winnerModal.value = false;
+    localStorage.removeItem('playerLives');  // Удаляем сохраненные данные
+    localStorage.removeItem('opponentLives');  // Удаляем сохраненные данные
     window.location.reload();
   } catch (error) {
     console.error("Error starting new game:", error);
@@ -199,17 +253,8 @@ const startNewGame = async () => {
 const exitGame = () => {
   router.push('/');
 };
-
-onMounted(() => {
-  initializeWebSocket();
-});
-
-onUnmounted(() => {
-  if (ws.value) {
-    ws.value.close();
-  }
-});
 </script>
+
 
 <style scoped>
 .shareLocal {
@@ -251,7 +296,7 @@ onUnmounted(() => {
 
 .board {
   display: grid;
-  grid-template-columns: repeat(11, 30px);
+  grid-template-columns: repeat(11, 30px); /* 10 columns + 1 for labels */
 }
 
 .row {
@@ -342,6 +387,7 @@ button:hover {
   color: IndianRed;
   background-color: #f7e0e0;
 }
+
 
 .amiss {
   background-color: DodgerBlue;
