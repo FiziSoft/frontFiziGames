@@ -1,7 +1,7 @@
 <template>
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
-      <div class="game-board">
+      <div v-if="opponentName == 'Opponent'" class="game-board">
         <h3>Гравець <strong>{{ playerName }}</strong></h3>
         <div class="board">
           <div class="label-row">
@@ -226,7 +226,7 @@ onUnmounted(() => {
 .cell {
   width: 30px;
   height: 30px;
-  border: 1px solid rgba(59, 55, 55, 0.7);
+  border: .5px solid rgba(59, 55, 55, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -263,7 +263,7 @@ onUnmounted(() => {
   background-color: white;
   border: 1px solid black;
   padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .modal-content {
