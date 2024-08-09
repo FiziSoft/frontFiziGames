@@ -1,13 +1,10 @@
 <template>
   <GameLayout name-game="Морський Бій">
     <div class="containerFormCreate">
-      <i 
-        :class="isBoardVisible ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" 
-        @click="toggleVisibility"
-      ></i>
+      
       <!-- Игровое поле игрока -->
       <div v-if="opponentName !== 'Opponent' && isBoardVisible" class="game-board">
-      <div class="my_board"><h3>Гравець <strong>{{ playerName }}</strong> </h3> 
+      <div class="my_board"><h3>Гравець: <strong>{{ playerName }}</strong> </h3> 
         
       </div>
         <div class="board">
@@ -44,6 +41,10 @@
       <div class="turn-indicator" v-if="opponentName !== 'Opponent'">
         <div v-if="isMyTurn()" class="turn-box your-turn">Ваш хід</div>
         <div v-else class="turn-box opponent-turn">Хід опонента</div>
+        <i 
+        :class="isBoardVisible ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" 
+        @click="toggleVisibility"
+      ></i>
       </div>
 
       <!-- Ряд для жизней оппонента -->
@@ -71,7 +72,7 @@
             ></div>
           </div>
         </div>
-        <h3 v-if="opponentName !== 'Opponent'">Гравець <strong>{{ opponentName }}</strong></h3>
+        <h3 class="opponentName" v-if="opponentName !== 'Opponent'">Гравець: <strong>{{ opponentName }}</strong></h3>
       </div>
     </div>
 
@@ -229,6 +230,11 @@ onUnmounted(() => {
 
 <style scoped>
 
+.opponentName {
+  margin-top: 5px;
+  margin-left: 30px;
+}
+
 .my_board {
   display: flex;
   justify-content: space-between;
@@ -348,6 +354,7 @@ button:hover {
   justify-content: center;
   align-items: center;
   margin: 5px 0;
+  border: 1px solid;
 }
 
 .turn-box {
