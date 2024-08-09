@@ -192,7 +192,6 @@ onMounted(() => {
     }
 
     if (data.game_started) {
-      alert("Игра началась!");
       window.location.reload();  // Обновляем страницу
     }
   };
