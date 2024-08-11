@@ -3,6 +3,9 @@
       <img src="path/to/uk-flag.svg" @click="setLanguage('uk')" alt="Українська" />
       <img src="path/to/ru-flag.svg" @click="setLanguage('ru')" alt="Русский" />
       <img src="path/to/en-flag.svg" @click="setLanguage('en')" alt="English" />
+      <img src="path/to/en-flag.svg" @click="setLanguage('pl')" alt="Poland" />
+      <img src="path/to/en-flag.svg" @click="setLanguage('es')" alt="Espania" />
+
     </div>
   </template>
   
@@ -18,7 +21,7 @@
   };
   
   onMounted(() => {
-    const savedLanguage = localStorage.getItem('language') || 'uk';
+    const savedLanguage = localStorage.getItem('language') || 'ua';
     locale.value = savedLanguage;
   });
   </script>

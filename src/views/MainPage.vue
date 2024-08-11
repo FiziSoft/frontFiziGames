@@ -7,6 +7,8 @@
           <option value="ua">Ua</option>
           <option value="ru">Ru</option>
           <option value="en">En</option>
+          <option value="pl">Pl</option>
+          <option value="es">Es</option>
         </select>
       </div>
     </div>

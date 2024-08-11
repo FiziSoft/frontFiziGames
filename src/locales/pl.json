@@ -1,0 +1,108 @@
+{
+    "welcome": "Fizi Games",
+    "best_online_games": "Najlepsze gry planszowe online",
+    "themes": {
+      "default": "Ciemny",
+      "theme1": "Zachód słońca",
+      "theme2": "Lekkość",
+      "theme3": "Słoneczny",
+      "theme4": "Różowy"
+    },
+    "games": {
+      "loseFriends": {
+        "name": "Jak stracić przyjaciół",
+        "description": "W tej grze zadaniem każdego uczestnika jest wybranie osoby, która najbardziej pasuje do opisu na karcie pytania. Gracz, który zdobędzie najwięcej 'głosów', otrzymuje 1 punkt. Kto zdobędzie najwięcej punktów na koniec wieczoru, może potrzebować nowych przyjaciół lub przemyśleć zmianę imienia i przeprowadzkę do innego miasta."
+      },
+      "battleSee": {
+        "name": "Bitwa Morska",
+        "description": "To klasyczna gra planszowa, która przenosi Cię do świata bitew morskich i taktycznych manewrów. W tej grze dwóch graczy stara się zatopić statki przeciwnika, zanim ich własne statki zostaną zniszczone.",
+        "create": "Stwórz grę",
+        "name_player": "Twoje imię:",
+        "join": "Dołącz do gry",
+        "player": "Gracz",
+        "your_turn": "Twoja kolej",
+        "opponent_turn": "Kolej przeciwnika",
+        "add_opponent": "Dodaj przeciwnika",
+        "game_won": "Wygrałeś!",
+        "game_lost": "Przegrałeś!",
+        "start_new_game": "Zacznij od nowa",
+        "exit": "Wyjście",
+        "play_battleship": "Zagrajmy w Bitwę Morską"
+      },
+      "rsp": {
+        "name": "Kamień Papier Nożyczki",
+        "description": "Kamień Papier Nożyczki to klasyczna gra oparta na szczęściu i strategii. Dwóch graczy jednocześnie wybiera jedną z trzech figur: kamień, nożyczki lub papier. Kamień pokonuje nożyczki, nożyczki pokonują papier, a papier pokonuje kamień."
+      },
+      "spy": {
+        "name": "Szpieg",
+        "description": "Szpieg to gra, w której gracze próbują dowiedzieć się, kto jest szpiegiem, zadając sobie nawzajem pytania. Jeden gracz otrzymuje rolę szpiega i próbuje odgadnąć tajne słowo, nie ujawniając swojej tożsamości."
+      },
+      "tod": {
+        "name": "Prawda czy Wyzwanie",
+        "description": "Prawda czy Wyzwanie to klasyczna gra imprezowa, w której gracze wybierają między prawdą a wyzwaniem. Wybór prawdy oznacza, że gracz musi szczerze odpowiedzieć na pytanie, a wyzwanie wymaga wykonania zadania."
+      },
+      "five_second": {
+        "name": "5 Sekund",
+        "description": "5 Sekund to szybka i zabawna gra, w której gracze muszą wymienić trzy rzeczy w pięć sekund. Na przykład trzy rodzaje owoców lub trzy znane filmy. Jeśli gracz nie zdąży, kolejka przechodzi do następnego gracza.",
+        "continue_game": "Kontynuuj poprzednią grę",
+        "add_player": "Dodaj gracza",
+        "delete_player": "Usuń",
+        "start_game": "Rozpocznij",
+        "timer": "Stoper",
+        "score": "punkty",
+        "answer_correct": "+",
+        "answer_wrong": "-",
+        "game_type_3": "Wymień trzy",
+        "game_type_5": "Wymień pięć",
+        "current_player": "Obecny gracz",
+        "default_name": "Imię"
+      },
+      "codenames": {
+        "name": "Kryptonimy",
+        "description": "Kryptonimy to gra drużynowa, w której gracze próbują odgadnąć słowa za pomocą wskazówek. Dwie drużyny rywalizują, aby jako pierwsze odnaleźć wszystkie swoje słowa kodowe na planszy. Wskazówka składa się z jednego słowa i liczby, która wskazuje, ile słów jest ze sobą powiązanych.",
+        "title": "Kryptonimy",
+        "create_game": "Stwórz grę z {count} słowami",
+        "teams": {
+          "blue": "Niebiescy",
+          "red": "Czerwoni",
+          "your_team": "Twoja drużyna",
+          "change_team": "Zmień drużynę"
+        },
+        "start_game": "Rozpocznij grę",
+        "show_colors": "Pokaż kolory",
+        "hide_colors": "Ukryj kolory",
+        "update_words": "Zaktualizuj słowa",
+        "winner_message": "Drużyna {team} wygrała!",
+        "choose_team": "Wybierz swoją drużynę",
+        "confirm_reveal": "Czy jesteś pewien?",
+        "yes": "Tak",
+        "no": "Nie",
+        "add_players": "Dodaj graczy",
+        "add_captain": "Dodaj kapitana",
+        "play_codenames": "Zagrajmy w Kryptonimy",
+        "tour": {
+          "teamNameTitle": "Drużyny",
+          "teamName": "Są dwie drużyny, Niebiescy i Czerwoni <br/>(w nawiasach liczba graczy w drużynie)",
+          "team-progressTitle": "Punkty",
+          "team-progress": "Liczba punktów potrzebnych do wygrania <strong>(Niebiescy zaczynają, dlatego zawsze mają o 1 punkt więcej)</strong>",
+          "gridTitle": "Słowa do odgadnięcia",
+          "grid": "Tutaj wyświetlane są słowa, które kapitanowie muszą zakodować, a gracze muszą odgadnąć",
+          "usersTitle": "Dodawanie graczy, którym będziesz dawał wskazówki",
+          "users": "Użyj kodu QR lub przekaż gotowy link przez media społecznościowe",
+          "captainTitle": "Dodaj kapitana drugiej drużyny",
+          "captain": "Użyj kodu QR lub przekaż gotowy link przez media społecznościowe",
+          "startTitle": "Po naciśnięciu zobaczysz kolorową mapę słów",
+          "start": "1. Tę mapę widzą tylko kapitanowie <br/> 2. Na jej podstawie kapitanowie próbują łączyć słowa z różnymi znaczeniami <br/> 3. Drużyna Niebieskich zaczyna pierwsza (mają o 1 słowo więcej do odgadnięcia) <br/> 4. Drużyna, która pierwsza odgadnie wszystkie słowa, wygrywa <br/> 5. Gracze zaznaczają słowa na swoich telefonach (ale może to również zrobić kapitan) <br/> 6. Czarne słowo to bomba<br/>(jeśli je wybierzesz, przegrywasz)"
+        }
+      }
+    },
+    "select_theme": "Wybierz motyw",
+    "select_language": "Wybierz język",
+    "close": "Zamknij",
+    "tour" : {
+        "back":"Wstecz",
+        "next":"Dalej",
+        "finish":"Zakończ"
+    }
+  }
+  

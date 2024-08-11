@@ -11,10 +11,15 @@
         <h3 class="gameTypeText">{{ $t('games.five_second.game_type_3') }}</h3>
         <p><strong>{{ currentQuestion.question }}</strong></p>
       </div>
+
       <div class="controls" v-if="!gameOver">
-        <button class="btn-grad" @click="startGame">{{ $t('games.five_second.start_game') }}</button>
+        <button class="btn-grad" v-if="!isRunning" @click="startGame">{{ $t('games.five_second.start_game') }}</button>
+        <button class="btn-icon" v-if="!isRunning" @click="refreshQuestion">
+          <i style="margin-top: 15px;" class="fa fa-refresh"></i>
+        </button>
         <p v-if="isRunning" class="timer">{{ timeLeft }}</p>
       </div>
+
       <div v-if="gameOver" class="modal yes_or_not_div">
         <button class="btn-grad" @click="playerAnswered(true)">{{ $t('games.five_second.answer_correct') }}</button>
         <button class="btn-grad" @click="playerAnswered(false)">{{ $t('games.five_second.answer_wrong') }}</button>
@@ -31,6 +36,12 @@ import GameLayout from '../GameLayout.vue'
 
 // eslint-disable-next-line
 import alarmSound from '@/assets/sound/tic5sec.mp3'
+
+
+
+
+
+
 
 const alarm = new Audio(alarmSound)
 
@@ -49,6 +60,15 @@ const gameType = ref(localStorage.getItem('five_second_game_type') || '3')
 const questions = ref([])
 
 let timer = null
+
+
+if (route.params.locale) {
+  locale.value = route.params.locale;
+}
+// Получение языка из localStorage или установка 'ua' по умолчанию
+const savedLocale = localStorage.getItem('language') || 'ua';
+locale.value = savedLocale;
+
 
 const loadQuestions = async () => {
   try {
@@ -77,6 +97,10 @@ const startGame = () => {
       gameOver.value = true
     }
   }, 1000)
+}
+
+const refreshQuestion = () => {
+  currentQuestion.value = questions.value[Math.floor(Math.random() * questions.value.length)]
 }
 
 const nextQuestion = () => {
@@ -178,7 +202,19 @@ router.beforeEach((to, from, next) => {
 
 .btn-grad {
   margin: 15px;
+}
 
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-color);
+  margin-left: 10px;
+}
+
+.btn-icon:hover {
+  color: var(--btn-bg-color);
 }
 
 .gameTypeText {
@@ -194,8 +230,6 @@ router.beforeEach((to, from, next) => {
   padding: 10px;
   color: var(--text-color);
 }
-
-
 
 .card p {
   font-size: 1.5em;
@@ -258,6 +292,9 @@ router.beforeEach((to, from, next) => {
     font-size: 18px;
     padding: 12px 24px;
   }
+  .btn-icon {
+    font-size: 18px;
+  }
   .timer {
     font-size: 40px;
   }
@@ -271,6 +308,9 @@ router.beforeEach((to, from, next) => {
   .btn-grad {
     font-size: 16px;
     padding: 10px 20px;
+  }
+  .btn-icon {
+    font-size: 16px;
   }
   .timer {
     font-size: 35px;

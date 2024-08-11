@@ -328,10 +328,17 @@ const startTour = () => {
 </script>
 
 <style scoped>
+
+.buttonsCode {
+  padding: 0 25px;
+}
+ 
+
+
 .groupShare {
   width: 100%;
   display: flex;
-  padding: 10px;
+  gap:20px
 }
 
 .tourDiv {

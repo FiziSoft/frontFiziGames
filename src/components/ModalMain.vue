@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="close">
     <div class="modal-content">
       <button class="close-button" @click="close">×</button>
-      <h2>{{ $t(`games.${game.key}.name`) }}</h2>
+      <h2 class="name_game_modal">{{ $t(`games.${game.key}.name`) }}</h2>
       <p>{{ $t(`games.${game.key}.description`) }}</p>
     </div>
   </div>
@@ -56,5 +56,9 @@ const close = () => {
   top: 10px;
   right: 10px;
   cursor: pointer;
+}
+
+.name_game_modal {
+  font-size: x-large;
 }
 </style>

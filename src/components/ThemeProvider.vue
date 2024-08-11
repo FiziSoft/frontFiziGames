@@ -60,7 +60,7 @@
     },
   };
   
-  const currentTheme = ref(localStorage.getItem('theme') || 'default');
+  const currentTheme = ref(localStorage.getItem('theme') || 'theme3');
   
   const applyTheme = (theme) => {
     const root = document.documentElement;

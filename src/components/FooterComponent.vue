@@ -3,6 +3,12 @@
     <button class="menuBurger" @click="toggleModal">
       <i :class="isModalOpen ? 'fa fa-chevron-down' : 'fa fa-bars'"></i>
     </button>
+    
+    <!-- Центрируем иконку дома -->
+    <button class="homeIcon" @click="goToHome">
+      <i class="fa fa-home"></i>
+    </button>
+
     <span class="menuFizi" @click="goToHome">FiziGames</span>
 
     <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal">
@@ -28,6 +34,9 @@
               <option value="ua">Українська</option>
               <option value="ru">Русский</option>
               <option value="en">English</option>
+              <option value="pl">Poland</option>
+              <option value="es">Espania</option>
+
             </select>
           </div>
           <ShareButton url="https://fizi.cc" text="Запрошую пограти на Fizi.cc (Найкращі настільні ігри Он-лайн)"></ShareButton>
@@ -82,10 +91,20 @@ const changeLanguage = (event) => {
   position: fixed
   bottom: 0
   box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1)
-  border-top: 1px solid rgba(0, 0, 0, 0.1)
+  border-top: .5px solid rgba(0, 0, 0, 0.2)
   z-index: 1000
   margin-top: 50px
-  
+
+  // Центрируем иконку дома
+  .homeIcon
+    background: none
+    border: none
+    font-size: 24px
+    cursor: pointer
+    color: var(--burger-color) !important
+    position: absolute
+    left: 50%
+    transform: translateX(-50%)
 
 .menuBurger
   background: none
@@ -111,7 +130,6 @@ const changeLanguage = (event) => {
   justify-content: center
   align-items: flex-end
   z-index: 999
-  
 
 .modal-content
   background: var(--bg-color)

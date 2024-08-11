@@ -1,0 +1,108 @@
+{
+    "welcome": "Fizi Games",
+    "best_online_games": "Los mejores juegos de mesa en línea",
+    "themes": {
+      "default": "Oscuro",
+      "theme1": "Atardecer",
+      "theme2": "Ligero",
+      "theme3": "Soleado",
+      "theme4": "Rosa"
+    },
+    "games": {
+      "loseFriends": {
+        "name": "Cómo perder amigos",
+        "description": "En este juego, la tarea de cada participante es elegir a la persona que mejor se ajuste a la descripción en la tarjeta de pregunta. El jugador que recoja más 'votos' obtiene 1 punto. Quien recoja más puntos al final de la noche, quizás deba hacerse nuevos amigos o considerar cambiar su nombre y mudarse a otra ciudad."
+      },
+      "battleSee": {
+        "name": "Batalla Naval",
+        "description": "Este es un juego de mesa clásico que te transporta al mundo de las batallas navales y las maniobras tácticas. En este juego, dos jugadores intentan hundir los barcos del oponente antes de que sus propios barcos sean destruidos.",
+        "create": "Crear juego",
+        "name_player": "Tu nombre:",
+        "join": "Unirse al juego",
+        "player": "Jugador",
+        "your_turn": "Tu turno",
+        "opponent_turn": "Turno del oponente",
+        "add_opponent": "Añade un oponente",
+        "game_won": "¡Has ganado!",
+        "game_lost": "¡Has perdido!",
+        "start_new_game": "Empezar de nuevo",
+        "exit": "Salir",
+        "play_battleship": "Vamos a jugar Batalla Naval"
+      },
+      "rsp": {
+        "name": "Piedra Papel Tijeras",
+        "description": "Piedra Papel Tijeras es un juego clásico de suerte y estrategia. Dos jugadores eligen simultáneamente una de las tres figuras: piedra, tijeras o papel. La piedra gana a las tijeras, las tijeras ganan al papel, y el papel gana a la piedra."
+      },
+      "spy": {
+        "name": "Espía",
+        "description": "Espía es un juego en el que los jugadores intentan averiguar quién es el espía haciendo preguntas entre ellos. Un jugador recibe el rol de espía e intenta adivinar la palabra secreta sin revelar su identidad."
+      },
+      "tod": {
+        "name": "Verdad o Reto",
+        "description": "Verdad o Reto es un juego clásico de fiestas donde los jugadores eligen entre decir la verdad o aceptar un reto. Si eligen verdad, deben responder honestamente a una pregunta, y si eligen reto, deben realizar una tarea."
+      },
+      "five_second": {
+        "name": "5 Segundos",
+        "description": "5 Segundos es un juego rápido y divertido donde los jugadores deben nombrar tres cosas en cinco segundos. Por ejemplo, tres tipos de frutas o tres películas famosas. Si el jugador no lo logra, el turno pasa al siguiente jugador.",
+        "continue_game": "Continuar el juego anterior",
+        "add_player": "Agregar jugador",
+        "delete_player": "Eliminar",
+        "start_game": "Empezar",
+        "timer": "Cronómetro",
+        "score": "puntos",
+        "answer_correct": "+",
+        "answer_wrong": "-",
+        "game_type_3": "Nombra tres",
+        "game_type_5": "Nombra cinco",
+        "current_player": "Jugador actual",
+        "default_name": "Nombre"
+      },
+      "codenames": {
+        "name": "Codenames",
+        "description": "Codenames es un juego de equipo donde los jugadores intentan adivinar palabras usando pistas. Dos equipos compiten para ser los primeros en encontrar todas sus palabras clave en el tablero. La pista consiste en una palabra y un número que indica cuántas palabras están relacionadas.",
+        "title": "Codenames",
+        "create_game": "Crear juego con {count} palabras",
+        "teams": {
+          "blue": "Azules",
+          "red": "Rojos",
+          "your_team": "Tu equipo",
+          "change_team": "Cambiar de equipo"
+        },
+        "start_game": "Empezar el juego",
+        "show_colors": "Mostrar colores",
+        "hide_colors": "Ocultar colores",
+        "update_words": "Actualizar palabras",
+        "winner_message": "¡El equipo {team} ha ganado!",
+        "choose_team": "Elige tu equipo",
+        "confirm_reveal": "¿Estás seguro?",
+        "yes": "Sí",
+        "no": "No",
+        "add_players": "Agregar jugadores",
+        "add_captain": "Agregar capitán",
+        "play_codenames": "Vamos a jugar Codenames",
+        "tour": {
+          "teamNameTitle": "Equipos",
+          "teamName": "Hay dos equipos, Azules y Rojos <br/>(el número en paréntesis indica la cantidad de jugadores en el equipo)",
+          "team-progressTitle": "Puntuación",
+          "team-progress": "Cantidad de puntos necesarios para ganar <strong>(Los azules comienzan, por lo tanto siempre tienen 1 punto más)</strong>",
+          "gridTitle": "Palabras para adivinar",
+          "grid": "Aquí se muestran las palabras que los capitanes deben codificar y los jugadores deben adivinar",
+          "usersTitle": "Agregar jugadores a quienes debes dar pistas",
+          "users": "Usa un código QR o comparte un enlace a través de redes sociales",
+          "captainTitle": "Agrega un capitán para el segundo equipo",
+          "captain": "Usa un código QR o comparte un enlace a través de redes sociales",
+          "startTitle": "Después de presionar, verás el mapa de colores de las palabras",
+          "start": "1. Este mapa solo lo ven los capitanes <br/> 2. Usando el mapa, los capitanes intentan unir palabras con significados comunes <br/> 3. El equipo azul empieza primero (tienen 1 palabra más para adivinar) <br/> 4. El equipo que adivine todas las palabras primero gana <br/> 5. Los jugadores marcan las palabras en sus teléfonos (aunque también puede hacerlo el capitán) <br/> 6. La palabra negra es una bomba<br/>(si la eliges, pierdes)"
+        }
+      }
+    },
+    "select_theme": "Selecciona un tema",
+    "select_language": "Selecciona un idioma",
+    "close": "Cerrar",
+    "tour" : {
+        "back":"Atrás",
+        "next":"Siguiente",
+        "finish":"Finalizar"
+    }
+  }
+  
