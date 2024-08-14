@@ -28,6 +28,14 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import GameLayout from "../GameLayout.vue";
 
+// Получение языка из localStorage или установка 'ua' по умолчанию
+
+import { useI18n } from 'vue-i18n';
+import { url_stat } from "@/link";
+const { locale } = useI18n();
+const savedLocale = localStorage.getItem('language') || 'ua';
+locale.value = savedLocale;
+
 
 const playerName = ref(localStorage.getItem('playerName'))
 const numPlayers = ref(null);
@@ -45,8 +53,19 @@ const sendCreateRoomRequest = async () => {
       name: playerName.value,
       req_players: numPlayers.value
     });
-
     const roomId = response.data.id;
+
+    axios.post(url_stat, {
+      game_id: 7,
+      room_number: roomId,
+      creator_name: playerName.value,
+      language: locale.value,
+      player_count: 0,
+      is_local: false,
+     
+      
+    });
+    
     localStorage.setItem('playerName', playerName.value);
     router.push({ name: 'RspGameRoom', params: { id: roomId } });
   } catch (error) {

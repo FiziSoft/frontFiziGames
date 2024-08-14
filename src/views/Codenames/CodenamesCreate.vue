@@ -13,10 +13,17 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
+
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 import GameLayout from '../GameLayout.vue';
+import { url_stat } from "@/link";
+
+
+
+const playerName = ref(localStorage.getItem('playerName') || '');
 
 const { locale } = useI18n();
 const router = useRouter();
@@ -37,6 +44,18 @@ const createGame = async (numWords) => {
       locale: locale.value,
     });
     const { game_id } = response.data;
+
+    axios.post(url_stat, {
+      game_id: 1,
+      room_number: game_id,
+      creator_name: playerName.value,
+      language: locale.value,
+      player_count: 0,
+      is_local: false,
+           
+    });
+
+
     router.push({
       name: 'codenames-gameboard',
       params: {

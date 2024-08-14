@@ -30,6 +30,11 @@ import GameLayout from '../GameLayout.vue';
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
+
+import { url_stat } from "@/link";
+
 
 const router = useRouter();
 const route = useRoute();
@@ -76,11 +81,24 @@ const saveUsers = () => {
 };
 
 const startGame = () => {
-  const roomId = Math.random().toString(36).substr(2, 9);
+  const roomId = uuidv4();
   five_second_users.value = five_second_users.value.map(user => ({ ...user, score: 0 }));
   localStorage.setItem('five_second_game_type', gameType.value);
   localStorage.removeItem('five_second_game_state');
   saveUsers();
+  const playerName = ref(localStorage.getItem('playerName') || '');
+
+  axios.post(url_stat, {
+      game_id: 4,
+      room_number: roomId,
+      creator_name: playerName.value,
+      language: locale.value,
+      player_count: 0,
+      is_local: true,
+     
+      
+    });
+
   router.push({ name: 'five-second-room', params: { roomId }, query: { locale: locale.value } });
 };
 

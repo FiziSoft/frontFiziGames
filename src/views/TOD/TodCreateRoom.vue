@@ -71,11 +71,27 @@
 
 <script setup>
 import GameLayout from '../GameLayout.vue';
-import {onBeforeMount, ref, reactive} from 'vue'
+import  {ref } from 'vue'
 import {router} from "../../router.js"
   
-import { useRoute } from 'vue-router';
- 
+import { v4 as uuidv4 } from 'uuid';
+
+
+import axios from "axios";
+
+
+
+import { useI18n } from 'vue-i18n';
+import { url_stat } from "@/link";
+
+const { locale } = useI18n();
+const savedLocale = localStorage.getItem('language') || 'ua';
+locale.value = savedLocale;
+
+
+const playerName = ref(localStorage.getItem('playerName') || '');
+
+
 const newPhone = ref('')
 const users = ref([
   {
@@ -116,10 +132,27 @@ const addUser = () =>{
 
 const onFocus = (e) => e.target.select();
 
+
+
+const roomId = uuidv4();
+
+
 const startGame =() =>{
 
-  localStorage.setItem('users', JSON.stringify(users.value))
+  localStorage.setItem('tod_users', JSON.stringify(users.value))
   localStorage.players = JSON.stringify(users.value)
+
+  axios.post(url_stat, {
+      game_id: 6,
+      room_number: roomId,
+      creator_name: playerName.value,
+      language: locale.value,
+      player_count: 0,
+      is_local: true,
+     
+      
+    });
+
   router.push({name: 'TOD_room' })
  console.log(users)
 }

@@ -119,6 +119,7 @@ onMounted(() => {
 
 .locale-container
   margin-top: 10px // Добавляем отступ сверху для мобильной версии
+  color: #000
 
 .locale-selector
   padding: 5px
