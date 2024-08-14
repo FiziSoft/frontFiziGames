@@ -68,7 +68,7 @@ const createRoom = async () => {
       creator_name: playerName.value,
       language: locale.value,
       player_count: 2,
-      is_local: false,
+      is_local: true,
       
     });
 
