@@ -17,12 +17,22 @@ import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import GameLayout from '../GameLayout.vue';
 import { url_serv_lose_friends } from "@/link"
+import axios from "axios";
 
 const router = useRouter();
 
 
 
 
+import { useI18n } from 'vue-i18n';
+import { url_stat } from "@/link";
+
+const { locale } = useI18n();
+const savedLocale = localStorage.getItem('language') || 'ua';
+locale.value = savedLocale;
+
+
+const playerName = ref(localStorage.getItem('playerName') || '');
 
 const createAndJoinRoom = async () => {
 
@@ -33,6 +43,17 @@ const createAndJoinRoom = async () => {
   });
   const { room_id } = await createResponse.json();
 
+
+  axios.post(url_stat, {
+      game_id: 3,
+      room_number: room_id,
+      creator_name: playerName.value,
+      language: locale.value,
+      player_count: 0,
+      is_local: false,
+     
+      
+    });
   
   router.push({ name: 'LoseFriendsConnect', params: { roomId: room_id } });
 };
