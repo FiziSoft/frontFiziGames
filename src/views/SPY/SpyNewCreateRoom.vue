@@ -84,7 +84,7 @@ const sendCreateRoomRequest = async () => {
       room_number: roomId,
       creator_name: playerName.value,
       language: locale.value,
-      player_count: 0,
+      player_count: numPlayers.value,
       is_local: true,
      
       
