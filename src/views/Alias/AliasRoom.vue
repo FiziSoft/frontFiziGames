@@ -393,6 +393,7 @@ console.log('Результат раунда:', roundScore.value);
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin-bottom: 50px;
 }
 
 .teamNames {
@@ -402,7 +403,7 @@ console.log('Результат раунда:', roundScore.value);
 }
 
 .teamName {
-  font-size: 1.5em;
+  font-size: 1.3em;
   padding: 10px;
   border: 2px solid transparent;
   border-radius: 10px;
