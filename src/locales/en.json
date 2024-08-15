@@ -9,6 +9,10 @@
     "theme4": "Pink"
   },
   "games": {
+    "alias": {
+      "name": "Alias",
+      "description": ""
+    },
     "loseFriends": {
       "name": "How to Lose Friends",
       "description": "In this game, each participant's task is to choose the person who best fits the description on the question card. The player who collects the most 'votes' earns 1 point. Whoever collects the most points by the end of the evening may need to make new friends or consider changing their name and moving to another city"

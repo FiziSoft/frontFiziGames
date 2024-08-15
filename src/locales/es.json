@@ -9,6 +9,10 @@
       "theme4": "Rosa"
     },
     "games": {
+      "alias": {
+      "name": "Alias",
+      "description": ""
+    },
       "loseFriends": {
         "name": "Cómo perder amigos",
         "description": "En este juego, la tarea de cada participante es elegir a la persona que mejor se ajuste a la descripción en la tarjeta de pregunta. El jugador que recoja más 'votos' obtiene 1 punto. Quien recoja más puntos al final de la noche, quizás deba hacerse nuevos amigos o considerar cambiar su nombre y mudarse a otra ciudad."

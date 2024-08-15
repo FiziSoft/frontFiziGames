@@ -42,7 +42,12 @@ import {url_main_page} from "@/link"
 
 
 const games = ref([
-{
+  {
+    key: 'alias',
+    url: '/alias',
+    icon: 'fa-solid fa-a',  
+  },
+  {
     key: 'loseFriends',
     url: '/bye-friends',
     icon: 'fa-solid fa-users-slash',  

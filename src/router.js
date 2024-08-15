@@ -26,6 +26,8 @@ import SpyOfflineRoom from './views/SPY/SpyOfflineRoom.vue'
 import BfConnect from './views/ByeFriends/BfConnect.vue'
 import LoseFriendsRoom from './views/ByeFriends/LoseFriendsRoom.vue'
 import LoseFriendsConnect from './views/ByeFriends/LoseFriendsConnect.vue'
+import AliasCreate from './views/Alias/AliasCreate.vue'
+import AliasRoom from './views/Alias/AliasRoom.vue'
 
 const routes = [
     {
@@ -33,6 +35,11 @@ const routes = [
         name: "Main",
         component: MainPage
     },
+
+    { path: '/alias', name: 'AliasCreate', component: AliasCreate },
+
+    { path: '/alias-room/:roomId', name: 'AliasRoom', component: AliasRoom },
+
 
     { path: '/bye-friends', name: 'byefriends', component: BfConnect },
 

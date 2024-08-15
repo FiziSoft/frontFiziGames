@@ -1,0 +1,9 @@
+  <li class="result_row" v-for="(word, index) in currentRoundWords" :key="word">
+    <div>{{ word }}</div>
+    <div>
+      {{ wordResults[word] }}
+      <span v-if="index === currentRoundWords.length - 1 && wordResults[word] === '+'">
+        ({{ wordResultsDetails[word] }})
+      </span>
+    </div>
+  </li>
