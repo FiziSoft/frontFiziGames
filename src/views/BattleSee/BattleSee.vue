@@ -73,7 +73,12 @@
             ></div>
           </div>
         </div>
-        <h3 class="opponentName" v-if="opponentName !== 'Opponent'">{{ $t('games.battleSee.player') }}: <strong>{{ opponentName }}</strong></h3>
+        <h3 class="opponentName" v-if="opponentName !== 'Opponent'">
+          {{ $t('games.battleSee.player') }}: <strong>{{ opponentName }}</strong>
+          <span :style="{ color: isPlayerOnline ? 'green' : 'grey' }">&#9679;</span>
+        </h3>
+
+
       </div>
     </div>
 
@@ -102,6 +107,7 @@ import axios from 'axios';
 
 
 import { useI18n } from 'vue-i18n';
+import AliasCreate from '../Alias/AliasCreate.vue';
 
 // Инициализация i18n и маршрутизации
 const { t, locale } = useI18n();
@@ -112,6 +118,7 @@ const savedLocale = localStorage.getItem('language') || 'ua';
 locale.value = savedLocale;
 
 
+const isPlayerOnline = ref(false); // Флаг, указывающий на онлайн-статус оппонента
 
 const myBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
 const opponentBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
@@ -195,25 +202,52 @@ const exitGame = () => {
 
 onMounted(() => {
   const updateGameState = async (data) => {
-    myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
-    opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
-    currentTurn.value = data.current_turn;
-    playerLives.value = playerId === data.admin.id ? data.adminLives : data.playerLives;
-    opponentLives.value = playerId === data.admin.id ? data.playerLives : data.adminLives;
+  // Проверка типа сообщения
+  if (data.type === 'pong') {
+    console.log('Pong received from server');
+    return; // Прерываем выполнение функции, так как это сообщение типа "pong"
+  }
 
-    opponentName.value = playerId === data.admin.id ? (data.player ? data.player.name : "Opponent") : data.admin.name;
+  // Проверяем, что данные содержат информацию об администраторе и игроке
+  if (!data.admin || !data.admin.id) {
+    console.error('Admin или его id отсутствует в данных:', data);
+    return;
+  }
 
-    if (data.winner) {
-      winner.value = data.winner;
-      winnerModal.value = true;
-      winnerMessage.value = data.winner === playerId ? t('games.battleSee.game_won') : t('games.battleSee.game_lost');
-    }
+  if (data.player && !data.player.id) {
+    console.error('Player или его id отсутствует в данных:', data);
+    return;
+  }
 
-    
-  };
+  // Обновляем статус подключения игрока
+  if (data.player_online !== undefined) {
+    isPlayerOnline.value = data.player_online;
+  }
 
+  myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
+  opponentBoard.value = playerId === data.admin.id ? data.playerBoard : data.adminBoard;
+  currentTurn.value = data.current_turn;
+  playerLives.value = playerId === data.admin.id ? data.adminLives : data.playerLives;
+  opponentLives.value = playerId === data.admin.id ? data.playerLives : data.adminLives;
+
+  opponentName.value = playerId === data.admin.id ? (data.player ? data.player.name : "Opponent") : data.admin.name;
+
+  if (data.winner) {
+    winner.value = data.winner;
+    winnerModal.value = true;
+    winnerMessage.value = data.winner === playerId ? t('games.battleSee.game_won') : t('games.battleSee.game_lost');
+  }
+
+  if (data.type === 'game_start_signal') {
+    console.log("Первое обновление страницы, при входе игрока");
+    window.location.reload();
+  }
+};
+
+
+
+  // Инициализация WebSocket соединения
   const initializeWebSocket = () => {
-    console.log(`Connecting to WebSocket for room: ${roomId}, playerId: ${playerId}`);
     ws.value = new ReconnectingWebSocket(`${url_serv_battle_sea_wss}${roomId}/${playerId}`, [], {
       maxRetries: 10,
       minReconnectionDelay: 1000,
@@ -221,28 +255,33 @@ onMounted(() => {
 
     ws.value.onmessage = async (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === 'move') {
+
+      if (data.type === 'pong') {
+        console.log('Pong received from server');
+      } else if (data.type === 'move') {
         handleMoveResponse(data);
       }
-      await updateGameState(data); 
 
-      if (data.type === 'game_start_signal') {
-        console.log("Первое обновление страницы, при входе игрока")
-        window.location.reload();  // Обновляем страницу
-
-      }
+      await updateGameState(data);
     };
-
-
-   
 
     ws.value.onclose = () => {
       console.log("WebSocket connection closed");
+      isPlayerOnline.value = false; // Предполагаем, что игрок оффлайн при закрытии соединения
     };
+
+    // Отправка пинг каждые 5 секунд
+    setInterval(() => {
+      if (ws.value && ws.value.readyState === WebSocket.OPEN) {
+        ws.value.send(JSON.stringify({ type: 'ping' }));
+      }
+    }, 4000);
   };
 
   initializeWebSocket();
 });
+
+
 
 
 
