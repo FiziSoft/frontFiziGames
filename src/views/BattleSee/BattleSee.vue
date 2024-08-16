@@ -96,7 +96,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import GameLayout from '../GameLayout.vue';
-import { url_main_page, url_serv_battle_sea_wss, url_serv_battle_sea } from "@/link";
+import { url_main_page, url_serv_battle_sea_wss, url_serv_battle_sea,url_stat } from "@/link";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import axios from 'axios';
 
@@ -210,6 +210,8 @@ onMounted(() => {
     }
 
     if (data.game_started) {
+
+      
       window.location.reload();  // Обновляем страницу
     }
   };

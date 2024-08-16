@@ -95,7 +95,7 @@ import ShareButton from '@/components/ShareButton.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import GameLayout from '../GameLayout.vue';
 
-import { url_serv_lose_friends_share, url_serv_lose_friends_wss, url_serv_lose_friends } from "@/link"
+import { url_serv_lose_friends_wss, url_serv_lose_friends, url_main_page } from "@/link"
 
 const route = useRoute();
 const router = useRouter();
@@ -115,7 +115,7 @@ const unanimous = ref(false);
 const tie = ref(false);
 const tiePlayers = ref([]);
 
-const url_share = `${url_serv_lose_friends_share}/lose-friends/connect/${roomId.value}`;
+const url_share = `${url_main_page}/lose-friends/connect/${roomId.value}`;
 
 const storedQuestion = computed(() => localStorage.getItem('LoseFriends_cur_q'));
 const aaa = computed(() => question.value || storedQuestion.value);

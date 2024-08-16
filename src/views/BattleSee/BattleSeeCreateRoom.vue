@@ -56,22 +56,12 @@ const isButtonActive = computed(() => {
 
 const createRoom = async () => {
   try {
-    const response = await axios.post(`${url_serv_battle_sea}/api/create-room`, { name: playerName.value });
+    const response = await axios.post(`${url_serv_battle_sea}/api/create-room`, { name: playerName.value, language: locale.value});
     const { roomId, adminId } = response.data;
     localStorage.setItem('playerName', playerName.value);
     localStorage.setItem('seaBattleAdminId', adminId);
 
-
-   axios.post(url_stat, {
-      game_id: 2,
-      room_number: roomId,
-      creator_name: playerName.value,
-      language: locale.value,
-      player_count: 2,
-      is_local: true,
-      
-    });
-
+    
     router.push({ name: 'BattleSeeGameRoom', params: { roomId, playerId: adminId, locale: locale.value } }).then(() => {
       window.location.reload(); // Обновляем страницу один раз после перенаправления
     });
