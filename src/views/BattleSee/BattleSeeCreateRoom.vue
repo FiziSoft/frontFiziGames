@@ -63,7 +63,7 @@ const createRoom = async () => {
 
     
     router.push({ name: 'BattleSeeGameRoom', params: { roomId, playerId: adminId, locale: locale.value } }).then(() => {
-      window.location.reload(); // Обновляем страницу один раз после перенаправления
+      // window.location.reload(); // Обновляем страницу один раз после перенаправления
     });
   } catch (error) {
     console.error('Error creating room:', error);

@@ -209,11 +209,7 @@ onMounted(() => {
       winnerMessage.value = data.winner === playerId ? t('games.battleSee.game_won') : t('games.battleSee.game_lost');
     }
 
-    if (data.game_started) {
-
-      
-      window.location.reload();  // Обновляем страницу
-    }
+    
   };
 
   const initializeWebSocket = () => {
@@ -229,7 +225,16 @@ onMounted(() => {
         handleMoveResponse(data);
       }
       await updateGameState(data); 
+
+      if (data.type === 'game_start_signal') {
+        console.log("Первое обновление страницы, при входе игрока")
+        window.location.reload();  // Обновляем страницу
+
+      }
     };
+
+
+   
 
     ws.value.onclose = () => {
       console.log("WebSocket connection closed");
@@ -238,6 +243,7 @@ onMounted(() => {
 
   initializeWebSocket();
 });
+
 
 
 onUnmounted(() => {
