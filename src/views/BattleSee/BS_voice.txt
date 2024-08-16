@@ -91,6 +91,7 @@
 </template>
 
 <script setup>
+// Ваш существующий код...
 
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -100,18 +101,11 @@ import { url_main_page, url_serv_battle_sea_wss, url_serv_battle_sea,url_stat } 
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import axios from 'axios';
 
-
 import { useI18n } from 'vue-i18n';
 
-// Инициализация i18n и маршрутизации
 const { t, locale } = useI18n();
-
-
-// Получение языка из localStorage или установка 'ua' по умолчанию
 const savedLocale = localStorage.getItem('language') || 'ua';
 locale.value = savedLocale;
-
-
 
 const myBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
 const opponentBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
@@ -135,12 +129,9 @@ const playerId = route.params.playerId;
 
 const url_connect = `${url_main_page}/battle-sea/connect/${roomId}`;
 
-
-const isBoardVisible = ref(true); // Управляет видимостью блока
-
+const isBoardVisible = ref(true);
 const toggleVisibility = () => {
-  isBoardVisible.value = !isBoardVisible.value; // Переключаем видимость
-
+  isBoardVisible.value = !isBoardVisible.value;
 };
 
 const getCellClass = (cell, isMyBoard) => {
@@ -177,8 +168,6 @@ const handleMoveResponse = (data) => {
   }, 700);
 };
 
-
-
 const startNewGame = async () => {
   try {
     await axios.post(`${url_serv_battle_sea}/api/start-new-game/${roomId}`);
@@ -191,6 +180,44 @@ const startNewGame = async () => {
 
 const exitGame = () => {
   router.push('/');
+};
+
+// Добавляем распознавание речи
+const startVoiceRecognition = () => {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+
+  recognition.lang = 'ru-RU'; // Настройте язык на нужный вам
+  recognition.interimResults = false;
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript.trim().toLowerCase();
+    console.log("Распознанная команда: ", transcript);
+    handleVoiceCommand(transcript);
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Ошибка распознавания речи: ", event.error);
+  };
+
+  recognition.onend = () => {
+    // Автоматически перезапускать распознавание речи
+    recognition.start();
+  };
+
+  recognition.start();
+};
+
+const handleVoiceCommand = (command) => {
+  const match = command.match(/([а-я]+)\s?(\d+)/);
+  if (match) {
+    const column = match[1].charCodeAt(0) - 1072; // Преобразование буквы в номер столбца
+    const row = parseInt(match[2]) - 1; // Номер строки
+
+    if (row >= 0 && row < 10 && column >= 0 && column < 10) {
+      makeMove(row, column);
+    }
+  }
 };
 
 onMounted(() => {
@@ -208,8 +235,6 @@ onMounted(() => {
       winnerModal.value = true;
       winnerMessage.value = data.winner === playerId ? t('games.battleSee.game_won') : t('games.battleSee.game_lost');
     }
-
-    
   };
 
   const initializeWebSocket = () => {
@@ -224,17 +249,13 @@ onMounted(() => {
       if (data.type === 'move') {
         handleMoveResponse(data);
       }
-      await updateGameState(data); 
+      await updateGameState(data);
 
       if (data.type === 'game_start_signal') {
-        console.log("Первое обновление страницы, при входе игрока")
+        console.log("Первое обновление страницы, при входе игрока");
         window.location.reload();  // Обновляем страницу
-
       }
     };
-
-
-   
 
     ws.value.onclose = () => {
       console.log("WebSocket connection closed");
@@ -242,9 +263,8 @@ onMounted(() => {
   };
 
   initializeWebSocket();
+  startVoiceRecognition(); // Запуск распознавания речи при монтировании компонента
 });
-
-
 
 onUnmounted(() => {
   if (ws.value) {
@@ -252,6 +272,7 @@ onUnmounted(() => {
   }
 });
 </script>
+
 
 <style scoped>
 .opponentName {
