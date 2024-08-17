@@ -3,7 +3,7 @@
     <div class="containerFormCreate">
       
       <!-- Игровое поле игрока -->
-      <div v-if="opponentName !== 'Opponent' && isBoardVisible" class="game-board">
+      <div v-if="isPlayerOnline && isBoardVisible" class="game-board">
         <div class="my_board"><h3>{{ $t('games.battleSee.player') }}: <strong>{{ playerName }}</strong> </h3></div>
         <div class="board">
           <div class="label-row">
@@ -25,18 +25,24 @@
       </div>
 
       <!-- Ряд для жизней игрока -->
-      <div v-if="opponentName !== 'Opponent'" class="life-row">
+      <div v-if="isPlayerOnline" class="life-row">
         <div v-for="(life, index) in playerLives" :key="'player-life-' + index" class="life-dot"></div>
       </div>
 
+      <!-- Телеграм кнопка и уведомление, если оппонент не онлайн -->
+      <div v-if="opponentName !== 'Opponent' && !isGameStart" class="shareLocal">
+        <TelegramShareButton :url="url_connect_opponent" text="заходи заново"></TelegramShareButton> 
+        <h2> &#8592; {{ $t('games.battleSee.add_opponent') }} </h2>  
+      </div>
+
       <!-- Телеграм кнопка и уведомление -->
-      <div v-if="opponentName == 'Opponent'" class="shareLocal">
+      <div v-if="opponentName === 'Opponent' && !isGameStart" class="shareLocal">
         <TelegramShareButton :url="url_connect" :text="$t('games.battleSee.play_battleship')"></TelegramShareButton> 
         <h2> &#8592; {{ $t('games.battleSee.add_opponent') }} </h2>  
       </div>
 
       <!-- Индикатор хода -->
-      <div class="turn-indicator" v-if="opponentName !== 'Opponent'">
+      <div class="turn-indicator" v-if="isPlayerOnline">
           <div v-if="isMyTurn()" class="turn-box your-turn">{{ $t('games.battleSee.your_turn') }}</div>
           <div v-else class="turn-box opponent-turn">{{ $t('games.battleSee.opponent_turn') }}</div>
        
@@ -49,12 +55,12 @@
       </div>
 
       <!-- Ряд для жизней оппонента -->
-      <div v-if="opponentName !== 'Opponent'" class="life-row">
+      <div v-if="isPlayerOnline" class="life-row">
         <div v-for="(life, index) in opponentLives" :key="'opponent-life-' + index" class="life-dot"></div>
       </div>
       
       <!-- Игровое поле оппонента -->
-      <div class="game-board" v-if="opponentName !== 'Opponent'">
+      <div class="game-board" v-if="isPlayerOnline">
         <div class="board">
           <div class="label-row">
             <div class="cell label" :class="cornerClass"></div>
@@ -75,10 +81,10 @@
         </div>
         <h3 class="opponentName" v-if="opponentName !== 'Opponent'">
           {{ $t('games.battleSee.player') }}: <strong>{{ opponentName }}</strong>
-          <span :style="{ color: isPlayerOnline ? 'green' : 'grey' }">&#9679;</span>
+          <span :style="{ color: isPlayerOnline ? 'green' : 'grey' }"> (&#9679;)</span>
         </h3>
 
-
+      
       </div>
     </div>
 
@@ -107,7 +113,6 @@ import axios from 'axios';
 
 
 import { useI18n } from 'vue-i18n';
-import AliasCreate from '../Alias/AliasCreate.vue';
 
 // Инициализация i18n и маршрутизации
 const { t, locale } = useI18n();
@@ -135,13 +140,16 @@ const playerLives = ref(20);
 const opponentLives = ref(20);
 const cornerClass = ref('');
 
+
 const playerName = ref(localStorage.getItem('playerName') || '');
+const isGameStart = ref(false)
 
 const roomId = route.params.roomId;
 const playerId = route.params.playerId;
 
 const url_connect = `${url_main_page}/battle-sea/connect/${roomId}`;
 
+const url_connect_opponent = ref(`${url_main_page}/battle-sea/connect/${roomId}`)
 
 const isBoardVisible = ref(true); // Управляет видимостью блока
 
@@ -167,15 +175,29 @@ const makeMove = async (row, col) => {
   ws.value.send(JSON.stringify(move));
 };
 
+// Импорт звуков
+import missSoundFile from '@/assets/sound/miss_sound.mp3';
+import hitSoundFile from '@/assets/sound/hit_sound.mp3';
+import sunkSoundFile from '@/assets/sound/sunk_sound.mp3';
+
+// Инициализация объектов Audio
+const missSound = new Audio(missSoundFile);
+const hitSound = new Audio(hitSoundFile);
+const sunkSound = new Audio(sunkSoundFile);
+
+// Обновление функции handleMoveResponse
 const handleMoveResponse = (data) => {
   if (data.message === 'miss') {
     moveMessageClass.value = 'miss';
+    missSound.play(); // Воспроизведение звука промаха
   } else if (data.message === 'hit') {
     moveMessageClass.value = 'ahit';
     opponentLives.value -= 1;
+    hitSound.play(); // Воспроизведение звука ранения
   } else if (data.message === 'sunk') {
     moveMessageClass.value = 'asunk';
     opponentLives.value -= 1;
+    sunkSound.play(); // Воспроизведение звука потопления
   }
   cornerClass.value = moveMessageClass.value;
 
@@ -183,6 +205,7 @@ const handleMoveResponse = (data) => {
     cornerClass.value = 'none';
   }, 700);
 };
+
 
 
 
@@ -222,6 +245,17 @@ onMounted(() => {
   // Обновляем статус подключения игрока
   if (data.player_online !== undefined) {
     isPlayerOnline.value = data.player_online;
+    console.log(data.player_online)
+    isGameStart.value = true;
+
+    if (!data.player_online) {
+      isGameStart.value = false;
+      console.log("2222" , data.player_online);
+      url_connect_opponent.value = `${url_main_page}/battle-sea/${roomId}/${data.player?.id}`;
+      console.log(url_connect_opponent.value);
+      console.log(isGameStart.value);
+
+    }
   }
 
   myBoard.value = playerId === data.admin.id ? data.adminBoard : data.playerBoard;
@@ -243,6 +277,7 @@ onMounted(() => {
     window.location.reload();
   }
 };
+
 
 
 
@@ -275,7 +310,7 @@ onMounted(() => {
       if (ws.value && ws.value.readyState === WebSocket.OPEN) {
         ws.value.send(JSON.stringify({ type: 'ping' }));
       }
-    }, 4000);
+    }, 5000);
   };
 
   initializeWebSocket();
