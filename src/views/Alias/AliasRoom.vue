@@ -574,11 +574,11 @@ font-size: x-large;
 }
 
 .currentWord {
-    font-size: 4rem;
+    font-size: 3rem;
     position: relative;
     text-shadow: 2px 2px 0 #1b221b, 4px 4px 0 #080908, 6px 6px 0 #0a0a0a blur(4px);
     border-radius: 50px; /* Закругление */
-   
+   margin: 15px 0;
 }
 
 .currentWord::before {

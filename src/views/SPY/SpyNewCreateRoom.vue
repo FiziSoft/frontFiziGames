@@ -3,20 +3,25 @@
     <div class="containerFormCreate">
       <form class="formCreate">
         <div class="formElement">
-          <label class="btn-gradient-1" for="playerName">Ваше ім'я:</label>
+          <label class="input-label" for="playerName">Ваше ім'я:</label>
           <input v-model="playerName" type="text" id="playerName" class="input-gradient">
         </div>
         <div class="formElement">
-          <label>Кількість гравців:</label>
-          <input v-model="numPlayers" class="input-gradient" placeholder=" " type="number" />
+          <label class="input-label">Кількість гравців:</label>
+          <input v-model="numPlayers" class="input-gradient" placeholder=" " type="number" max="18" min="1" />
         </div>
         <div class="formElement">
-          <label class="btn-gradient-1" for="time_game">Час на гру (хв):</label>
-          <input v-model="time_game" type="number" id="time_game" class="input-gradient">
+          <label class="input-label" for="time_game">Час на гру (хв):</label>
+          <input v-model="time_game" type="number" id="time_game" class="input-gradient" max="20" min="1" />
         </div>
         <div class="formElement">
-          <Dropdown_my :items="themeOptions" v-model="selectedTheme" label="Тема гри:" />
+          <label class="input-label" for="selectedTheme">Тема гри:</label>
+          <select v-model="selectedTheme" id="selectedTheme" class="input-gradient">
+            <option value="" disabled selected>Зроби вибір</option>
+            <option v-for="theme in themeOptions" :key="theme" :value="theme">{{ theme }}</option>
+          </select>
         </div>
+
         <div class="btnDiv">
           <button :disabled="!isButtonActive" type="button" @click="sendCreateRoomRequest" class="btn-grad">Почати гру</button>
         </div>
@@ -33,7 +38,6 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { v4 as uuidv4 } from 'uuid';
 import GameLayout from "../GameLayout.vue";
-import Dropdown_my from "/src/components/Dropdown_my.vue";
 import themeData from './theme.json';
 import axios from "axios";
 
@@ -43,22 +47,40 @@ const { locale } = useI18n();
 const savedLocale = localStorage.getItem('language') || 'ua';
 locale.value = savedLocale;
 
-
 const router = useRouter();
 const playerName = ref(localStorage.getItem('playerName') || '');
 const numPlayers = ref(null);
 const time_game = ref(null);
-const selectedTheme = ref(null);
+const selectedTheme = ref("");
 const selectedWord = ref(null);
 const themes = ref(themeData);
 const themeOptions = ref(Object.keys(themeData));
 const gameMode = ref('offline');
 const errorMessage = ref('');
 const isButtonActive = computed(() => {
-  return playerName.value.trim().length > 0 && numPlayers.value && time_game.value && selectedTheme.value;
+  return (
+    playerName.value.trim().length > 0 &&
+    numPlayers.value &&
+    time_game.value &&
+    selectedTheme.value
+  );
 });
 
+const validateInputs = () => {
+  if (numPlayers.value > 18) {
+    errorMessage.value = "Кількість гравців не може бути більше 18.";
+    return false;
+  }
+  if (time_game.value > 20) {
+    errorMessage.value = "Час на гру не може бути більше 20 хвилин.";
+    return false;
+  }
+  return true;
+};
+
 const sendCreateRoomRequest = async () => {
+  if (!validateInputs()) return;
+
   try {
     if (selectedTheme.value) {
       const words = themes.value[selectedTheme.value];
@@ -86,10 +108,7 @@ const sendCreateRoomRequest = async () => {
       language: locale.value,
       player_count: numPlayers.value,
       is_local: true,
-     
-      
     });
-
 
     router.push({ name: 'spyOfflineRoom', params: { idRoom: roomId } });
   } catch (error) {
@@ -103,5 +122,31 @@ const sendCreateRoomRequest = async () => {
 .error-message {
   color: red;
   margin-top: 10px;
+}
+
+.input-label {
+  font-weight: normal;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.select-label {
+  margin-top: 10px;
+  display: block;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.btnDiv {
+  margin-top: 20px;
+  text-align: center;
 }
 </style>

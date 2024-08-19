@@ -48,19 +48,20 @@ const games = ref([
     icon: 'fa-solid fa-a',  
   },
   {
-    key: 'loseFriends',
-    url: '/bye-friends',
-    icon: 'fa-solid fa-users-slash',  
+    key: 'codenames',
+    url: '/codenames',
+    icon: 'fa-solid fa-sitemap',
   },
+  
   {
     key: 'battleSee',
     url: '/battle-sea',
     icon: 'fa-solid fa-ship',
   },
   {
-    key: 'rsp',
-    url: '/rsp-createRoom',
-    icon: 'fa-solid fa-hands-asl-interpreting',
+    key: 'loseFriends',
+    url: '/bye-friends',
+    icon: 'fa-solid fa-users-slash',  
   },
   {
     key: 'spy',
@@ -68,20 +69,24 @@ const games = ref([
     icon: 'fa-solid fa-user-secret',
   },
   {
-    key: 'tod',
-    url: '/tod',
-    icon: 'fa-solid fa-hat-wizard',
-  },
-  {
     key: 'five_second',
     url: '/five-second',
     icon: 'fa-solid fa-stopwatch',
   },
   {
-    key: 'codenames',
-    url: '/codenames',
-    icon: 'fa-solid fa-sitemap',
+    key: 'tod',
+    url: '/tod',
+    icon: 'fa-solid fa-hat-wizard',
   },
+  {
+    key: 'rsp',
+    url: '/rsp-createRoom',
+    icon: 'fa-solid fa-hands-asl-interpreting',
+  }
+  
+ 
+  
+  
 ]);
 
 const selectedGame = ref(null);

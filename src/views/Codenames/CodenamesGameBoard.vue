@@ -95,6 +95,12 @@ import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import { v4 as uuidv4 } from 'uuid';
 import ToolTripFizi from '@/components/ToolTripFizi.vue';
 
+
+
+import bombSound from '@/assets/sound/sunk_sound.mp3';
+import revealSound from '@/assets/sound/plus_click.mp3'; // Импорт звука для кнопки "-"
+
+
 const { locale, t } = useI18n();
 const route = useRoute();
 const router = useRouter();
@@ -205,9 +211,19 @@ const connectWebSocket = () => {
   }
 };
 
+const playSound = (sound) => {
+  const audio = new Audio(sound);
+  audio.play();
+};
+
 const revealWord = (word) => {
   if (revealedWords.value[word] || winner.value) return;
-
+  // Определяем, какой звук воспроизводить
+  if (board.value[word] === 'bomb') {
+    playSound(bombSound);
+  } else {
+    playSound(revealSound);
+  }
   socket.send(JSON.stringify({ type: "reveal", word, playerId: playerId.value, playerTeam: userTeam.value }));
 };
 

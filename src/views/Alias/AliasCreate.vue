@@ -2,6 +2,13 @@
   <GameLayout nameGame="Alias">
     <div class="containerFormCreate">
       <form class="formCreate">
+        <div v-if="showContinueGameDialog" class="modal-overlay">
+        <div class="modal">
+          <p>Хотите продолжить незавершённую игру?</p>
+          <button @click="continueExistingGame" class="btn-grad">Да</button>
+          <button @click="startNewGame" class="btn-grad">Нет</button>
+        </div>
+      </div>
         <div class="formElement">
           <label for="team1Name">Команда:</label>
           <input v-model="team1Name" type="text" id="team1Name" class="input-gradient">
@@ -73,7 +80,10 @@ const difficultyOptions = ref({
 
 const categoryExamples = computed(() => {
   if (!wordsData[difficulty.value]) return '';
-  return wordsData[difficulty.value].slice(0, 3).join(', ');
+  
+  const words = wordsData[difficulty.value];
+  const shuffledWords = words.sort(() => 0.5 - Math.random()); // Перемешиваем массив случайным образом
+  return shuffledWords.slice(0, 3).join(', '); // Берем первые три элемента из перемешанного массива
 });
 
 const getCategoryExample = (difficulty) => {
@@ -83,6 +93,7 @@ const getCategoryExample = (difficulty) => {
 const isButtonActive = computed(() => {
   return team1Name.value.trim().length > 0 && team2Name.value.trim().length > 0 && targetScore.value;
 });
+
 
 // Генерация случайного имени
 const generateRandomNames = () => {
@@ -98,11 +109,37 @@ const generateRandomNames = () => {
   team2Name.value = namesData[randomNameIndex2];
 };
 
+const showContinueGameDialog = ref(false);
+
+const showContinueGameModal = () => {
+  showContinueGameDialog.value = true;
+};
+
+const continueExistingGame = () => {
+  const roomId = localStorage.getItem('alias_RoomId');
+  router.push({ name: 'AliasRoom', params: { roomId: roomId } });
+};
+
+const startNewGame = () => {
+  showContinueGameDialog.value = false;
+  resetGame(); // Удалить предыдущую игру
+};
+
+
+
 // Генерация случайных имен при загрузке компонента
 onMounted(() => {
+  checkForExistingGame();
+
   generateRandomNames();
 });
 
+const checkForExistingGame = () => {
+  const existingGame = localStorage.getItem('alias_currentWord');
+  if (existingGame) {
+    showContinueGameModal();
+  }
+};
 const maxTeamNameLength = 10;
 const maxTargetScore = 100;
 
@@ -150,6 +187,41 @@ const resetGame = () => {
 </script>
 
 <style scoped>
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  top: 2%;
+  width: 400px;
+  height: 90%;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.btn-grad {
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
 .error-message {
   color: red;
   margin-top: 10px;

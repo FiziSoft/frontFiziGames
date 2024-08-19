@@ -92,6 +92,13 @@ const board = ref({});
 let socket;
 const url_share = `https://fizi.cc/codenames/player-view/${gameId.value}`;
 
+
+import bombSound from '@/assets/sound/sunk_sound.mp3';
+import revealSound from '@/assets/sound/plus_click.mp3'; // Импорт звука для кнопки "-"
+
+
+
+
 // Вычисляемое свойство для подсчета угаданных слов
 const redRevealedCount = computed(() => Object.values(revealedWords.value).filter(role => role === 'red').length);
 const blueRevealedCount = computed(() => Object.values(revealedWords.value).filter(role => role === 'blue').length);
@@ -208,10 +215,24 @@ const confirmRevealWord = (word) => {
   showConfirmRevealModal.value = true;
 };
 
+
+const playSound = (sound) => {
+  const audio = new Audio(sound);
+  audio.play();
+};
+
 const revealWord = (word) => {
   if (revealedWords.value[word] || winnerMessage.value) return;
 
   console.log(`Revealing word: ${word}`);
+
+// Определяем, какой звук воспроизводить
+  if (board.value[word] === 'bomb') {
+    playSound(bombSound);
+  } else {
+    playSound(revealSound);
+  }
+
   socket.send(JSON.stringify({ type: "reveal", word, playerId: playerId.value, revealingPlayerTeam: userTeam.value }));
   showConfirmRevealModal.value = false;
 };
