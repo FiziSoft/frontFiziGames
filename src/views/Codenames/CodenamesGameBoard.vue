@@ -67,14 +67,14 @@
     </div>
     <div v-if="showTelegramShareModalCaptain" class="modal-unique">
       <div  class="modal-content-unique">
-        <TelegramShareButton :url="url_captan_share" :text="$t('games.codenames.play_codenames')" />
+        <TelegramShareButton :description="$t('games.codenames.add_captain')" :url="url_captan_share" :text="$t('games.codenames.play_codenames')" />
         <button  class="button_finish btnCaptain" @click="showTelegramShareModalCaptain = false">{{ $t('close') }}</button>
       </div>
     </div>
     <div v-if="showTelegramShareModalUser" class="modal-unique">
       <div class="modal-content-unique">
-        <TelegramShareButton :url="url_share" :text="$t('games.codenames.play_codenames')" />
-        <!-- <button class="button_finish" @click="showTelegramShareModalUser = false">{{ $t('close') }}</button> -->
+        <TelegramShareButton :description="$t('games.codenames.add_players')" :url="url_share" :text="$t('games.codenames.play_codenames')" />
+        <button class="btn-grad"  @click="showTelegramShareModalUser = false">{{ $t('close') }}</button>
       </div>
     </div>
 
