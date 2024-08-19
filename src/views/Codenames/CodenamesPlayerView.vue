@@ -95,7 +95,8 @@ const url_share = `https://fizi.cc/codenames/player-view/${gameId.value}`;
 
 import bombSound from '@/assets/sound/sunk_sound.mp3';
 import revealSound from '@/assets/sound/plus_click.mp3'; // Импорт звука для кнопки "-"
-
+import missSound from '@/assets/sound/hit_sound.mp3';
+import neutralSound from '@/assets/sound/neutral.mp3';
 
 
 
@@ -226,11 +227,15 @@ const revealWord = (word) => {
 
   console.log(`Revealing word: ${word}`);
 
-// Определяем, какой звук воспроизводить
-  if (board.value[word] === 'bomb') {
+/// Определяем, какой звук воспроизводить
+if (board.value[word] === 'bomb') {
     playSound(bombSound);
+  } else if (board.value[word] === userTeam.value) {
+    playSound(revealSound); // Если слово соответствует команде пользователя
+  } else if (board.value[word] === 'neutral') {
+    playSound(neutralSound); // Если слово нейтральное
   } else {
-    playSound(revealSound);
+    playSound(missSound); // Если слово соответствует команде соперника
   }
 
   socket.send(JSON.stringify({ type: "reveal", word, playerId: playerId.value, revealingPlayerTeam: userTeam.value }));
