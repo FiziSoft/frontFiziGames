@@ -74,7 +74,7 @@
     <div v-if="showTelegramShareModalUser" class="modal-unique">
       <div class="modal-content-unique">
         <TelegramShareButton :url="url_share" :text="$t('games.codenames.play_codenames')" />
-        <button class="button_finish" @click="showTelegramShareModalUser = false">{{ $t('close') }}</button>
+        <!-- <button class="button_finish" @click="showTelegramShareModalUser = false">{{ $t('close') }}</button> -->
       </div>
     </div>
 
