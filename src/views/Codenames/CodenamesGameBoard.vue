@@ -81,7 +81,7 @@
     <!-- Компонент подсказок -->
     <ToolTripFizi v-if="showTour" :steps="steps" />
      <!-- Кнопка для запуска тура -->
-     <button @click="startTour" class="tourDiv"><i class="fa-regular fa-circle-question"></i></button>
+     <!-- <button @click="startTour" class="tourDiv"><i class="fa-regular fa-circle-question"></i></button> -->
   </GameLayout>
 </template>
 
