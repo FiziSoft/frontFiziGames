@@ -81,10 +81,15 @@
         </div>
         <h3 class="opponentName" v-if="opponentName !== 'Opponent'">
           {{ $t('games.battleSee.player') }}: <strong>{{ opponentName }}</strong>
-          <span :style="{ color: isPlayerOnline ? 'green' : 'grey' }"> (&#9679;)</span>
+          
+          <span :style="{ color: isPlayerOnline ? 'green' : 'grey' }"> &#9673;</span>
+          <i 
+            :class="isSoundOn ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark'" 
+            @click="toggleSound"
+            style="cursor: pointer; margin-left: 10px; font-size: x-large;"
+          ></i>
+        
         </h3>
-
-      
       </div>
     </div>
 
@@ -102,7 +107,6 @@
 </template>
 
 <script setup>
-
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
@@ -110,21 +114,14 @@ import GameLayout from '../GameLayout.vue';
 import { url_main_page, url_serv_battle_sea_wss, url_serv_battle_sea,url_stat } from "@/link";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import axios from 'axios';
-
-
 import { useI18n } from 'vue-i18n';
 
 // Инициализация i18n и маршрутизации
 const { t, locale } = useI18n();
-
-
-// Получение языка из localStorage или установка 'ua' по умолчанию
 const savedLocale = localStorage.getItem('language') || 'ua';
 locale.value = savedLocale;
 
-
-const isPlayerOnline = ref(false); // Флаг, указывающий на онлайн-статус оппонента
-
+const isPlayerOnline = ref(false);
 const myBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
 const opponentBoard = ref(Array(10).fill(null).map(() => Array(10).fill('')));
 const currentTurn = ref(null);
@@ -139,25 +136,37 @@ const opponentName = ref('');
 const playerLives = ref(20);
 const opponentLives = ref(20);
 const cornerClass = ref('');
-
-
 const playerName = ref(localStorage.getItem('playerName') || '');
 const isGameStart = ref(false)
-
 const roomId = route.params.roomId;
 const playerId = route.params.playerId;
-
 const url_connect = `${url_main_page}/battle-sea/connect/${roomId}`;
+const url_connect_opponent = ref(`${url_main_page}/battle-sea/connect/${roomId}`);
+const isBoardVisible = ref(true);
 
-const url_connect_opponent = ref(`${url_main_page}/battle-sea/connect/${roomId}`)
 
-const isBoardVisible = ref(true); // Управляет видимостью блока
+const soundStateKey = 'seaBattle-soundState'; // Ключ для сохранения состояния звука
+
+// Проверяем сохраненное состояние звука
+const savedSoundState = localStorage.getItem(soundStateKey);
+const isSoundOn = ref(savedSoundState !== 'off');
+
 
 
 
 
 const toggleVisibility = () => {
-  isBoardVisible.value = !isBoardVisible.value; // Переключаем видимость
+  isBoardVisible.value = !isBoardVisible.value;
+};
+
+// Функция переключения звука
+
+const toggleSound = () => {
+  isSoundOn.value = !isSoundOn.value;
+  missSound.muted = !isSoundOn.value;
+  hitSound.muted = !isSoundOn.value;
+  sunkSound.muted = !isSoundOn.value;
+  localStorage.setItem(soundStateKey, isSoundOn.value ? 'on' : 'off');
 
 };
 
@@ -172,7 +181,6 @@ const isMyTurn = () => currentTurn.value === playerId;
 
 const makeMove = async (row, col) => {
   if (!isMyTurn()) return;
-
   console.log(`Making move: row=${row}, col=${col}, playerId=${playerId}`);
   const move = { type: 'move', row, col, playerId };
   ws.value.send(JSON.stringify(move));
@@ -188,31 +196,38 @@ const missSound = new Audio(missSoundFile);
 const hitSound = new Audio(hitSoundFile);
 const sunkSound = new Audio(sunkSoundFile);
 
-// Функция для воспроизведения звука
+missSound.muted = true;
+hitSound.muted = true;
+sunkSound.muted = true;
+
+// Функция для воспроизведения звука с учетом состояния
 function playAudio(audio) {
+  if (isSoundOn.value) {
     audio.play().catch(error => {
-        console.error('Error trying to play audio:', error);
+      console.error('Error trying to play audio:', error);
     });
+  }
 }
+
 
 // Обработчики взаимодействия с документом
 function enableAudioPlayback() {
     document.addEventListener('click', () => {
-        playAudio(missSound);
-        playAudio(hitSound);
-        playAudio(sunkSound);
+        missSound.muted = false;
+        hitSound.muted = false;
+        sunkSound.muted = false;
     }, { once: true });
 
     document.addEventListener('keydown', () => {
-        playAudio(missSound);
-        playAudio(hitSound);
-        playAudio(sunkSound);
+        missSound.muted = false;
+        hitSound.muted = false;
+        sunkSound.muted = false;
     }, { once: true });
 
     document.addEventListener('touchstart', () => {
-        playAudio(missSound);
-        playAudio(hitSound);
-        playAudio(sunkSound);
+        missSound.muted = false;
+        hitSound.muted = false;
+        sunkSound.muted = false;
     }, { once: true });
 }
 
@@ -237,10 +252,6 @@ const handleMoveResponse = (data) => {
   }, 700);
 };
 
-
-
-
-
 const startNewGame = async () => {
   try {
     await axios.post(`${url_serv_battle_sea}/api/start-new-game/${roomId}`);
@@ -257,11 +268,9 @@ const exitGame = () => {
 
 onMounted(() => {
   const updateGameState = async (data) => {
-
     const oppo_id = playerId === data.admin.id 
   ? (data.player ? data.player.id : null) 
   : data.admin.id;
-
 
   // Проверка типа сообщения
   if (data.type === 'pong') {
@@ -316,9 +325,6 @@ onMounted(() => {
   }
 };
 
-
-
-
   // Инициализация WebSocket соединения
   const initializeWebSocket = () => {
     ws.value = new ReconnectingWebSocket(`${url_serv_battle_sea_wss}${roomId}/${playerId}`, [], {
@@ -340,6 +346,7 @@ onMounted(() => {
 
     ws.value.onclose = () => {
       console.log("WebSocket connection closed");
+      isGameStart.value = false;
       isPlayerOnline.value = false; // Предполагаем, что игрок оффлайн при закрытии соединения
     };
 
@@ -356,10 +363,6 @@ onMounted(() => {
 
 });
 
-
-
-
-
 onUnmounted(() => {
   if (ws.value) {
     ws.value.close();
@@ -369,6 +372,8 @@ onUnmounted(() => {
 
 <style scoped>
 .opponentName {
+  display: flex;
+  justify-content: space-between;
   margin-top: 5px;
   margin-left: 30px;
 }

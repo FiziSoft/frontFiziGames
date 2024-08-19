@@ -12,7 +12,9 @@
   <script setup>
   import { defineProps } from 'vue'
   import FooterComponent from '@/components/FooterComponent.vue'
-  
+  import TooltipModal from '@/components/TooltipModal.vue';
+
+
   const props = defineProps({
     nameGame: {
       type: String,
@@ -38,6 +40,9 @@
     font-weight: 100
     // height: 90px
     padding: 10px
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.2)
+    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.1)
+    margin-bottom: 10px
   
   .mainBody
     margin: 10px

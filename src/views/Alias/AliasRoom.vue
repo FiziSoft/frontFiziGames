@@ -1,16 +1,18 @@
 /* eslint-disable */
 
 <template>
-<GameLayout :nameGame="`Alias игра до: ${targetScore} очков`">
+<GameLayout :nameGame="` Игра Alias до ${targetScore} очков`">
   <div class="gameContainer">
     <audio ref="gameAudio" :src="audioFile"></audio>
+    <audio ref="plusButtonSound" :src="plusSound"></audio> <!-- Аудио для кнопки "+" -->
+    <audio ref="minusButtonSound" :src="minusSound"></audio> <!-- Аудио для кнопки "-" -->
 
       <div class="teamNames">
         <div :class="team1Class">
-          {{ team1Name }}: {{ teamScores.team1 }} 
+          {{ team1Name }} <br> {{ teamScores.team1 }} 
         </div>
         <div :class="team2Class">
-          {{ team2Name }}: {{ teamScores.team2 }} 
+          {{ team2Name }} <br>  {{ teamScores.team2 }} 
         </div>
       </div>
 
@@ -26,7 +28,7 @@
         </div>
 
       </div>
-      <div v-if="timer > 0" class="timer">{{ timer }} сек</div>
+      <div v-if="timer > 0 && isGameRunning" class="timer">{{ timer }} сек</div>
       <div v-else-if="showResultModal" class="results">
         <div class="modal">
           <p>Выберите команду для добавления очка:</p>
@@ -39,6 +41,7 @@
        
         <p >
           <u>Результат за раунд</u>: 
+          
           <strong>
           <span v-if="roundScore > 0">+{{ roundScore }}</span>
           <span v-else-if="roundScore < 0">{{ roundScore }}</span>
@@ -88,10 +91,31 @@ import wordsData from '@/views/Alias/alias_worlds_ru.json'; // JSON с слов�
 import GameLayout from '../GameLayout.vue';
 
 import audioFile from '@/assets/sound/60sec.mp3';
+import plusSound from '@/assets/sound/plus_click.mp3'; // Импорт звука для кнопки "+"
+import minusSound from '@/assets/sound/miss_sound.mp3'; // Импорт звука для кнопки "-"
 
 
 const gameAudio = ref(null); // Привязка аудио элемента
 
+
+const plusButtonSound = ref(null); // Привязка для звука кнопки "+"
+const minusButtonSound = ref(null); // Привязка для звука кнопки "-"
+
+// Функция для воспроизведения звука кнопки "+"
+const playPlusSound = () => {
+  const audioElement = plusButtonSound.value;
+  if (audioElement) {
+    audioElement.play();
+  }
+};
+
+// Функция для воспроизведения звука кнопки "-"
+const playMinusSound = () => {
+  const audioElement = minusButtonSound.value;
+  if (audioElement) {
+    audioElement.play();
+  }
+};
 
 const route = useRoute();
 const team1Name = ref(localStorage.getItem('alias_team1Name') || 'Команда 1');
@@ -222,13 +246,22 @@ const nextWord = () => {
 const handleScoreAction = (isPlus) => {
   if (timer.value > 0) {
     if (isPlus) {
+      playPlusSound(); // Воспроизведение звука при нажатии "+"
       // Добавляем очки только текущей команде
       teamScores.value[currentTeam.value]++;
       wordResultsDetails[currentWord.value] = currentTeam.value === 'team1' ? team1Name.value : team2Name.value;
-    } else if (scoringMode.value === 'strict') {
+    } 
+    
+    else if(scoringMode.value === 'strict') {
+      playMinusSound(); // Воспроизведение звука при нажатии "-"
+
       // Вычитание очков также для текущей команды
       teamScores.value[currentTeam.value]--;
       wordResultsDetails[currentWord.value] = currentTeam.value === 'team1' ? team1Name.value : team2Name.value;
+    }
+    else{
+      playMinusSound(); // Воспроизведение звука при нажатии "-"
+
     }
 
     wordResults[currentWord.value] = isPlus ? '+' : '-';
@@ -350,6 +383,7 @@ const exitGame = () => {
 };
 
 const endTurn = () => {
+
   clearInterval(interval);
   currentTeam.value = currentTeam.value === 'team1' ? 'team2' : 'team1';
   localStorage.setItem('alias_currentTeam', currentTeam.value);
@@ -387,8 +421,10 @@ console.log('Результат раунда:', roundScore.value);
 </script>
 
 <style scoped>
+
+
 .gameContainer {
-  font-size: x-large;
+  font-size: large;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -426,16 +462,19 @@ console.log('Результат раунда:', roundScore.value);
   justify-content: center;
 }
 
-.startButton, .btn-grad {
-  background-color: #4CAF50;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  font-size: 16px;
-  margin-top: 20px;
-  cursor: pointer;
-  border: none;
-  border-radius: 10px;
+.startButton {
+  display: inline-block;
+    width: 150px;
+    height: 150px;
+    font-size: 24px;
+    border-radius: 50%;
+    background-color: SeaGreen;
+    color: white;
+    cursor: pointer;
+    margin-top: 20px;
+    box-shadow: 1px 7px 18px rgba(0, 0, 0, 0.7);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    padding-top: 60px;
 }
 
 .timer {
@@ -502,8 +541,8 @@ console.log('Результат раунда:', roundScore.value);
 
 .result_row {
   display: flex;
-  width: 250px;
-  justify-content: space-between;
+  width: 200px;
+  justify-content: space-around;
 }
 
 .result_ul {
@@ -531,13 +570,29 @@ font-size: x-large;
   border: 1px solid;
   margin: 10px 0;
   background-color: transparent;
+  box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.5);
 }
 
 .currentWord {
-  font-size: 2em; /* Увеличиваем размер слова */
-  margin: 20px 0;
-  text-align: center;
+    font-size: 4rem;
+    position: relative;
+    text-shadow: 2px 2px 0 #1b221b, 4px 4px 0 #080908, 6px 6px 0 #0a0a0a blur(4px);
+    border-radius: 50px; /* Закругление */
+   
 }
+
+.currentWord::before {
+    content: "завод"; /* Вставьте ваше слово */
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #070a07;
+    text-shadow: none;
+    z-index: -1;
+    transform: translate(8px, 8px);
+    filter: blur(4px); /* Для затемнения */
+}
+
 
 
 .scoreButtons {
@@ -549,5 +604,8 @@ font-size: x-large;
   font-size: xx-large;
 }
 
+.bottom-btn {
+  padding-bottom: 7px;
+}
 
 </style>
