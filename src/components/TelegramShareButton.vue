@@ -1,5 +1,8 @@
 <template>
   <div class="share-buttons">
+    <!-- Выводим описание, если оно передано -->
+    <div v-if="props.description" class="description">{{ props.description }}</div>
+
     <qrcode-vue :value="props.url" :size="128" class="qrShare"></qrcode-vue>
 
     <button @click="shareToWhatsApp" class="share-button whatsapp">
@@ -30,6 +33,11 @@ const props = defineProps({
     required: true
   },
   text: {
+    type: String,
+    required: false,
+    default: ''
+  },
+  description: {
     type: String,
     required: false,
     default: ''
@@ -66,6 +74,13 @@ const copyToClipboard = () => {
 </script>
 
 <style scoped>
+.description {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
 .copy-button {
   color: white;
   background-color: #007bff;

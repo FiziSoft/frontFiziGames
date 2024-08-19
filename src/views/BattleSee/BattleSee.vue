@@ -31,13 +31,13 @@
 
       <!-- Телеграм кнопка и уведомление, если оппонент не онлайн -->
       <div v-if="opponentName !== 'Opponent' && !isGameStart" class="shareLocal">
-        <TelegramShareButton :url="url_connect_opponent" text="заходи заново"></TelegramShareButton> 
+        <TelegramShareButton description="reconect" :url="url_connect_opponent" text="заходи заново"></TelegramShareButton> 
         <h2> &#8592; {{ $t('games.battleSee.add_opponent') }} </h2>  
       </div>
 
       <!-- Телеграм кнопка и уведомление -->
-      <div v-if="opponentName === 'Opponent' && !isGameStart" class="shareLocal">
-        <TelegramShareButton :url="url_connect" :text="$t('games.battleSee.play_battleship')"></TelegramShareButton> 
+      <div v-if="opponentName === 'Opponent' && !isGameStart" class="shareLocal" >
+        <TelegramShareButton description="First in" :url="url_connect" :text="$t('games.battleSee.play_battleship') "></TelegramShareButton> 
         <h2> &#8592; {{ $t('games.battleSee.add_opponent') }} </h2>  
       </div>
 
@@ -153,6 +153,9 @@ const url_connect_opponent = ref(`${url_main_page}/battle-sea/connect/${roomId}`
 
 const isBoardVisible = ref(true); // Управляет видимостью блока
 
+
+
+
 const toggleVisibility = () => {
   isBoardVisible.value = !isBoardVisible.value; // Переключаем видимость
 
@@ -185,19 +188,47 @@ const missSound = new Audio(missSoundFile);
 const hitSound = new Audio(hitSoundFile);
 const sunkSound = new Audio(sunkSoundFile);
 
+// Функция для воспроизведения звука
+function playAudio(audio) {
+    audio.play().catch(error => {
+        console.error('Error trying to play audio:', error);
+    });
+}
+
+// Обработчики взаимодействия с документом
+function enableAudioPlayback() {
+    document.addEventListener('click', () => {
+        playAudio(missSound);
+        playAudio(hitSound);
+        playAudio(sunkSound);
+    }, { once: true });
+
+    document.addEventListener('keydown', () => {
+        playAudio(missSound);
+        playAudio(hitSound);
+        playAudio(sunkSound);
+    }, { once: true });
+
+    document.addEventListener('touchstart', () => {
+        playAudio(missSound);
+        playAudio(hitSound);
+        playAudio(sunkSound);
+    }, { once: true });
+}
+
 // Обновление функции handleMoveResponse
 const handleMoveResponse = (data) => {
   if (data.message === 'miss') {
     moveMessageClass.value = 'miss';
-    missSound.play(); // Воспроизведение звука промаха
+    playAudio(missSound); // Воспроизведение звука промаха
   } else if (data.message === 'hit') {
     moveMessageClass.value = 'ahit';
     opponentLives.value -= 1;
-    hitSound.play(); // Воспроизведение звука ранения
+    playAudio(hitSound); // Воспроизведение звука ранения
   } else if (data.message === 'sunk') {
     moveMessageClass.value = 'asunk';
     opponentLives.value -= 1;
-    sunkSound.play(); // Воспроизведение звука потопления
+    playAudio(sunkSound); // Воспроизведение звука потопления
   }
   cornerClass.value = moveMessageClass.value;
 
@@ -205,6 +236,7 @@ const handleMoveResponse = (data) => {
     cornerClass.value = 'none';
   }, 700);
 };
+
 
 
 
@@ -225,6 +257,12 @@ const exitGame = () => {
 
 onMounted(() => {
   const updateGameState = async (data) => {
+
+    const oppo_id = playerId === data.admin.id 
+  ? (data.player ? data.player.id : null) 
+  : data.admin.id;
+
+
   // Проверка типа сообщения
   if (data.type === 'pong') {
     console.log('Pong received from server');
@@ -251,7 +289,7 @@ onMounted(() => {
     if (!data.player_online) {
       isGameStart.value = false;
       console.log("2222" , data.player_online);
-      url_connect_opponent.value = `${url_main_page}/battle-sea/${roomId}/${data.player?.id}`;
+      url_connect_opponent.value = `${url_main_page}/battle-sea/${roomId}/${oppo_id}`;
       console.log(url_connect_opponent.value);
       console.log(isGameStart.value);
 
@@ -274,7 +312,7 @@ onMounted(() => {
 
   if (data.type === 'game_start_signal') {
     console.log("Первое обновление страницы, при входе игрока");
-    window.location.reload();
+    // window.location.reload();
   }
 };
 
@@ -314,6 +352,8 @@ onMounted(() => {
   };
 
   initializeWebSocket();
+  enableAudioPlayback();
+
 });
 
 
