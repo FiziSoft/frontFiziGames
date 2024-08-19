@@ -40,9 +40,12 @@
             {{ word }}
           </div>
         </div>
+        <div class="share_button">
+          <ShareButton :url="url_share" :text="$t('games.codenames.play_codenames')"></ShareButton>
+        </div>
       </div>
+
     </div>
-    <ShareButton :url="url_share" :text="$t('games.codenames.play_codenames')"></ShareButton>
     
     <!-- Модальное окно для отображения победителя -->
     <div v-if="showWinnerModal" class="modal-unique">
@@ -281,6 +284,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
+.containerCodenames {
+  margin-bottom: 50px;
+}
+
+.share_button {
+  margin-top: 30px;
+}
+
 .modal-unique {
   position: fixed;
   top: 0;

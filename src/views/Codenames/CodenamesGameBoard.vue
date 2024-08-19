@@ -99,6 +99,7 @@ import ToolTripFizi from '@/components/ToolTripFizi.vue';
 
 import bombSound from '@/assets/sound/sunk_sound.mp3';
 import revealSound from '@/assets/sound/plus_click.mp3'; // Импорт звука для кнопки "-"
+import { url_main_page } from "@/link";
 
 
 const { locale, t } = useI18n();
@@ -127,7 +128,7 @@ const url_captan_share = window.location.href;
 const wordsLoaded = ref(false);  
 
 let socket;
-const url_share = `https://fizi.cc/codenames/player-view/${gameId.value}`;
+const url_share = `${url_main_page}/codenames/player-view/${gameId.value}`;
 
 const redRevealedCount = computed(() => Object.values(revealedWords.value).filter(role => role === 'red').length);
 const blueRevealedCount = computed(() => Object.values(revealedWords.value).filter(role => role === 'blue').length);
