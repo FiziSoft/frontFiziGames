@@ -3,6 +3,7 @@ import App from './App.vue'
 import {router} from "./router"
 import './assets/style.sass'
 import './assets/neonCheckbox.scss'
+import './assets/loader.css'
 import store from './components/store'
 import i18n from './i18n'
 

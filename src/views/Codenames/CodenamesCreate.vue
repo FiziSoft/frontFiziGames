@@ -51,7 +51,7 @@ const createGame = async (numWords) => {
       creator_name: playerName.value,
       language: locale.value,
       player_count: 0,
-      is_local: false,
+      is_local: true,
            
     });
 

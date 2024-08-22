@@ -5,7 +5,7 @@
       
       <!-- Анимация загрузки -->
       <div v-if="!wordsLoaded" class="loading-spinner">
-        <div class="spinner"></div>
+        <div class="loader"></div>
       </div>
       
       <!-- Основное содержимое -->
@@ -60,15 +60,15 @@
         <p v-if="bombSelected">{{ $t('games.codenames.winner_message', { team: winner }) }}</p>
         <p v-else>{{ $t('games.codenames.winner_message', { team: winner }) }}</p>
         <div>
-          <button class="button_finish" @click="restartGame">{{ $t('games.codenames.start_game') }}</button>
-          <button class="button_finish" @click="changeWordsCount">{{ $t('games.codenames.update_words') }}</button>
+          <button class="btn-grad" @click="restartGame">{{ $t('games.codenames.start_game') }}</button>
+          <button class="btn-grad" @click="changeWordsCount">{{ $t('games.codenames.update_words') }}</button>
         </div>
       </div>
     </div>
     <div v-if="showTelegramShareModalCaptain" class="modal-unique">
       <div  class="modal-content-unique">
         <TelegramShareButton :description="$t('games.codenames.add_captain')" :url="url_captan_share" :text="$t('games.codenames.play_codenames')" />
-        <button  class="button_finish btnCaptain" @click="showTelegramShareModalCaptain = false">{{ $t('close') }}</button>
+        <button  class="btn-grad" @click="showTelegramShareModalCaptain = false">{{ $t('close') }}</button>
       </div>
     </div>
     <div v-if="showTelegramShareModalUser" class="modal-unique">
@@ -419,4 +419,9 @@ const startTour = () => {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* HTML: <div class="loader"></div> */
+/* HTML: <div class="loader"></div> */
+/* HTML: <div class="loader"></div> */
+
 </style>

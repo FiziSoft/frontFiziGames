@@ -52,6 +52,7 @@ import { inject, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import ShareButton from './ShareButton.vue';
+import { setLocale } from '@/i18n';
 
 
 const router = useRouter();
@@ -72,10 +73,9 @@ const handleChangeTheme = (event) => {
   changeTheme(event.target.value);
 };
 
-const changeLanguage = (event) => {
+const changeLanguage = async (event) => {
   const lang = event.target.value;
-  locale.value = lang;
-  localStorage.setItem('language', lang);
+  await setLocale(lang);  // Используем централизованную функцию смены языка
 };
 </script>
 
@@ -90,8 +90,8 @@ const changeLanguage = (event) => {
   background: var(--bg-color)
   position: fixed
   bottom: 0
-  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1)
-  border-top: .5px solid rgba(0, 0, 0, 0.2)
+  box-shadow: 0 -4px 10px var(--box-shadow-color)
+  border-top: .5px solid var(--border-color)
   z-index: 1000
   margin-top: 50px
 

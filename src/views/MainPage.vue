@@ -12,7 +12,7 @@
         </select>
       </div>
     </div>
-    
+
     <hr>
     <br>
     <div>{{ $t('best_online_games') }}</div>
@@ -38,6 +38,7 @@ import { useI18n } from 'vue-i18n';
 import ModalMain from '@/components/ModalMain.vue';
 
 import {url_main_page} from "@/link"
+import { setLocale } from '@/i18n';
 
 
 
@@ -97,9 +98,9 @@ const openModal = (game) => {
   selectedGame.value = game;
 };
 
-const changeLocale = () => {
-  locale.value = currentLocale.value;
-  localStorage.setItem('language', currentLocale.value);
+const changeLocale = async (event) => {
+  const lang = event.target.value;
+  await setLocale(lang); // Используем централизованную функцию смены языка
 };
 
 onMounted(() => {

@@ -36,9 +36,9 @@ const routes = [
         component: MainPage
     },
 
-    { path: '/alias', name: 'AliasCreate', component: AliasCreate },
+    { path: '/alias', name: 'AliasCreate', component: AliasCreate,  props: route => ({ locale: route.query.locale }) },
 
-    { path: '/alias-room/:roomId', name: 'AliasRoom', component: AliasRoom },
+    { path: '/alias-room/:roomId', name: 'AliasRoom', component: AliasRoom,  props: route => ({ locale: route.query.locale }) },
 
 
     { path: '/bye-friends', name: 'byefriends', component: BfConnect },

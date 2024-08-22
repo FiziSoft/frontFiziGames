@@ -9,15 +9,18 @@
   
   const themes = {
     default: {
-      '--bg-color': 'linear-gradient(90deg, rgba(65,41,90,1) 0%, rgba(47,7,67,1) 100%)',
-      '--text-color': '#fff',
-      '--gradient-color': 'linear-gradient(to right, #DA22FF 0%, #9733EE 51%, #DA22FF 100%)',
-      '--btn-gradient-color': 'linear-gradient(to right, #DA22FF, #9733EE)',
-      '--btn-delete-color': '#fff',
-      '--fizi-gradient': 'linear-gradient(to right, #FF512F, #DD2476)',
-      '--border-color': '#fff',
-      '--burger-color': '#fff'
-    },
+    '--bg-color': 'linear-gradient(90deg, rgba(65,41,90,1) 0%, rgba(47,7,67,1) 100%)',
+    '--text-color': '#fff',
+    '--gradient-color': 'linear-gradient(to right, #DA22FF 0%, #9733EE 51%, #DA22FF 100%)',
+    '--btn-gradient-color': 'linear-gradient(to right, #DA22FF, #9733EE)',
+    '--btn-delete-color': '#fff',
+    '--fizi-gradient': 'linear-gradient(to right, #FF512F, #DD2476)',
+    '--border-color': 'rgba(255, 255, 255, 0.3)',
+    '--burger-color': '#fff',
+    '--box-shadow-color': 'rgba(255, 255, 255, 0.1)', // Новый параметр для цвета тени
+    '--box-shadow-big-color': 'rgba(255, 255, 255, 0.3)', // Темная тень для светлой темы
+
+  },
     theme1: {
       '--bg-color': 'radial-gradient( circle farthest-corner at 10% 20%,  rgba(253,193,104,1) 0%, rgba(251,128,128,1) 90% )',
       '--text-color': '#000',
@@ -25,8 +28,12 @@
       '--btn-gradient-color': 'linear-gradient(to right, #fa709a 0%, #fee140 100%)',
       '--btn-delete-color': '#000',
       '--fizi-gradient': 'linear-gradient(to right, #6A82FB, #FC5C7D)',
-      '--border-color': '#000',
-      '--burger-color': '#000'  
+      '--border-color': 'rgba(0, 0, 0, 0.2)',
+      '--burger-color': '#000',
+      '--box-shadow-color': 'rgba(0, 0, 0, 0.1)', // Темная тень для светлой темы
+      '--box-shadow-big-color': 'rgba(0, 0, 0, 0.5)', // Темная тень для светлой темы
+
+  
     },
     theme2: {
       '--bg-color': 'linear-gradient(to left, #a8edea 0%, #fed6e3 100%)',
@@ -35,8 +42,12 @@
       '--btn-gradient-color': 'linear-gradient( 68.4deg,  rgba(248,182,204,1) 0.5%, rgba(192,198,230,1) 49%, rgba(225,246,240,1) 99.8% )',
       '--btn-delete-color': '#000',
       '--fizi-gradient': 'linear-gradient(to right, #FF5F6D, #FFC371)',
-      '--border-color': '#000',
-      '--burger-color': '#000'  
+      '--border-color': 'rgba(0, 0, 0, 0.2)',
+      '--burger-color': '#000',
+      '--box-shadow-color': 'rgba(0, 0, 0, 0.1)', // Темная тень для светлой темы
+      '--box-shadow-big-color': 'rgba(0, 0, 0, 0.5)', // Темная тень для светлой темы
+
+  
     },
     theme3: {
       '--bg-color': 'linear-gradient( 184.1deg,  rgba(249,255,182,1) 44.7%, rgba(226,255,172,1) 67.2% )',
@@ -45,8 +56,12 @@
       '--btn-gradient-color': 'linear-gradient(to right, #ffdd00, #fbb034)',
       '--btn-delete-color': '#000',
       '--fizi-gradient': 'linear-gradient(to right, #00F260, #0575E6)',
-      '--border-color': '#000',
-      '--burger-color': '#000'
+      '--border-color': 'rgba(0, 0, 0, 0.2)',
+      '--burger-color': '#000',
+      '--box-shadow-color': 'rgba(0, 0, 0, 0.1)', // Темная тень для светлой темы
+      '--box-shadow-big-color': 'rgba(0, 0, 0, 0.5)', // Темная тень для светлой темы
+
+
     },
     theme4: {
       '--bg-color': '#f8c4d4',
@@ -55,8 +70,12 @@
       '--btn-gradient-color': 'linear-gradient(to right, #ff758c, #ff7eb3)',
       '--btn-delete-color': '#000',
       '--fizi-gradient': 'linear-gradient(to right, #8E2DE2, #4A00E0)',
-      '--border-color': '#000',
-      '--burger-color': '#000'
+      '--border-color': 'rgba(0, 0, 0, 0.2)',
+      '--burger-color': '#000',
+      '--box-shadow-color': 'rgba(0, 0, 0, 0.1)', // Темная тень для светлой темы
+      '--box-shadow-big-color': 'rgba(0, 0, 0, 0.5)', // Темная тень для светлой темы
+
+
     },
   };
   

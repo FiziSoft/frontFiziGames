@@ -7,3 +7,33 @@
       </span>
     </div>
   </li>
+
+
+
+
+  const allWordsData = await loadWordsForGame(locale.value);
+    wordsData.value = allWordsData[difficulty.value];
+    console.log(`Words loaded for difficulty ${difficulty.value}:`, wordsData.value);
+
+
+
+    onMounted(async () => {
+  try {
+    const allWordsData = await loadWordsForGame(locale.value);
+    wordsData.value = allWordsData[difficulty.value];
+    console.log(`Words loaded for difficulty ${difficulty.value}:`, wordsData.value);
+
+    if (route.params.idRoom !== localStorage.getItem('alias_RoomId')) {
+      console.log('Комната не найдена!');
+    } else {
+      // Проверяем, если есть текущее слово, значит игра была начата ранее, иначе показываем кнопку "Начать"
+      if (localStorage.getItem('alias_currentWord')) {
+        await startGame();
+      } else {
+        isGameRunning.value = false; // Показываем кнопку "Начать"
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load words for the game:', error);
+  }
+});

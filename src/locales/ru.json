@@ -1,6 +1,6 @@
 {
   "welcome": "Fizi Games",
-  "best_online_games": "Лучшие онлайн настольные игры",
+  "best_online_games": "Лучшие настольные игры Онлайн",
   "themes": {
     "default": "Темная",
     "theme1": "Закат",
@@ -78,7 +78,7 @@
       "start_game": "Начать игру",
       "show_colors": "Показать цвета",
       "hide_colors": "Скрыть цвета",
-      "update_words": "Обновить слова",
+      "update_words": "Изменить слова",
       "winner_message": "Команда {team} выиграла!",
       "choose_team": "Выберите свою команду",
       "confirm_reveal": "Вы уверены?",

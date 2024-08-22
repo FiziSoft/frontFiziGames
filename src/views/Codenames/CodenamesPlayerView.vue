@@ -291,6 +291,7 @@ onMounted(() => {
 
 .share_button {
   margin-top: 30px;
+  margin-left: 30px;
 }
 
 .modal-unique {

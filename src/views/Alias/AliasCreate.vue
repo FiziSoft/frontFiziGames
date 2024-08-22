@@ -3,12 +3,12 @@
     <div class="containerFormCreate">
       <form class="formCreate">
         <div v-if="showContinueGameDialog" class="modal-overlay">
-        <div class="modal">
-          <p>Хотите продолжить незавершённую игру?</p>
-          <button @click="continueExistingGame" class="btn-grad">Да</button>
-          <button @click="startNewGame" class="btn-grad">Нет</button>
+          <div class="modal">
+            <p>Хотите продолжить незавершённую игру?</p>
+            <button @click="continueExistingGame" class="btn-grad">Да</button>
+            <button @click="startNewGame" class="btn-grad">Нет</button>
+          </div>
         </div>
-      </div>
         <div class="formElement">
           <label for="team1Name">Команда:</label>
           <input v-model="team1Name" type="text" id="team1Name" class="input-gradient">
@@ -24,6 +24,10 @@
           <select v-model="difficulty" id="difficulty" class="input-gradient">
             <option v-for="(label, value) in difficultyOptions" :key="value" :value="value">{{ label }}</option>
           </select>
+        </div>
+        <div class="formElement">
+          <label for="targetScore">Целевой счет:</label>
+          <input v-model="targetScore" type="number" id="targetScore" class="input-gradient" min="1">
         </div>
         <div class="formElement">
           <label for="scoringModeElement" id="scoringModeElement">
@@ -54,22 +58,25 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { v4 as uuidv4 } from 'uuid';
 import GameLayout from "../GameLayout.vue";
-import namesData from '@/views/Alias/alias_name.json'; // JSON с именами для команд
-import axios from "axios";
-import wordsData from '@/views/Alias/alias_worlds_ru.json'; // JSON с словами для игры
+import { loadWordsForGame, loadNamesForGame } from '@/wordsStorage'; // Импорт функций загрузки слов и названий
 import TooltipModal from '@/components/TooltipModal.vue';
 
 const router = useRouter();
 const team1Name = ref('');
 const team2Name = ref('');
 const difficulty = ref(1); // По умолчанию Легкая (1)
-const targetScore = ref(50);
+const targetScore = ref(50); // Установка значения по умолчанию
 const errorMessage = ref('');
 const scoringModeCheckbox = ref(false); // Используем чекбокс вместо выбора режима
 const lastWordMode = ref(false); // По умолчанию выключено
+
+const route = useRoute();
+
+import { useI18n } from 'vue-i18n';
+const { t, locale } = useI18n();
 
 const difficultyOptions = ref({
   1: 'Легкая',
@@ -78,10 +85,13 @@ const difficultyOptions = ref({
   4: 'Смешанная'
 });
 
+const wordsData = ref([]);
+const namesData = ref([]);
+
 const categoryExamples = computed(() => {
-  if (!wordsData[difficulty.value]) return '';
+  if (!wordsData.value[difficulty.value]) return '';
   
-  const words = wordsData[difficulty.value];
+  const words = wordsData.value[difficulty.value];
   const shuffledWords = words.sort(() => 0.5 - Math.random()); // Перемешиваем массив случайным образом
   return shuffledWords.slice(0, 3).join(', '); // Берем первые три элемента из перемешанного массива
 });
@@ -94,19 +104,24 @@ const isButtonActive = computed(() => {
   return team1Name.value.trim().length > 0 && team2Name.value.trim().length > 0 && targetScore.value;
 });
 
-
 // Генерация случайного имени
-const generateRandomNames = () => {
-  const randomNameIndex1 = Math.floor(Math.random() * namesData.length);
-  let randomNameIndex2;
+const generateRandomNames = async () => {
+  try {
+    namesData.value = await loadNamesForGame(locale.value); // Загрузка названий команд
 
-  team1Name.value = namesData[randomNameIndex1];
+    const randomNameIndex1 = Math.floor(Math.random() * namesData.value.length);
+    let randomNameIndex2;
 
-  do {
-    randomNameIndex2 = Math.floor(Math.random() * namesData.length);
-  } while (randomNameIndex2 === randomNameIndex1);
+    team1Name.value = namesData.value[randomNameIndex1];
 
-  team2Name.value = namesData[randomNameIndex2];
+    do {
+      randomNameIndex2 = Math.floor(Math.random() * namesData.value.length);
+    } while (randomNameIndex2 === randomNameIndex1);
+
+    team2Name.value = namesData.value[randomNameIndex2];
+  } catch (error) {
+    console.error('Failed to load team names:', error);
+  }
 };
 
 const showContinueGameDialog = ref(false);
@@ -125,13 +140,16 @@ const startNewGame = () => {
   resetGame(); // Удалить предыдущую игру
 };
 
-
-
 // Генерация случайных имен при загрузке компонента
-onMounted(() => {
-  checkForExistingGame();
+onMounted(async () => {
+  if (route.query.locale) {
+    locale.value = route.query.locale;
+  }
 
-  generateRandomNames();
+  await loadWords();  // Загрузка слов
+  await generateRandomNames();  // Генерация случайных названий команд
+
+  checkForExistingGame();
 });
 
 const checkForExistingGame = () => {
@@ -140,6 +158,7 @@ const checkForExistingGame = () => {
     showContinueGameModal();
   }
 };
+
 const maxTeamNameLength = 10;
 const maxTargetScore = 100;
 
@@ -174,7 +193,7 @@ const createRoom = async () => {
     localStorage.setItem('alias_lastWordMode', lastWordMode.value);
     localStorage.setItem('alias_RoomId', roomId);
 
-    router.push({ name: 'AliasRoom', params: { roomId: roomId } });
+    router.push({ name: 'AliasRoom', params: { roomId: roomId }, query: { locale: locale.value } });
   } catch (error) {
     console.error('Ошибка при создании комнаты:', error);
     errorMessage.value = "Произошла ошибка при создании комнаты. Пожалуйста, попробуйте снова.";
@@ -182,9 +201,29 @@ const createRoom = async () => {
 };
 
 const resetGame = () => {
-  localStorage.clear();
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith('alias_')) {
+      localStorage.removeItem(key);
+    }
+  });
+};
+
+// Загрузка слов для игры
+const loadWords = async () => {
+  try {
+    wordsData.value = await loadWordsForGame(locale.value);  // Загрузка слов
+  } catch (error) {
+    console.error('Failed to load words:', error);
+  }
 };
 </script>
+
+<style scoped>
+/* Стили остаются без изменений */
+</style>
+
+
+
 
 <style scoped>
 
@@ -212,15 +251,7 @@ const resetGame = () => {
   text-align: center;
 }
 
-.btn-grad {
-  margin: 10px;
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
+
 
 .error-message {
   color: red;
