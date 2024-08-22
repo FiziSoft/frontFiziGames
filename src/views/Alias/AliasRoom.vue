@@ -119,7 +119,7 @@ const difficulty = ref(localStorage.getItem('alias_difficulty') || 1);
 const targetScore = ref(localStorage.getItem('alias_targetScore') || 50);
 const scoringMode = ref(localStorage.getItem('alias_scoringMode') || 'strict'); // 'strict' или 'simple'
 const lastWordMode = ref(localStorage.getItem('alias_lastWordMode') === 'true'); // Опция "последнее общее слово"
-const time_cur = 10;
+const time_cur = 60;
 const timer = ref(Number(localStorage.getItem('alias_timer')) || time_cur);
 const currentWord = ref(localStorage.getItem('alias_currentWord') || '');
 const isGameRunning = ref(false);
