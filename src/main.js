@@ -20,6 +20,16 @@ app.mount('#app')
 
 
 
+if ('serviceWorker' in navigator && 'indexedDB' in window) {
+    // Инициализация сервис-воркера и IndexedDB
+    navigator.serviceWorker.register('/service-worker.js').then(() => {
+        alert('Service Worker зарегистрирован');
+    }).catch(error => {
+        console.error('Ошибка при регистрации Service Worker:', error);
+    });
+} else {
+    alert('Ваш браузер не поддерживает офлайн-режим');
+}
 
 
 
