@@ -1,5 +1,5 @@
 <template>
-  <GameLayout :nameGame="`${t('games.alias.name')} ${t('games.alias.game_room.title', { targetScore: targetScore })}`">
+  <GameLayout :nameGame="`${t('games.alias.game_room.title', { targetScore: targetScore })}`">
     <div class="gameContainer">
       <audio ref="gameAudio" :src="audioFile"></audio>
       <audio ref="plusButtonSound" :src="plusSound"></audio> <!-- Аудио для кнопки "+" -->
