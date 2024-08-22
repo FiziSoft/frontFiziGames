@@ -1,24 +1,24 @@
 <template>
-  <GameLayout nameGame="Alias">
+  <GameLayout :nameGame="t('games.alias.name')">
     <div class="containerFormCreate">
       <form class="formCreate">
         <div v-if="showContinueGameDialog" class="modal-overlay">
           <div class="modal">
-            <p>Хотите продолжить незавершённую игру?</p>
-            <button @click="continueExistingGame" class="btn-grad">Да</button>
-            <button @click="startNewGame" class="btn-grad">Нет</button>
+            <p>{{ t('games.alias.create_room.continue_game') }}</p>
+            <button @click="continueExistingGame" class="btn-grad">{{ t('games.alias.create_room.yes') }}</button>
+            <button @click="startNewGame" class="btn-grad">{{ t('games.alias.create_room.no') }}</button>
           </div>
         </div>
         <div class="formElement">
-          <label for="team1Name">Команда:</label>
+          <label for="team1Name">{{ t('games.alias.create_room.team1_name') }}</label>
           <input v-model="team1Name" type="text" id="team1Name" class="input-gradient">
         </div>
         <div class="formElement">
-          <label for="team2Name">Команда:</label>
+          <label for="team2Name">{{ t('games.alias.create_room.team2_name') }}</label>
           <input v-model="team2Name" type="text" id="team2Name" class="input-gradient">
         </div>
         <div class="formElement">
-          <label for="difficulty">Сложность игры: <br>
+          <label for="difficulty">{{ t('games.alias.create_room.difficulty') }} <br>
             <p class="difficulty-info">({{ getCategoryExample(difficulty.value) }})</p>
           </label>
           <select v-model="difficulty" id="difficulty" class="input-gradient">
@@ -26,14 +26,14 @@
           </select>
         </div>
         <div class="formElement">
-          <label for="targetScore">Целевой счет:</label>
+          <label for="targetScore">{{ t('games.alias.create_room.target_score') }}</label>
           <input v-model="targetScore" type="number" id="targetScore" class="input-gradient" min="1">
         </div>
         <div class="formElement">
           <label for="scoringModeElement" id="scoringModeElement">
-            Штраф за пропуск:
+            {{ t('games.alias.create_room.strict_mode') }}
             <TooltipModal 
-              text="<strong>Строго</strong> — отнимать балл при выборе минус. <br/><strong>Просто</strong> — пропускать слово при выборе минус."
+              :text="t('games.alias.create_room.strict_mode_description')"
               targetId="scoringModeElement" 
             />
           </label>
@@ -41,12 +41,12 @@
           <label for="scoringModeCheckbox" class="checkbox-label"></label>
         </div>
         <div class="formElement">
-          <label for="lastWordMode">Последнее слово, общее?</label>
+          <label for="lastWordMode">{{ t('games.alias.create_room.last_word_common') }}</label>
           <input v-model="lastWordMode" type="checkbox" id="lastWordMode" class="checkbox-custom">
           <label for="lastWordMode" class="checkbox-label"></label>
         </div>
         <div class="btnDiv">
-          <button :disabled="!isButtonActive" type="button" @click="createRoom" class="btn-grad">Создать комнату</button>
+          <button :disabled="!isButtonActive" type="button" @click="createRoom" class="btn-grad">{{ t('games.alias.create_room.create_button') }}</button>
         </div>
       </form>
       <div v-if="errorMessage" class="error-message">
@@ -78,12 +78,12 @@ const route = useRoute();
 import { useI18n } from 'vue-i18n';
 const { t, locale } = useI18n();
 
-const difficultyOptions = ref({
-  1: 'Легкая',
-  2: 'Средняя',
-  3: 'Трудная',
-  4: 'Смешанная'
-});
+const difficultyOptions = computed(() => ({
+  1: t('games.alias.difficulty_1'),
+  2: t('games.alias.difficulty_2'),
+  3: t('games.alias.difficulty_3'),
+  4: t('games.alias.difficulty_4')
+}));
 
 const wordsData = ref([]);
 const namesData = ref([]);
@@ -164,15 +164,15 @@ const maxTargetScore = 100;
 
 const validateInput = () => {
   if (team1Name.value.length > maxTeamNameLength) {
-    errorMessage.value = `Название команды 1 не может быть длиннее ${maxTeamNameLength} символов.`;
+    errorMessage.value = t('games.alias.create_room.error_too_long_team_name', { maxTeamNameLength });
     return false;
   }
   if (team2Name.value.length > maxTeamNameLength) {
-    errorMessage.value = `Название команды 2 не может быть длиннее ${maxTeamNameLength} символов.`;
+    errorMessage.value = t('games.alias.create_room.error_too_long_team_name', { maxTeamNameLength });
     return false;
   }
   if (targetScore.value > maxTargetScore) {
-    errorMessage.value = `Целевой счет не может превышать ${maxTargetScore} очков.`;
+    errorMessage.value = t('games.alias.create_room.error_too_high_score', { maxTargetScore });
     return false;
   }
   return true;
@@ -196,7 +196,7 @@ const createRoom = async () => {
     router.push({ name: 'AliasRoom', params: { roomId: roomId }, query: { locale: locale.value } });
   } catch (error) {
     console.error('Ошибка при создании комнаты:', error);
-    errorMessage.value = "Произошла ошибка при создании комнаты. Пожалуйста, попробуйте снова.";
+    errorMessage.value = t('games.alias.create_room.error_general');
   }
 };
 
@@ -217,12 +217,6 @@ const loadWords = async () => {
   }
 };
 </script>
-
-<style scoped>
-/* Стили остаются без изменений */
-</style>
-
-
 
 
 <style scoped>

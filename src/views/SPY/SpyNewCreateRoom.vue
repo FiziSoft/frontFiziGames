@@ -125,7 +125,6 @@ const sendCreateRoomRequest = async () => {
 }
 
 .input-label {
-  font-weight: normal;
   margin-bottom: 5px;
   display: block;
 }
