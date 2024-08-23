@@ -267,10 +267,17 @@ const refreshWords = () => {
 const restartGame = () => {
   refreshWords();
   startGame();
+  setTimeout(() => {
+        location.reload(); // Обновить страницу через 1 секунды
+      }, 1000);
 };
 
 const changeWordsCount = () => {
-  router.push({ name: 'codenames-create' });
+  router.push({ name: 'codenames-create' }).then(() => {
+    setTimeout(() => {
+      location.reload(); // Полная перезагрузка страницы после небольшого ожидания
+    }, 500); // Можно настроить задержку, если требуется
+  });
 };
 
 const filteredWords = computed(() => {

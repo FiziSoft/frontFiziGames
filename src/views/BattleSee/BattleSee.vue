@@ -348,15 +348,19 @@ onMounted(() => {
       console.log("WebSocket connection closed");
       isGameStart.value = false;
       isPlayerOnline.value = false; // Предполагаем, что игрок оффлайн при закрытии соединения
+
+      setTimeout(() => {
+        location.reload(); // Обновить страницу через 2 секунды
+      }, 2000);
     };
 
     // Отправка пинг каждые 5 секунд
     setInterval(() => {
-      if (ws.value && ws.value.readyState === WebSocket.OPEN) {
-        ws.value.send(JSON.stringify({ type: 'ping' }));
-      }
-    }, 5000);
-  };
+        if (ws.value && ws.value.readyState === WebSocket.OPEN) {
+          ws.value.send(JSON.stringify({ type: 'ping' }));
+        }
+      }, 5000);
+    };
 
   initializeWebSocket();
   enableAudioPlayback();
