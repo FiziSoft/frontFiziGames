@@ -17,6 +17,8 @@
             <div class="score">
               <p>{{ player.score }}</p>
             </div>
+            <div class="status-dot" :class="{ active: player.has_voted }"></div>
+
           </div>
         </div>
       </div>
@@ -64,6 +66,8 @@
             <div class="score">
               <p>{{ player.score }}</p>
             </div>
+            <div class="status-dot" :class="{ active: player.has_voted }"></div>
+
           </div>
         </div>
       </div>
@@ -89,13 +93,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ShareButton from '@/components/ShareButton.vue';
 import TelegramShareButton from '@/components/TelegramShareButton.vue';
 import GameLayout from '../GameLayout.vue';
 
-import { url_serv_lose_friends_wss, url_serv_lose_friends, url_main_page } from "@/link"
+import { url_serv_lose_friends_wss, url_serv_lose_friends, url_main_page } from "@/link";
 
 const route = useRoute();
 const router = useRouter();
@@ -128,60 +132,43 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 const connectWebSocket = () => {
   const wsUrl = `${url_serv_lose_friends_wss}/ws/${roomId.value}/${playerId.value}`;
   ws = new ReconnectingWebSocket(wsUrl, [], {
-    maxRetries: 10, // Максимальное количество попыток переподключения
-    minReconnectionDelay: 1000, // Минимальная задержка перед переподключением (1 секунда)
+    maxRetries: 3, // Максимальное количество попыток переподключения
+    minReconnectionDelay: 2000, // Минимальная задержка перед переподключением (1 секунда)
   });
+
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log('Received data:', data); // Логирование данных для отладки
+    console.log('Received data:', data);
 
     if (data.players) {
-      players.value = data.players;
+      updatePlayers(data.players);
+
       if (players.value.length >= 3 && !question.value) {
         askQuestion();
       }
     }
 
     if (data.waiting) {
-      question.value = null;
-      winner.value = null;
-      selectedPlayerId.value = null;
-      showWinnerModal.value = false;
+      resetGame();
     }
 
     if (data.question && players.value.length >= 3) {
-      question.value = data.question;
-      winner.value = null;
-      selectedPlayerId.value = null;
-      showWinnerModal.value = false;
-      localStorage.setItem('LoseFriends_cur_q', question.value);
+      handleNewQuestion(data);
     }
 
     if (data.winner) {
-      winner.value = data.winner;
-      votes.value = data.votes;
-      votesAll.value = data.votes_all;
-      console.log('Votes all:', votesAll.value);
-      unanimous.value = data.unanimous;
-      question.value = data.cur_question; // Обновление вопроса
-      tacke_q();
-
-      selectedPlayerId.value = null;
-      showWinnerModal.value = true;
-      playerScore.value = winner.value.score;
-      localStorage.setItem('LoseFriends_score', playerScore.value);
+      handleWinner(data);
     }
 
     if (data.tie) {
-      tie.value = true;
-      question.value = data.question;
-      tiePlayers.value = data.tiePlayers;
-      winner.value = null;
-      selectedPlayerId.value = null;
-      showWinnerModal.value = false;
-    } else {
-      tie.value = false;
-      tiePlayers.value = [];
+        console.log('Handling tie:', data);
+        handleTie(data); // Обработка переголосования
+    }
+
+    // Обработчик для завершения переголосования
+    if (data.end_tie) {
+        console.log('End of tie:', data);
+        handleEndTie();
     }
   };
 
@@ -191,6 +178,90 @@ const connectWebSocket = () => {
       connectWebSocket();
     }, 1000);
   };
+};
+
+const updatePlayers = (newPlayers) => {
+  newPlayers.forEach((updatedPlayer) => {
+    const existingPlayer = players.value.find(p => p.player_id === updatedPlayer.player_id);
+    if (existingPlayer) {
+      Object.assign(existingPlayer, updatedPlayer);
+    } else {
+      players.value.push(updatedPlayer);
+    }
+  });
+};
+
+const resetGame = () => {
+  question.value = null;
+  winner.value = null;
+  selectedPlayerId.value = null;
+  showWinnerModal.value = false;
+  players.value.forEach(player => player.has_voted = false);
+  tie.value = false;
+  tiePlayers.value = [];
+  localStorage.removeItem('LoseFriends_cur_q');
+};
+
+const handleNewQuestion = (data) => {
+    tie.value = false; // Сброс состояния переголосования
+    tiePlayers.value = []; // Очистка списка игроков для переголосования
+    question.value = data.question;
+    winner.value = null;
+    selectedPlayerId.value = null;
+    showWinnerModal.value = false;
+
+    // Сохраняем вопрос в localStorage
+    localStorage.setItem('LoseFriends_cur_q', question.value);
+    players.value.forEach(player => {
+        player.has_voted = false;
+        if (player.selected) {
+            player.selected = false;
+        }
+    });
+
+    console.log('New question received and state reset:', {
+        question: question.value,
+        players: players.value,
+        tie: tie.value,
+        tiePlayers: tiePlayers.value
+    });
+};
+
+
+const handleWinner = (data) => {
+  winner.value = data.winner;
+  votes.value = data.votes;
+  votesAll.value = data.votes_all;
+  unanimous.value = data.unanimous;
+  question.value = data.cur_question;
+  tacke_q();
+
+  selectedPlayerId.value = null;
+  showWinnerModal.value = true;
+  playerScore.value = winner.value.score;
+  localStorage.setItem('LoseFriends_score', playerScore.value);
+};
+
+const handleTie = (data) => {
+    tie.value = true;
+    question.value = data.question;
+    tiePlayers.value = data.tiePlayers;
+    winner.value = null;
+    selectedPlayerId.value = null;
+    showWinnerModal.value = false;
+
+    console.log('Tie state updated:', tie.value, tiePlayers.value);
+};
+
+
+const handleEndTie = () => {
+  tie.value = false;
+  tiePlayers.value = [];
+  winner.value = null;
+  selectedPlayerId.value = null;
+  showWinnerModal.value = false;
+  localStorage.removeItem('LoseFriends_cur_q');
+  question.value = null;
 };
 
 const askQuestion = () => {
@@ -206,20 +277,25 @@ const tacke_q = () => {
 const vote = (votedPlayerId) => {
   if (!selectedPlayerId.value) {
     selectedPlayerId.value = votedPlayerId;
+
+    const currentPlayer = players.value.find(player => player.player_id === playerId.value);
+    if (currentPlayer) {
+      currentPlayer.has_voted = true;
+    }
+
     ws.send(JSON.stringify({ action: 'vote', player_id: votedPlayerId }));
   }
 };
 
 const nextRound = () => {
-  showWinnerModal.value = false;
+  handleEndTie(); // Сброс состояния переголосования перед началом нового раунда
   ws.send(JSON.stringify({ action: 'next_round' }));
 };
 
 const createAndJoinRoom = async () => {
   console.log('Player ID:', playerId.value);
   console.log('Room ID:', roomId.value);
-  playerScore.value = 0;  // Обнуляем очки игрока при создании новой комнаты
-  console.log('Player Score:', playerScore.value);
+  playerScore.value = 0;
 
   const formData = new URLSearchParams();
   formData.append('room_id', roomId.value);
@@ -241,8 +317,8 @@ const createAndJoinRoom = async () => {
     return;
   }
 
-  localStorage.setItem('LoseFriends_score', playerScore.value);  // Сохраняем обнуленные очки в локальное хранилище
-  localStorage.setItem('LoseFriends_roomId', roomId.value); // Сохраняем текущий roomId
+  localStorage.setItem('LoseFriends_score', playerScore.value);
+  localStorage.setItem('LoseFriends_roomId', roomId.value);
   router.push({ name: 'LoseFriendsGameRoom', params: { roomId: roomId.value } });
 };
 
@@ -250,12 +326,10 @@ const joinExistingRoom = async () => {
   console.log('Player ID:', playerId.value);
   console.log('Room ID:', roomId.value);
 
-  // Проверяем, совпадает ли текущий roomId с сохраненным
   const storedRoomId = localStorage.getItem('LoseFriends_roomId');
   if (storedRoomId !== roomId.value) {
-    playerScore.value = 0;  // Обнуляем очки игрока, если комната новая
+    playerScore.value = 0;
   }
-  console.log('Player Score:', playerScore.value);
 
   const formData = new URLSearchParams();
   formData.append('room_id', roomId.value);
@@ -277,16 +351,27 @@ const joinExistingRoom = async () => {
     return;
   }
 
-  // Обновляем очки игрока на основе данных с сервера
   playerScore.value = responseData.player_score || 0;
   localStorage.setItem('LoseFriends_score', playerScore.value);
 
-  localStorage.setItem('LoseFriends_roomId', roomId.value); // Сохраняем текущий roomId
+  localStorage.setItem('LoseFriends_roomId', roomId.value);
   connectWebSocket();
   question.value = storedQuestion.value;
 };
 
+watch([question, players, winner], () => {
+  console.log('Состояние изменилось:', {
+    question: question.value,
+    players: players.value,
+    winner: winner.value
+  });
+});
+
 onMounted(() => {
+  if (storedQuestion.value) {
+    question.value = storedQuestion.value;
+  }
+
   if (!playerId.value || playerId.value === "undefined" || playerId.value === null || playerId.value.trim() === "" ||
       !roomId.value || roomId.value === "undefined" || roomId.value === null || roomId.value.trim() === "") {
     router.push({ name: 'Home' }).catch(err => {
@@ -297,6 +382,10 @@ onMounted(() => {
   }
 });
 </script>
+
+
+
+
 
 <style>
 .game-room {
@@ -425,4 +514,17 @@ onMounted(() => {
 .votes-table th {
   background-color: #f2f2f2;
 }
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgb(187, 185, 185);
+  margin-top: 5px;
+}
+
+.status-dot.active {
+  background-color: green;
+}
+
 </style>

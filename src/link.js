@@ -31,3 +31,8 @@ export const url_main_page = 'https://fizi.cc';
 // export const url_stat = 'http://localhost:9999/create-room';
 export const url_stat = 'https://fizistat-33157f0b8398.herokuapp.com/create-room';
 
+
+
+
+
+export const url_serv_checkers = 'http://localhost:8111';

@@ -43,6 +43,8 @@ import { setLocale } from '@/i18n';
 
 
 const games = ref([
+
+
   {
     key: 'alias',
     url: '/alias',
@@ -78,12 +80,12 @@ const games = ref([
     key: 'tod',
     url: '/tod',
     icon: 'fa-solid fa-hat-wizard',
-  },
-  {
-    key: 'rsp',
-    url: '/rsp-createRoom',
-    icon: 'fa-solid fa-hands-asl-interpreting',
   }
+  // {
+  //   key: 'rsp',
+  //   url: '/rsp-createRoom',
+  //   icon: 'fa-solid fa-hands-asl-interpreting',
+  // }
   
  
   

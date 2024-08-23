@@ -28,6 +28,8 @@ import LoseFriendsRoom from './views/ByeFriends/LoseFriendsRoom.vue'
 import LoseFriendsConnect from './views/ByeFriends/LoseFriendsConnect.vue'
 import AliasCreate from './views/Alias/AliasCreate.vue'
 import AliasRoom from './views/Alias/AliasRoom.vue'
+import CheckersCreate from './views/Checkers/CheckersCreate.vue'
+import CheckersGameRoom from './views/Checkers/CheckersGameRoom.vue'
 
 const routes = [
     {
@@ -35,6 +37,20 @@ const routes = [
         name: "Main",
         component: MainPage
     },
+
+    { path: '/сheckers', name: 'CheckersCreate', component: CheckersCreate,  props: route => ({ locale: route.query.locale }) },
+
+    {
+        path: '/сheckers/:roomId/:playerId',
+        name: 'CheckersGameRoom',
+        component: CheckersGameRoom,
+
+        props: true
+    }
+    ,
+
+
+    
 
     { path: '/alias', name: 'AliasCreate', component: AliasCreate,  props: route => ({ locale: route.query.locale }) },
 
