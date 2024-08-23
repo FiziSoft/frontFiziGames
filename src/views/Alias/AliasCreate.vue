@@ -29,7 +29,7 @@
           <label for="targetScore">{{ t('games.alias.create_room.target_score') }}</label>
           <input v-model="targetScore" type="number" id="targetScore" class="input-gradient" min="1">
         </div>
-        <div class="formElement">
+        <div class="formElement" style="margin-top: 10px;">
           <label for="scoringModeElement" id="scoringModeElement">
             {{ t('games.alias.create_room.strict_mode') }}
             <TooltipModal 
@@ -40,7 +40,7 @@
           <input v-model="scoringModeCheckbox" type="checkbox" id="scoringModeCheckbox" class="checkbox-custom">
           <label for="scoringModeCheckbox" class="checkbox-label"></label>
         </div>
-        <div class="formElement">
+        <div class="formElement" style="margin-top: 20px;">
           <label for="lastWordMode">{{ t('games.alias.create_room.last_word_common') }}</label>
           <input v-model="lastWordMode" type="checkbox" id="lastWordMode" class="checkbox-custom">
           <label for="lastWordMode" class="checkbox-label"></label>

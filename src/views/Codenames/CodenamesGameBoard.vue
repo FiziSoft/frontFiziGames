@@ -57,7 +57,7 @@
     <!-- Модальное окно для отображения победителя -->
     <div v-if="showModal" class="modal-unique">
       <div class="modal-content-unique">
-        <p v-if="bombSelected">{{ $t('games.codenames.winner_message', { team: winner }) }}</p>
+        <p v-if="bombSelected">{{ $t('games.codenames.winner_message_bomb', { team: winner }) }}</p>
         <p v-else>{{ $t('games.codenames.winner_message', { team: winner }) }}</p>
         <div>
           <button class="btn-grad" @click="restartGame">{{ $t('games.codenames.start_game') }}</button>
@@ -153,7 +153,7 @@ const userTeam = ref(localStorage.getItem('userTeam') || '');
 
 const checkForWinner = (revealingPlayerTeam, word) => {
   if (revealedWords.value[word] === 'bomb') {
-    winner.value = revealingPlayerTeam === 'red' ? 'blue' : 'red';
+    winner.value = 'Вoooooom!';
     bombSelected.value = true;
     showModal.value = true;
   } else if (redRevealedCount.value === redTotal.value) {
@@ -269,7 +269,7 @@ const refreshWords = () => {
   bombSelected.value = false;
   setTimeout(() => {
         location.reload(); // Обновить страницу через 1 секунды
-      }, 1000);
+      }, 100);
 };
 
 const restartGame = () => {
@@ -277,7 +277,7 @@ const restartGame = () => {
   startGame();
   setTimeout(() => {
         location.reload(); // Обновить страницу через 1 секунды
-      }, 1000);
+      }, 100);
 };
 
 const changeWordsCount = () => {
