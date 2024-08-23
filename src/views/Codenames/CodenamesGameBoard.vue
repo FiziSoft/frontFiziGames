@@ -111,6 +111,11 @@ if (route.params.locale) {
   locale.value = route.params.locale;
 }
 
+// Получаем язык из localStorage или устанавливаем по умолчанию
+const savedLocale = localStorage.getItem('language') || 'en'; // 'en' как язык по умолчанию
+locale.value = savedLocale;
+
+
 const words = ref([]);
 const revealedWords = ref({});
 const board = ref({});
@@ -262,6 +267,9 @@ const refreshWords = () => {
   revealedWords.value = {};
   winner.value = null;
   bombSelected.value = false;
+  setTimeout(() => {
+        location.reload(); // Обновить страницу через 1 секунды
+      }, 1000);
 };
 
 const restartGame = () => {
@@ -273,17 +281,17 @@ const restartGame = () => {
 };
 
 const changeWordsCount = () => {
-  try {
-    router.push({ name: 'codenames-create' }).then(() => {
-      setTimeout(() => {
-        location.reload(); // Полная перезагрузка страницы после небольшого ожидания
-      }, 500); // Увеличьте задержку до 500 мс
-    });
-  } catch (error) {
-    console.error("Error during changeWordsCount:", error);
-  }
-};
 
+  const currentLocale = locale.value;  // Получаем текущую локаль
+  // Переход на страницу создания игры с параметром локали
+  router.push({ name: 'codenames-create', query: { locale: currentLocale } })
+    .then(() => {
+      // После загрузки новой страницы обновляем слова и возвращаемся к игровому процессу
+      setTimeout(() => {
+        location.reload();  // Обновляем страницу, если нужно перезагрузить состояние полностью
+      }, 400);  // Настраиваемая задержка, если требуется
+    });
+};
 
 
 const filteredWords = computed(() => {

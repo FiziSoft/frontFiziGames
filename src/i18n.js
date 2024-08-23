@@ -8,27 +8,6 @@ const i18n = createI18n({
   messages: {}, // Начинаем с пустым объектом
 });
 
-
-
-export async function loadAllLocales(locales) {
-  const promises = locales.map(async locale => {
-    const messages = await fetchAndStoreLocale(locale);
-    i18n.global.setLocaleMessage(locale, messages);
-  });
-
-  await Promise.all(promises);
-}
-
-// Пример использования: загрузка всех нужных локализаций при старте
-const localesToLoad = ['ua', 'ru', 'en', 'es', 'pl']; // Замените на те языки, которые вам нужны
-loadAllLocales(localesToLoad).then(() => {
-  const currentLocale = localStorage.getItem('language') || 'ua';
-  i18n.global.locale = currentLocale;
-});
-
-
-
-
 // Функция для открытия базы данных IndexedDB
 async function openLocaleDB() {
   return openDB('LocaleDB', 1, {
@@ -90,16 +69,39 @@ export async function loadLocaleMessages(locale) {
   return messages;
 }
 
-
-
-
-
 export async function setLocale(locale) {
-  const messages = await loadLocaleMessages(locale);
-  i18n.global.setLocaleMessage(locale, messages);
-  i18n.global.locale = locale;
-  localStorage.setItem('language', locale);
+  try {
+    const messages = await loadLocaleMessages(locale);
+    if (messages) {
+      i18n.global.setLocaleMessage(locale, messages);
+      i18n.global.locale = locale;
+      localStorage.setItem('language', locale);
+      console.log(`Locale set to ${locale}`);
+    } else {
+      console.error(`Failed to load locale: ${locale}`);
+    }
+  } catch (error) {
+    console.error(`Error setting locale: ${error}`);
+  }
 }
 
+export async function loadAllLocales(locales) {
+  const promises = locales.map(async locale => {
+    const messages = await fetchAndStoreLocale(locale);
+    i18n.global.setLocaleMessage(locale, messages);
+  });
+
+  await Promise.all(promises);
+}
+
+// Пример использования: загрузка всех нужных локализаций при старте
+const localesToLoad = ['ua', 'ru', 'en', 'es', 'pl']; // Замените на те языки, которые вам нужны
+loadAllLocales(localesToLoad).then(() => {
+  const currentLocale = localStorage.getItem('language') || 'ua';
+  setLocale(currentLocale).then(() => {
+    // Теперь приложение может рендериться
+    console.log(`App is ready with locale: ${currentLocale}`);
+  });
+});
 
 export default i18n;
