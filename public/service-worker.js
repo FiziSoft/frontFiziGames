@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fizigames-cache-v2'; // Обновите версию кеша
+const CACHE_NAME = 'fizigames-cache-v3'; // Обновите версию кеша
 
 // Файлы, которые необходимо закешировать
 const FILES_TO_CACHE = [
@@ -14,7 +14,6 @@ const FILES_TO_CACHE = [
   '/src/assets/whatsapp.png',
   '/src/assets/viber.png',
   '/src/assets/telegram.png',
-
   // добавьте другие важные файлы
 ];
 
@@ -44,12 +43,44 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request).catch(() => {
-        // Если запрашиваемый ресурс не найден в кеше и недоступен из сети, возвращаем закешированную офлайн-страницу
-        return caches.match('/index.html');
-      });
-    })
-  );
+  const url = new URL(event.request.url);
+
+  if (url.pathname.startsWith('/files/locales/')) {
+    // Обработка запросов на локализационные файлы
+    event.respondWith(
+      caches.open(CACHE_NAME).then(async cache => {
+        const response = await cache.match(event.request);
+
+        if (response) {
+          // Если файл есть в кэше, возвращаем его
+          return response;
+        }
+
+        // Иначе делаем запрос на сервер
+        try {
+          const fetchResponse = await fetch(event.request);
+          
+          // Кешируем полученный файл локализации
+          if (fetchResponse && fetchResponse.status === 200) {
+            cache.put(event.request, fetchResponse.clone());
+          }
+
+          return fetchResponse;
+        } catch (error) {
+          console.error('Ошибка при загрузке файла локализации:', error);
+          return caches.match('/index.html');
+        }
+      })
+    );
+  } else {
+    // Для всех остальных запросов обычная обработка
+    event.respondWith(
+      caches.match(event.request).then(response => {
+        return response || fetch(event.request).catch(() => {
+          // Если запрашиваемый ресурс не найден в кеше и недоступен из сети, возвращаем закешированную офлайн-страницу
+          return caches.match('/index.html');
+        });
+      })
+    );
+  }
 });
