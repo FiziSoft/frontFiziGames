@@ -1,26 +1,24 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import {router} from "./router"
-import './assets/style.sass'
-import './assets/neonCheckbox.scss'
-import './assets/loader.css'
-import store from './components/store'
-import i18n from './i18n'
+import { createApp } from 'vue';
+import App from './App.vue';
+import { router } from "./router";
+import './assets/style.sass';
+import './assets/neonCheckbox.scss';
+import './assets/loader.css';
+import store from './components/store';
+import i18n, { setLocale } from './i18n';
 
-const app = createApp(App)
+async function initApp() {
+  const app = createApp(App);
 
-app.use(router)
-app.use(store)
+  // Применение языка при инициализации
+  const savedLanguage = localStorage.getItem('language') || 'ua'; // По умолчанию 'ua', если нет сохраненного языка
+  await setLocale(savedLanguage); // Установка сохраненного языка
 
-app.use(i18n);
+  app.use(router);
+  app.use(store);
+  app.use(i18n);
 
+  app.mount('#app');
+}
 
-app.mount('#app')
-
-
-
-
-
-
-
-
+initApp(); // Инициализация приложения

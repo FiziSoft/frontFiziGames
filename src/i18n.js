@@ -36,6 +36,12 @@ async function fetchAndStoreLocale(locale) {
   const storedData = await getLocaleData(locale);
   const lastModified = storedData ? storedData.lastModified : null;
 
+  // Если есть сохраненные данные, используйте их сразу
+  if (storedData) {
+    console.log(`Using stored locale for ${locale}`);
+    i18n.global.setLocaleMessage(locale, storedData.data);
+  }
+
   try {
     const response = await fetch(`https://fizistat-33157f0b8398.herokuapp.com/files/locales/${locale}.json`, {
       headers: lastModified ? { 'If-Modified-Since': lastModified } : {}
@@ -45,6 +51,7 @@ async function fetchAndStoreLocale(locale) {
       const data = await response.json();
       const newLastModified = response.headers.get('Last-Modified');
       await saveLocaleData(locale, data, newLastModified);
+      i18n.global.setLocaleMessage(locale, data); // Обновляем локализацию только если есть обновленные данные
       return data;
     } else if (response.status === 304 && storedData) {
       return storedData.data;
@@ -71,14 +78,20 @@ export async function loadLocaleMessages(locale) {
 
 export async function setLocale(locale) {
   try {
-    const messages = await loadLocaleMessages(locale);
+    const storedData = await getLocaleData(locale);
+    if (storedData) {
+      i18n.global.setLocaleMessage(locale, storedData.data);
+      i18n.global.locale = locale;
+      console.log(`Locale immediately set from IndexedDB to ${locale}`);
+    }
+
+    // Затем обновляем локализацию, если данные на сервере изменились
+    const messages = await fetchAndStoreLocale(locale);
     if (messages) {
       i18n.global.setLocaleMessage(locale, messages);
       i18n.global.locale = locale;
       localStorage.setItem('language', locale);
-      console.log(`Locale set to ${locale}`);
-    } else {
-      console.error(`Failed to load locale: ${locale}`);
+      console.log(`Locale updated to ${locale}`);
     }
   } catch (error) {
     console.error(`Error setting locale: ${error}`);

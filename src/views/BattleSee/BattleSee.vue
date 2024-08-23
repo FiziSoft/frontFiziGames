@@ -31,13 +31,13 @@
 
       <!-- Телеграм кнопка и уведомление, если оппонент не онлайн -->
       <div v-if="opponentName !== 'Opponent' && !isGameStart" class="shareLocal">
-        <TelegramShareButton description="reconect" :url="url_connect_opponent" text="заходи заново"></TelegramShareButton> 
+        <TelegramShareButton description="Reconnect" :url="url_connect_opponent" text="заходи заново"></TelegramShareButton> 
         <h2> &#8592; {{ $t('games.battleSee.add_opponent') }} </h2>  
       </div>
 
       <!-- Телеграм кнопка и уведомление -->
       <div v-if="opponentName === 'Opponent' && !isGameStart" class="shareLocal" >
-        <TelegramShareButton description="First in" :url="url_connect" :text="$t('games.battleSee.play_battleship') "></TelegramShareButton> 
+        <TelegramShareButton description="" :url="url_connect" :text="$t('games.battleSee.play_battleship') "></TelegramShareButton> 
         <h2> &#8592; {{ $t('games.battleSee.add_opponent') }} </h2>  
       </div>
 
