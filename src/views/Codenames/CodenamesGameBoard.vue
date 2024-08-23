@@ -273,12 +273,18 @@ const restartGame = () => {
 };
 
 const changeWordsCount = () => {
-  router.push({ name: 'codenames-create' }).then(() => {
-    setTimeout(() => {
-      location.reload(); // Полная перезагрузка страницы после небольшого ожидания
-    }, 500); // Можно настроить задержку, если требуется
-  });
+  try {
+    router.push({ name: 'codenames-create' }).then(() => {
+      setTimeout(() => {
+        location.reload(); // Полная перезагрузка страницы после небольшого ожидания
+      }, 500); // Увеличьте задержку до 500 мс
+    });
+  } catch (error) {
+    console.error("Error during changeWordsCount:", error);
+  }
 };
+
+
 
 const filteredWords = computed(() => {
   if (showOnlyRevealed.value) {
