@@ -5,8 +5,10 @@
         <div v-if="showContinueGameDialog" class="modal-overlay">
           <div class="modal">
             <p>{{ t('games.alias.create_room.continue_game') }}</p>
-            <button @click="continueExistingGame" class="btn-grad">{{ t('games.alias.create_room.yes') }}</button>
-            <button @click="startNewGame" class="btn-grad">{{ t('games.alias.create_room.no') }}</button>
+            <div style="max-width: 200px;">
+              <button @click="continueExistingGame" class="btn-grad">{{ t('games.alias.create_room.yes') }}</button>
+              <button @click="startNewGame" class="btn-grad">{{ t('games.alias.create_room.no') }}</button>
+            </div>
           </div>
         </div>
         <div class="formElement">
@@ -269,12 +271,13 @@ const loadWords = async () => {
 .modal {
   display: flex;
   flex-direction: column;
-  top: 20%;
-  max-width: 300px;
-  height: 55%;
+  top: 25%;
+  left: 25%;
+  max-width: 50%;
+  height: 50%;
   background: white;
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   text-align: center;
 }
