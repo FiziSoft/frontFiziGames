@@ -66,7 +66,6 @@
             <div class="score">
               <p>{{ player.score }}</p>
             </div>
-            <div class="status-dot" :class="{ active: player.has_voted }"></div>
 
           </div>
         </div>
@@ -81,6 +80,8 @@
             <div class="score">
               <p>{{ player.score }}</p>
             </div>
+            <div class="status-dot" :class="{ active: player.has_voted }"></div>
+
           </div>
         </div>
       </div>
@@ -137,40 +138,43 @@ const connectWebSocket = () => {
   });
 
   ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    console.log('Received data:', data);
+  const data = JSON.parse(event.data);
+  console.log('Received data:', data);
 
-    if (data.players) {
-      updatePlayers(data.players);
+  if (data.type === 'update_players') {
+    updatePlayers(data.players);
 
-      if (players.value.length >= 3 && !question.value) {
-        askQuestion();
-      }
+    if (players.value.length >= 3 && !question.value) {
+      askQuestion();
     }
+  }
 
-    if (data.waiting) {
-      resetGame();
-    }
+  if (data.type === 'waiting') {
+    resetGame();
+  }
 
-    if (data.question && players.value.length >= 3) {
-      handleNewQuestion(data);
-    }
+  if (data.type === 'new_question') {
+    updatePlayers(data.players);
 
-    if (data.winner) {
-      handleWinner(data);
-    }
+    handleNewQuestion(data);
+  }
 
-    if (data.tie) {
-        console.log('Handling tie:', data);
-        handleTie(data); // Обработка переголосования
-    }
+  if (data.type === 'winner_announced') {
+    handleWinner(data);
+  }
 
-    // Обработчик для завершения переголосования
-    if (data.end_tie) {
-        console.log('End of tie:', data);
-        handleEndTie();
-    }
-  };
+  if (data.type === 'tie') {
+
+      console.log('Handling tie:', data);
+      handleTie(data); // Обработка переголосования
+  }
+
+  if (data.type === 'end_tie') {
+      console.log('End of tie:', data);
+      handleEndTie();
+  }
+};
+
 
   ws.onclose = () => {
     console.log("WebSocket connection closed");
@@ -181,15 +185,25 @@ const connectWebSocket = () => {
 };
 
 const updatePlayers = (newPlayers) => {
+  // Обновляем существующих игроков или удаляем тех, кто отсутствует в новом списке
+  players.value = players.value.filter(existingPlayer => {
+    const updatedPlayer = newPlayers.find(p => p.player_id === existingPlayer.player_id);
+    if (updatedPlayer) {
+      Object.assign(existingPlayer, updatedPlayer);
+      return true; // Оставляем игрока в списке
+    }
+    return false; // Удаляем игрока из списка, если его нет в новом списке
+  });
+
+  // Добавляем новых игроков, если они не были найдены в текущем списке
   newPlayers.forEach((updatedPlayer) => {
     const existingPlayer = players.value.find(p => p.player_id === updatedPlayer.player_id);
-    if (existingPlayer) {
-      Object.assign(existingPlayer, updatedPlayer);
-    } else {
+    if (!existingPlayer) {
       players.value.push(updatedPlayer);
     }
   });
 };
+
 
 const resetGame = () => {
   question.value = null;

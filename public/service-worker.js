@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fizigames-cache-v3'; // Обновите версию кеша
+const CACHE_NAME = 'fizigames-cache-v4'; // Обновите версию кеша
 
 // Файлы, которые необходимо закешировать
 const FILES_TO_CACHE = [

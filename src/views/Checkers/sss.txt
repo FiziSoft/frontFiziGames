@@ -1,0 +1,31 @@
+const updateGameState = (data) => {
+  console.log("Updating game state with data:", data);
+
+  // Проверяем, что данные содержат объект Players и Connections
+  if (data && data.Connections && data.Players) {
+    if (Object.keys(data.Connections).length === 2) {
+      isPlayerOnline.value = true;
+    }
+
+    board.value = data.Board || Array(8).fill(null).map(() => Array(8).fill(''));
+    currentTurn.value = data.CurrentTurn || playerId;
+
+    // Проверяем существование игрока в объекте Players
+    const players = Object.keys(data.Players);
+    const opponentKey = players.find(key => key !== playerId);
+
+    if (opponentKey && data.Players[opponentKey]) {
+      opponentName.value = data.Players[opponentKey].Name || "Opponent";
+    } else {
+      opponentName.value = "Opponent";
+    }
+
+    if (data.winner) {
+      winner.value = data.winner;
+      winnerModal.value = true;
+      winnerMessage.value = data.winner === playerId ? t('games.checkers.game_won') : t('games.checkers.game_lost');
+    }
+  } else {
+    console.error("Received invalid game state data:", data);
+  }
+};

@@ -36,3 +36,6 @@ export const url_stat = 'https://fizistat-33157f0b8398.herokuapp.com/create-room
 
 
 export const url_serv_checkers = 'http://localhost:8111';
+
+export const url_serv_checkers_wss = 'ws://localhost:8111';
+

@@ -44,7 +44,11 @@ import { setLocale } from '@/i18n';
 
 const games = ref([
 
-
+// {
+//     key: 'checkers',
+//     url: '/checkers',
+//     icon: 'fa-solid fa-a',  
+//   },
   {
     key: 'alias',
     url: '/alias',

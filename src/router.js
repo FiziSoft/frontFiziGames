@@ -30,6 +30,7 @@ import AliasCreate from './views/Alias/AliasCreate.vue'
 import AliasRoom from './views/Alias/AliasRoom.vue'
 import CheckersCreate from './views/Checkers/CheckersCreate.vue'
 import CheckersGameRoom from './views/Checkers/CheckersGameRoom.vue'
+import CheckersConnect from './views/Checkers/CheckersConnect.vue'
 
 const routes = [
     {
@@ -38,17 +39,24 @@ const routes = [
         component: MainPage
     },
 
-    { path: '/сheckers', name: 'CheckersCreate', component: CheckersCreate,  props: route => ({ locale: route.query.locale }) },
+    { path: '/checkers', name: 'CheckersCreate', component: CheckersCreate,  props: route => ({ locale: route.query.locale }) },
 
     {
-        path: '/сheckers/:roomId/:playerId',
+        path: '/checkers/:roomId/:playerId',
         name: 'CheckersGameRoom',
         component: CheckersGameRoom,
 
         props: true
     }
     ,
+    {
+        path: '/checkers/connect/:roomId',
+        name: 'CheckersConnect',
+        component: CheckersConnect,
 
+        props: true
+    }
+    ,
 
     
 
