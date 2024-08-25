@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fizigames-cache-v4'; // Обновите версию кеша
+const CACHE_NAME = 'fizigames-cache-v5'; // Обновите версию кеша
 
 // Файлы, которые необходимо закешировать
 const FILES_TO_CACHE = [
@@ -28,7 +28,8 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME]; // Оставляем только текущий кеш
 
-  event.waitUntil(
+  
+  event.waitUntil(                         
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {

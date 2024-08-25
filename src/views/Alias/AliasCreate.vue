@@ -75,6 +75,10 @@ const lastWordMode = ref(false); // По умолчанию выключено
 
 const route = useRoute();
 
+
+const playerName = ref(localStorage.getItem('playerName') || '');
+
+
 import { useI18n } from 'vue-i18n';
 const { t, locale } = useI18n();
 
@@ -181,6 +185,8 @@ const validateInput = () => {
 const createRoom = async () => {
   if (!validateInput()) return;
   
+
+
   try {
     resetGame();
 
@@ -192,6 +198,22 @@ const createRoom = async () => {
     localStorage.setItem('alias_scoringMode', scoringModeCheckbox.value ? 'strict' : 'simple');
     localStorage.setItem('alias_lastWordMode', lastWordMode.value);
     localStorage.setItem('alias_RoomId', roomId);
+    try{
+      axios.post(url_stat, {
+        game_id: 34,
+        room_number: roomId,
+        creator_name: playerName.value,
+        language: locale.value,
+        player_count: 0,
+        is_local: true,
+            
+      });
+    }
+    catch(error){
+      console.log("not stat")
+
+    }
+    
 
     router.push({ name: 'AliasRoom', params: { roomId: roomId }, query: { locale: locale.value } });
   } catch (error) {
@@ -200,7 +222,17 @@ const createRoom = async () => {
   }
 };
 
+
+import axios from 'axios';
+
+import { url_stat } from "@/link";
+
+
 const resetGame = () => {
+
+
+    
+
   Object.keys(localStorage).forEach(key => {
     if (key.startsWith('alias_')) {
       localStorage.removeItem(key);
@@ -235,9 +267,11 @@ const loadWords = async () => {
 }
 
 .modal {
-  top: 2%;
-  width: 400px;
-  height: 90%;
+  display: flex;
+  flex-direction: column;
+  top: 20%;
+  max-width: 300px;
+  height: 55%;
   background: white;
   padding: 20px;
   border-radius: 10px;
