@@ -1,7 +1,9 @@
 .loader {
     width: 35px;
     height: 80px;
-    position: relative;
+    position: fixed;
+    top: 49%;
+    left: 49%;
   }
   .loader:after {
     content: "";
