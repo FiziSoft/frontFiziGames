@@ -272,8 +272,8 @@ const loadWords = async () => {
   display: flex;
   flex-direction: column;
   top: 25%;
-  left: 25%;
-  max-width: 50%;
+  left: 18%;
+  max-width: 64%;
   height: 50%;
   background: white;
   padding: 20px;

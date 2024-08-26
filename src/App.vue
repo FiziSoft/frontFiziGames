@@ -1,7 +1,8 @@
 <template>
   <div class="app-container">
     <ThemeProvider>
-      <router-view />
+      <div v-if="loading" class="loader"></div>
+      <router-view v-else />
       <FooterComponent @themeChange="handleThemeChange" />
     </ThemeProvider>
   </div>
@@ -13,6 +14,7 @@ import FooterComponent from '@/components/FooterComponent.vue';
 import ThemeProvider from '@/components/ThemeProvider.vue';
 import { setLocale } from '@/i18n';  // Импортируем функцию для смены языка
 
+const loading = ref(true); // Добавляем состояние для загрузки
 const currentTheme = ref('theme2');
 
 const handleThemeChange = (theme) => {
@@ -34,6 +36,8 @@ onMounted(async () => {
     console.log('Locale set to:', savedLanguage);
   } catch (error) {
     console.error('Failed to set locale:', error);
+  } finally {
+    loading.value = false; // Убираем лоадер после загрузки
   }
 });
 </script>

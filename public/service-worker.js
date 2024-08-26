@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fizigames-cache-v1'; // Обновите версию кеша
+const CACHE_NAME = 'fizigames-cache-v2'; // Обновите версию кеша
 
 // Файлы, которые необходимо закешировать
 const FILES_TO_CACHE = [
@@ -27,9 +27,8 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME]; // Оставляем только текущий кеш
-
   
-  event.waitUntil(                         
+  event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
@@ -69,6 +68,7 @@ self.addEventListener('fetch', event => {
           return fetchResponse;
         } catch (error) {
           console.error('Ошибка при загрузке файла локализации:', error);
+          // Здесь можно вернуть локальную версию или показать сообщение
           return caches.match('/index.html');
         }
       })
@@ -77,7 +77,13 @@ self.addEventListener('fetch', event => {
     // Для всех остальных запросов обычная обработка
     event.respondWith(
       caches.match(event.request).then(response => {
-        return response || fetch(event.request).catch(() => {
+        return response || fetch(event.request).then(fetchResponse => {
+          // Кеширование новых запросов
+          return caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, fetchResponse.clone());
+            return fetchResponse;
+          });
+        }).catch(() => {
           // Если запрашиваемый ресурс не найден в кеше и недоступен из сети, возвращаем закешированную офлайн-страницу
           return caches.match('/index.html');
         });
