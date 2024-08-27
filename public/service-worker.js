@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fizigames-cache-v4'; // Обновите версию кеша
+const CACHE_NAME = 'fizigames-cache-v5'; // Обновите версию кеша
 const MAX_CACHE_SIZE = 10 * 1024 * 1024; // Установите лимит кеша, например, 50MB
 
 // Файлы, которые необходимо закешировать
@@ -12,9 +12,7 @@ const FILES_TO_CACHE = [
   '/src/assets/sound/60sec.mp3',
   '/src/assets/sound/plus_click.mp3',
   '/src/assets/sound/miss_sound.mp3',
-  '/src/assets/whatsapp.png',
-  '/src/assets/viber.png',
-  '/src/assets/telegram.png',
+  
   // добавьте другие важные файлы
 ];
 

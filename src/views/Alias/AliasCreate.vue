@@ -3,13 +3,13 @@
     <div class="containerFormCreate">
      
       <form class="formCreate">
-        <AnimatedBackground
+        <!-- <AnimatedBackground
     :number-of-images="15"
     :min-size="20"
     :max-size="100"
     :min-speed="100"
     :max-speed="150"
-  />
+  /> -->
         <div v-if="showContinueGameDialog" class="modal-overlay">
           <div class="modal">
             <p>{{ t('games.alias.create_room.continue_game') }}</p>
