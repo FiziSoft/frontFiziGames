@@ -1,4 +1,5 @@
-const CACHE_NAME = 'fizigames-cache-v2'; // Обновите версию кеша
+const CACHE_NAME = 'fizigames-cache-v4'; // Обновите версию кеша
+const MAX_CACHE_SIZE = 10 * 1024 * 1024; // Установите лимит кеша, например, 50MB
 
 // Файлы, которые необходимо закешировать
 const FILES_TO_CACHE = [
@@ -62,13 +63,13 @@ self.addEventListener('fetch', event => {
           
           // Кешируем полученный файл локализации
           if (fetchResponse && fetchResponse.status === 200) {
-            cache.put(event.request, fetchResponse.clone());
+            await cache.put(event.request, fetchResponse.clone());
+            await limitCacheSize(CACHE_NAME, MAX_CACHE_SIZE); // Ограничиваем размер кеша
           }
 
           return fetchResponse;
         } catch (error) {
           console.error('Ошибка при загрузке файла локализации:', error);
-          // Здесь можно вернуть локальную версию или показать сообщение
           return caches.match('/index.html');
         }
       })
@@ -78,16 +79,32 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       caches.match(event.request).then(response => {
         return response || fetch(event.request).then(fetchResponse => {
-          // Кеширование новых запросов
           return caches.open(CACHE_NAME).then(cache => {
             cache.put(event.request, fetchResponse.clone());
+            limitCacheSize(CACHE_NAME, MAX_CACHE_SIZE); // Ограничиваем размер кеша
             return fetchResponse;
           });
         }).catch(() => {
-          // Если запрашиваемый ресурс не найден в кеше и недоступен из сети, возвращаем закешированную офлайн-страницу
           return caches.match('/index.html');
         });
       })
     );
   }
 });
+
+// Функция для ограничения размера кеша
+async function limitCacheSize(name, size) {
+  const cache = await caches.open(name);
+  const keys = await cache.keys();
+  let cacheSize = 0;
+
+  for (let request of keys) {
+    const response = await cache.match(request);
+    const blob = await response.blob();
+    cacheSize += blob.size;
+
+    if (cacheSize > size) {
+      await cache.delete(request);
+    }
+  }
+}

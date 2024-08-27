@@ -5,12 +5,19 @@ import './assets/style.sass';
 import './assets/neonCheckbox.scss';
 import './assets/loader.css';
 import store from './components/store';
-import i18n, { setLocale } from './i18n';
+import i18n, { setLocale, loadInitialLocales  } from './i18n';
+import { loadInitialGameData } from './gameData'; // Импорт функции для загрузки начальных игровых данных
+
 
 // Добавляем обработку лоадера
 const loaderElement = document.getElementById('loader');
 
 async function initApp() {
+
+
+  await loadInitialLocales();
+  await loadInitialGameData();
+
   const app = createApp(App);
 
   // Применение языка при инициализации

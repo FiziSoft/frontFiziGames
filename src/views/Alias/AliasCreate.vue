@@ -1,7 +1,15 @@
 <template>
   <GameLayout :nameGame="t('games.alias.name')">
     <div class="containerFormCreate">
+     
       <form class="formCreate">
+        <AnimatedBackground
+    :number-of-images="15"
+    :min-size="20"
+    :max-size="100"
+    :min-speed="100"
+    :max-speed="150"
+  />
         <div v-if="showContinueGameDialog" class="modal-overlay">
           <div class="modal">
             <p>{{ t('games.alias.create_room.continue_game') }}</p>
@@ -65,6 +73,8 @@ import { v4 as uuidv4 } from 'uuid';
 import GameLayout from "../GameLayout.vue";
 import { loadWordsForGame, loadNamesForGame } from '@/wordsStorage'; // Импорт функций загрузки слов и названий
 import TooltipModal from '@/components/TooltipModal.vue';
+import AnimatedBackground from "@/components/AnimatedBackground.vue";
+
 
 const router = useRouter();
 const team1Name = ref('');

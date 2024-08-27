@@ -98,23 +98,17 @@ export async function setLocale(locale) {
   }
 }
 
-export async function loadAllLocales(locales) {
-  const promises = locales.map(async locale => {
-    const messages = await fetchAndStoreLocale(locale);
-    i18n.global.setLocaleMessage(locale, messages);
-  });
-
-  await Promise.all(promises);
+// Загружаем только украинский и русский языки при старте
+export async function loadInitialLocales() {
+  const localesToLoad = ['ua', 'ru']; // Автоматически загружаем только украинский и русский языки
+  await Promise.all(localesToLoad.map(locale => fetchAndStoreLocale(locale)));
 }
 
-// Пример использования: загрузка всех нужных локализаций при старте
-const localesToLoad = ['ua', 'ru', 'en', 'es', 'pl']; // Замените на те языки, которые вам нужны
-loadAllLocales(localesToLoad).then(() => {
-  const currentLocale = localStorage.getItem('language') || 'ua';
-  setLocale(currentLocale).then(() => {
-    // Теперь приложение может рендериться
-    console.log(`App is ready with locale: ${currentLocale}`);
-  });
-});
+// Загружаем остальные языки только по мере необходимости
+export async function loadLocaleOnDemand(locale) {
+  if (!['ua', 'ru'].includes(locale)) {
+    await fetchAndStoreLocale(locale);
+  }
+}
 
 export default i18n;
