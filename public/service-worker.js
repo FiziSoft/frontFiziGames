@@ -1,5 +1,5 @@
-const CACHE_NAME = 'fizigames-cache-v5'; // Обновите версию кеша
-const MAX_CACHE_SIZE = 10 * 1024 * 1024; // Установите лимит кеша, например, 50MB
+const CACHE_NAME = 'fizigames-cache-v6'; // Обновите версию кеша
+const MAX_CACHE_SIZE = 10 * 1024 * 1024; // Установите лимит кеша, например, 10MB
 
 // Файлы, которые необходимо закешировать
 const FILES_TO_CACHE = [
@@ -12,7 +12,9 @@ const FILES_TO_CACHE = [
   '/src/assets/sound/60sec.mp3',
   '/src/assets/sound/plus_click.mp3',
   '/src/assets/sound/miss_sound.mp3',
-  
+  '/src/assets/whatsapp.png',
+  '/src/assets/viber.png',
+  '/src/assets/telegram.png',
   // добавьте другие важные файлы
 ];
 
@@ -25,13 +27,11 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME]; // Оставляем только текущий кеш
-  
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (!cacheWhitelist.includes(cacheName)) {
+          if (cacheName !== CACHE_NAME) {
             // Удаляем старые кеши
             return caches.delete(cacheName);
           }
