@@ -99,7 +99,7 @@ const url_share = `https://fizi.cc/codenames/player-view/${gameId.value}`;
 import bombSound from '@/assets/sound/sunk_sound.mp3';
 import revealSound from '@/assets/sound/plus_click.mp3'; // Импорт звука для кнопки "-"
 import missSound from '@/assets/sound/hit_sound.mp3';
-import neutralSound from '@/assets/sound/neutral.mp3';
+import neutralSound from '@/assets/sound/plus_click1.mp3';
 
 
 

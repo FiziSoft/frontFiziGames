@@ -6,7 +6,7 @@ import './assets/neonCheckbox.scss';
 import './assets/loader.css';
 import store from './components/store';
 import i18n, { setLocale, loadInitialLocales  } from './i18n';
-import { loadInitialGameData } from './wordsStorage'; // Импорт функции для загрузки начальных игровых данных
+import { loadInitialAliasGameData, loadInitialSpyGameData } from './wordsStorage'; // Импорт функции для загрузки начальных игровых данных
 
 
 // Добавляем обработку лоадера
@@ -16,7 +16,8 @@ async function initApp() {
 
 
   await loadInitialLocales();
-  await loadInitialGameData();
+  await loadInitialAliasGameData();
+  // await loadInitialSpyGameData()
 
   const app = createApp(App);
 

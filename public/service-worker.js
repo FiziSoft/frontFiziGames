@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fizigames-cache-v6'; // Обновите версию кеша
+const CACHE_NAME = 'fizigames-cache-v1'; // Обновите версию кеша
 const MAX_CACHE_SIZE = 10 * 1024 * 1024; // Установите лимит кеша, например, 10MB
 
 // Файлы, которые необходимо закешировать

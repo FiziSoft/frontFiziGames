@@ -2,41 +2,56 @@ import { openDB } from 'idb';
 
 // Функция для открытия базы данных IndexedDB
 async function openGameDB() {
-  return openDB('GameDataDB', 1, {
-    upgrade(db) {
-      // Создаем хранилища для общих данных всех игр
-      if (!db.objectStoreNames.contains('words')) {
-        db.createObjectStore('words', { keyPath: 'key' });
+  try {
+    return openDB('GameDataDB', 2, {
+      upgrade(db) {
+        // Создаем хранилища для данных всех игр
+        if (!db.objectStoreNames.contains('words')) {
+          db.createObjectStore('words', { keyPath: 'key' });
+        }
+        if (!db.objectStoreNames.contains('names')) {
+          db.createObjectStore('names', { keyPath: 'key' });
+        }
+        // Добавляем хранилища для игры "Шпіон"
+        if (!db.objectStoreNames.contains('spy_data')) {
+          db.createObjectStore('spy_data', { keyPath: 'key' });
+        }
       }
-      if (!db.objectStoreNames.contains('names')) {
-        db.createObjectStore('names', { keyPath: 'key' });
-      }
-    }
-  });
+    });
+  } catch (error) {
+    console.error("Ошибка при открытии базы данных:", error);
+    return null; // Возвращаем null, если база данных не смогла открыться
+  }
 }
 
 // Функция для сохранения данных в IndexedDB
 async function saveData(storeName, key, data, lastModified) {
-  const db = await openGameDB();
-  await db.put(storeName, { key, data, lastModified });
+  try {
+    const db = await openGameDB();
+    if (db) {
+      await db.put(storeName, { key, data, lastModified });
+    }
+  } catch (error) {
+    console.error(`Ошибка при сохранении данных в ${storeName}:`, error);
+  }
 }
 
 // Функция для получения данных из IndexedDB
 async function getData(storeName, key) {
-  const db = await openGameDB();
-  return await db.get(storeName, key);
+  try {
+    const db = await openGameDB();
+    if (db) {
+      return await db.get(storeName, key);
+    }
+  } catch (error) {
+    console.error(`Ошибка при получении данных из ${storeName}:`, error);
+  }
+  return null; // Возвращаем null, если не удалось получить данные
 }
 
-// Загрузка данных с сервера и сохранение их в IndexedDB
 async function fetchAndStoreData(storeName, key, url) {
   const storedData = await getData(storeName, key);
   const lastModified = storedData ? storedData.lastModified : null;
-
-  // Если есть сохраненные данные, используйте их сразу
-  if (storedData) {
-    console.log(`Using stored data for ${key} in ${storeName}`);
-    return storedData.data;
-  }
 
   try {
     const response = await fetch(url, {
@@ -53,44 +68,60 @@ async function fetchAndStoreData(storeName, key, url) {
     } else if (storedData) {
       return storedData.data;
     } else {
-      throw new Error('Failed to load data');
+      console.error('Failed to load data from server and no cached data available.');
+      return null; // Возвращаем null, если нет данных ни с сервера, ни в кэше
     }
   } catch (error) {
-    console.error(`Failed to fetch data for ${key} from server, loading from IndexedDB:`, error);
-    if (storedData) {
-      return storedData.data;
-    } else {
-      throw new Error('No data available in IndexedDB');
-    }
+    return storedData ? storedData.data : null; // Возвращаем данные из IndexedDB или null
   }
 }
 
-// Функция для загрузки слов для игры
+// Функция для загрузки данных для игры "Шпіон"
+export async function loadSpyData(locale) {
+  
+    const url = `https://fizistat-33157f0b8398.herokuapp.com/files/spy/spy_${locale}.json`;
+    return await fetchAndStoreData('spy_data', locale, url);
+  
+}
+
+// Функции для игры Alias (аналогично вышеописанным)
 export async function loadWordsForGame(locale) {
   const url = `https://fizistat-33157f0b8398.herokuapp.com/files/alias/alias_word_${locale}.json`;
   return await fetchAndStoreData('words', locale, url);
 }
 
-// Функция для загрузки имен команд для игры
 export async function loadNamesForGame(locale) {
   const url = `https://fizistat-33157f0b8398.herokuapp.com/files/alias/alias_team_name.json`;
   const allNames = await fetchAndStoreData('names', 'team_names', url);
-  return allNames[locale];  // Возвращаем имена команд на нужном языке
+  return allNames ? allNames[locale] : null;  // Возвращаем имена команд на нужном языке или null
 }
 
-// Функция для загрузки начальных данных игр (украинский и русский)
-export async function loadInitialGameData() {
-  const localesToLoad = ['ua', 'ru']; // Автоматически загружаем только украинский и русский языки
+export async function loadInitialAliasGameData() {
+  const localesToLoad = ['ua', 'ru'];
   await Promise.all(localesToLoad.map(async (locale) => {
     await loadWordsForGame(locale);
     await loadNamesForGame(locale);
   }));
 }
 
-// Функция для загрузки игровых данных по запросу (для других языков)
-export async function loadGameDataOnDemand(locale) {
+export async function loadInitialSpyGameData() {
+  const localesToLoad = ['ua', 'ru'];
+  await Promise.all(localesToLoad.map(async (locale) => {
+    await loadSpyData(locale);
+  }));
+
+}
+
+export async function loadAliasGameDataOnDemand(locale) {
   if (!['ua', 'ru'].includes(locale)) {
     await loadWordsForGame(locale);
     await loadNamesForGame(locale);
   }
+}
+
+export async function loadSpyGameDataOnDemand(locale) {
+  if (!['ua', 'ru'].includes(locale)) {
+    await loadSpyData(locale);
+  }
+
 }

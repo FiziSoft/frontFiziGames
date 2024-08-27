@@ -1,5 +1,12 @@
 <template>
   <GameLayout nameGame="Шпіон">
+    <AnimatedBackground
+      :number-of-images="3"
+      :min-size="20"
+      :max-size="80"
+      :min-speed="10"
+      :max-speed="150"
+    />
     <div class="containerFormCreate">
       <form class="formCreate">
         <div class="formElement">
@@ -34,15 +41,17 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { v4 as uuidv4 } from 'uuid';
 import GameLayout from "../GameLayout.vue";
-import themeData from './theme.json';
 import axios from "axios";
 
 import { useI18n } from 'vue-i18n';
 import { url_stat } from "@/link";
+import { loadSpyData } from '@/wordsStorage'; // Импорт функции загрузки данных для игры "Шпіон"
+import AnimatedBackground from "@/components/AnimatedBackground.vue";
+
 const { locale } = useI18n();
 const savedLocale = localStorage.getItem('language') || 'ua';
 locale.value = savedLocale;
@@ -53,9 +62,8 @@ const numPlayers = ref(null);
 const time_game = ref(null);
 const selectedTheme = ref("");
 const selectedWord = ref(null);
-const themes = ref(themeData);
-const themeOptions = ref(Object.keys(themeData));
-const gameMode = ref('offline');
+const themes = ref({});
+const themeOptions = ref([]);
 const errorMessage = ref('');
 const isButtonActive = computed(() => {
   return (
@@ -66,13 +74,25 @@ const isButtonActive = computed(() => {
   );
 });
 
+// Функция для загрузки данных тем из IndexedDB или сервера
+const loadThemes = async () => {
+  try {
+    const storedData = await loadSpyData(locale.value);
+    themes.value = storedData;
+    themeOptions.value = Object.keys(storedData);
+  } catch (error) {
+    console.error("Ошибка при загрузке данных тем:", error);
+    errorMessage.value = "Не удалось загрузить темы. Пожалуйста, попробуйте снова.";
+  }
+};
+
 const validateInputs = () => {
   if (numPlayers.value > 18) {
-    errorMessage.value = "Кількість гравців не може бути більше 18.";
+    errorMessage.value = "Кількість гравців не може бути більше 18";
     return false;
   }
   if (time_game.value > 20) {
-    errorMessage.value = "Час на гру не може бути більше 20 хвилин.";
+    errorMessage.value = "Час на гру не може бути більше 20 хвилин";
     return false;
   }
   return true;
@@ -116,6 +136,10 @@ const sendCreateRoomRequest = async () => {
     errorMessage.value = "Произошла ошибка при создании комнаты. Пожалуйста, попробуйте снова.";
   }
 };
+
+onMounted(() => {
+  loadThemes(); // Загружаем данные тем при монтировании компонента
+});
 </script>
 
 <style scoped>

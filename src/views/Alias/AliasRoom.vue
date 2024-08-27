@@ -72,17 +72,16 @@ import { ref, onMounted, reactive, computed, watch, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import GameLayout from '../GameLayout.vue';
 import { loadWordsForGame } from '@/wordsStorage'; // Подключаем функцию работы с IndexedDB
-
 import audioFile from '@/assets/sound/60sec.mp3';
 import plusSound from '@/assets/sound/plus_click.mp3'; // Импорт звука для кнопки "+"
 import minusSound from '@/assets/sound/miss_sound.mp3'; // Импорт звука для кнопки "-"
 
 const gameAudio = ref(null); // Привязка аудио элемента
-
 const plusButtonSound = ref(null); // Привязка для звука кнопки "+"
 const minusButtonSound = ref(null); // Привязка для звука кнопки "-"
-
 const continueButton = ref(null);
+
+
 const scrollToContinueButton = async () => {
   await nextTick();  // Убедиться, что DOM обновлён
   const button = continueButton.value;

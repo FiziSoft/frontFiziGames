@@ -1,15 +1,16 @@
 <template>
   <GameLayout :nameGame="t('games.alias.name')">
+    <AnimatedBackground
+    :number-of-images="3"
+    :min-size="20"
+    :max-size="80"
+    :min-speed="10"
+    :max-speed="150"
+  />
     <div class="containerFormCreate">
      
       <form class="formCreate">
-        <!-- <AnimatedBackground
-    :number-of-images="15"
-    :min-size="20"
-    :max-size="100"
-    :min-speed="100"
-    :max-speed="150"
-  /> -->
+       
         <div v-if="showContinueGameDialog" class="modal-overlay">
           <div class="modal">
             <p>{{ t('games.alias.create_room.continue_game') }}</p>
@@ -348,5 +349,15 @@ const loadWords = async () => {
 
 .checkbox-custom:checked + .checkbox-label::after {
   opacity: 1;
+}
+
+.formElement {
+  z-index: 9;
+}
+
+
+.input-gradient {
+  z-index: 9;
+
 }
 </style>
